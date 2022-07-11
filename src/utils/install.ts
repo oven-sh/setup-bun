@@ -29,6 +29,7 @@ export default async(release: Release) => {
     info(`Cached Bun to ${newCache}.`);
     addPath(newCache);
 
-    const bunPath = join(getHomeDir(), ".bun", "bin");
+    info(extracted);
+    const bunPath = join(extracted);
     addPath(bunPath);
 }

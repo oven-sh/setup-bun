@@ -1,7 +1,6 @@
 import { cacheDir, downloadTool, extractZip, find } from '@actions/tool-cache';
 import { addPath, info } from '@actions/core';
 import getAsset from './getAsset.js';
-import getHomeDir from './getHomeDir.js';
 import { join } from 'path';
 export default async (release) => {
     const cache = find('bun', release.tag_name);
@@ -17,6 +16,7 @@ export default async (release) => {
     const newCache = await cacheDir(extracted, 'bun', release.tag_name);
     info(`Cached Bun to ${newCache}.`);
     addPath(newCache);
-    const bunPath = join(getHomeDir(), ".bun", "bin");
+    info(extracted);
+    const bunPath = join(extracted);
     addPath(bunPath);
 };
