@@ -16,9 +16,9 @@ export default async(release: Release) => {
 
     const asset = getAsset(release.assets);
 
-    info(`Downloading Bun from ${asset.browser_download_url}.`);
+    info(`Downloading Bun from ${asset.asset.browser_download_url}.`);
 
-    const zipPath = await downloadTool(asset.browser_download_url);
+    const zipPath = await downloadTool(asset.asset.browser_download_url);
     const extracted = await extractZip(zipPath, join(getHomeDir(), ".bun", "bin"));
 
     const newCache = await cacheDir(
@@ -31,7 +31,7 @@ export default async(release: Release) => {
     addPath(newCache);
 
     console.log(extracted);
-    const bunPath = join(getHomeDir(), ".bun", "bin");
+    const bunPath = join(getHomeDir(), ".bun", "bin", asset.name.replaceAll('.zip', ''));
     console.log(readdirSync(bunPath));
     addPath(bunPath);
 }
