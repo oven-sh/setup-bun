@@ -12,7 +12,7 @@ const main = async () => {
         if (!version)
             return exit('Invalid bun version.');
         const release = await getGithubRelease(version, token);
-        if (release?.message === 'Not Found')
+        if ((release === null || release === void 0 ? void 0 : release.message) === 'Not Found')
             return exit('Invalid bun version.');
         info(`Going to install release ${release.tag_name}`);
         await install(release);
