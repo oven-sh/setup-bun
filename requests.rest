@@ -1,0 +1,11 @@
+GET https://api.github.com/repos/oven-sh/bun/releases/tags/bun-v0.1.2
+Content-Type: application/json
+User-Agent: setup-bun-github-action
+Authorization: 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
+
+###
+
+GET https://api.github.com/repos/oven-sh/bun/releases/latest
+Content-Type: application/json
+User-Agent: setup-bun-github-action
+Authorization: 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

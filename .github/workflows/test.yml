@@ -1,0 +1,28 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        bun-version:
+          ["latest", "0.1.2"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Bun
+        uses: ./
+        with:
+          bun-version: ${{ matrix.bun-version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Try bun
+        run: bun --help

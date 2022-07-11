@@ -1,0 +1,22 @@
+name: "Setup Bun"
+description: "Setup Bun by installing, downloading, and adding it to the path"
+author: "xHyroM"
+
+branding:
+  icon: "play-circle"
+  color: "white"
+
+inputs:
+  bun-version:
+    description: "The Bun version to install."
+    default: "latest"
+  github-token:
+    description: "The github token secret can be passed in using {{ secrets.GITHUB_TOKEN }}"
+
+outputs:
+  bun-version:
+    description: "The Bun version that was installed."
+
+runs:
+  using: "node12"
+  main: "dist/index.js"
