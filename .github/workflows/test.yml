@@ -25,4 +25,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Try bun
-        run: bun
+        run: bun add types
