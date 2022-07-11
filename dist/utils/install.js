@@ -19,7 +19,7 @@ export default async (release) => {
     info(`Cached Bun to ${newCache}.`);
     addPath(newCache);
     console.log(extracted);
-    const bunPath = join(getHomeDir(), ".bun", "bin", asset.name.replaceAll('.zip', ''));
+    const bunPath = join(getHomeDir(), ".bun", "bin", asset.name.replace('.zip', ''));
     console.log(readdirSync(bunPath));
     addPath(bunPath);
 };
