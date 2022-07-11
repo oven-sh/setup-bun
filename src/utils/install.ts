@@ -4,6 +4,7 @@ import { addPath, info } from '@actions/core';
 import getAsset from './getAsset.js';
 import getHomeDir from './getHomeDir.js';
 import { join } from 'path';
+import { readdirSync } from 'fs';
 
 export default async(release: Release) => {
     const cache = find('bun', release.tag_name);
@@ -31,5 +32,6 @@ export default async(release: Release) => {
 
     console.log(extracted);
     const bunPath = join(getHomeDir(), ".bun", "bin");
+    console.log(readdirSync(bunPath));
     addPath(bunPath);
 }
