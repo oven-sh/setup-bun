@@ -16,7 +16,7 @@ const main = async () => {
             return exit('Invalid bun version.');
         info(`Going to install release ${release.tag_name}`);
         await install(release);
-        setOutput('deno-version', release.tag_name);
+        setOutput('bun-version', release.tag_name);
     }
     catch (e) {
         exit(e);
