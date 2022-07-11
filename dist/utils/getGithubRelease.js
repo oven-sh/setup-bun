@@ -1,4 +1,4 @@
-import { fetch } from 'undici';
+import fetch from 'node-fetch';
 export default async (version, token) => {
     let url;
     if (version === 'latest')
