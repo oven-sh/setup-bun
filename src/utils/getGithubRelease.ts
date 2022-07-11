@@ -1,4 +1,4 @@
-import { fetch } from 'undici';
+import fetch from 'node-fetch';
 
 export interface Asset {
     name: string;

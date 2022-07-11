@@ -13,6 +13,6 @@
   "dependencies": {
     "@actions/core": "^1.9.0",
     "@actions/tool-cache": "^2.0.1",
-    "undici": "^5.6.1"
+    "node-fetch": "^3.2.6"
   }
 }
