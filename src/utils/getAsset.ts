@@ -17,7 +17,7 @@ export default (assets: Asset[]) => {
         throw new Error(`Unsupported platform ${process.platform}.`);
 
     return {
-        name: `bun-${process.platform}-${arch}.zip`,
+        name: `bun-${process.platform}-${arch}`,
         asset: assets.find(asset => asset.name === `bun-${process.platform}-${arch}.zip`),
     }
 }

@@ -13,7 +13,7 @@ export default (assets) => {
     if (!['linux', 'darwin'].some(platform => process.platform === platform))
         throw new Error(`Unsupported platform ${process.platform}.`);
     return {
-        name: `bun-${process.platform}-${arch}.zip`,
+        name: `bun-${process.platform}-${arch}`,
         asset: assets.find(asset => asset.name === `bun-${process.platform}-${arch}.zip`),
     };
 };

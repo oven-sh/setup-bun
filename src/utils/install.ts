@@ -9,7 +9,7 @@ import { readdirSync } from 'fs';
 
 export default async(release: Release) => {
     const asset = getAsset(release.assets);
-    const path = join(getHomeDir(), '.bun', 'bin');
+    const path = join(getHomeDir(), '.bun', 'bin', asset.name);
     const cache = find('bun', release.version) || await restoreCache([path], `bun-${process.platform}-${asset.name}`);
     if (cache) {
         info(`Using cached Bun installation from ${cache}.`);
@@ -34,6 +34,6 @@ export default async(release: Release) => {
     info(`Cached Bun to ${newCache}.`);
     addPath(newCache);
 
-    const bunPath = join(getHomeDir(), '.bun', 'bin', asset.name.replace('.zip', ''));
+    const bunPath = join(getHomeDir(), '.bun', 'bin', asset.name);
     addPath(bunPath);
 }
