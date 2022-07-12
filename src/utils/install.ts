@@ -12,7 +12,7 @@ export default async(release: Release) => {
     const cache = find('bun', release.version) || await restoreCache([path], `bun-${process.platform}-${asset.name}`);
     if (cache) {
         info(`Using cached Bun installation from ${cache}.`);
-        addPath(cache);
+        addPath(path);
         return;
     }
 
