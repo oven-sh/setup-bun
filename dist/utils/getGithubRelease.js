@@ -17,6 +17,6 @@ export default async (version, token) => {
     })).json();
     return {
         ...release,
-        version: miscTestBuilds ? new Date(release.name).getTime() : release.tag_name.replace('bun-v', '')
+        version: miscTestBuilds ? `timestamp-v${new Date(release.name).getTime().toString()}` : release.tag_name.replace('bun-v', '')
     };
 };
