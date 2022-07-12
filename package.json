@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "name": "setup-bun",
   "main": "dist/index.js",
   "type": "module",

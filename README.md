@@ -8,7 +8,7 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 ### Latest stable
 
 ```yaml
-- uses: xhyrom/setup-bun@v0.1.0
+- uses: xhyrom/setup-bun@v0.1.2
   with:
     bun-version: latest
 ```
@@ -16,7 +16,7 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 ### Specific version
 
 ```yaml
-- uses: xhyrom/setup-bun@v0.1.0
+- uses: xhyrom/setup-bun@v0.1.2
   with:
-    bun-version: "0.1.2"
+    bun-version: "0.1.3"
 ```
