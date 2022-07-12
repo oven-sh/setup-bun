@@ -1,3 +1,4 @@
+import { getInput } from '@actions/core';
 import fetch from 'node-fetch';
 
 export interface Asset {
@@ -6,6 +7,7 @@ export interface Asset {
 }
 
 export interface Release {
+    name: string;
     html_url: string;
     tag_name: string;
     message?: string;
@@ -14,9 +16,11 @@ export interface Release {
 }
 
 export default async(version: string, token: string): Promise<Release> => {
+    const miscTestBuilds = getInput('misc-test-builds');
+    const repository = miscTestBuilds ? miscTestBuilds : 'oven-sh/bun'
     let url;
-    if (version === 'latest') url = 'https://api.github.com/repos/oven-sh/bun/releases/latest';
-    else url = `https://api.github.com/repos/oven-sh/bun/releases/tags/bun-v${version}`;
+    if (version === 'latest') url = `https://api.github.com/repos/${repository}/releases/latest`;
+    else url = `https://api.github.com/repos/${repository}/releases/tags/bun-v${version}`;
 
     const release: any = await (await fetch(url, {
         headers: {
@@ -28,6 +32,6 @@ export default async(version: string, token: string): Promise<Release> => {
 
     return {
         ...release,
-        version: release.tag_name.replace('bun-v', '')
+        version: miscTestBuilds ? new Date(release.name).getTime() : release.tag_name.replace('bun-v', '')
     };
 }

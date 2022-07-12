@@ -12,6 +12,9 @@ inputs:
     default: "latest"
   github-token:
     description: "The github token secret can be passed in using {{ secrets.GITHUB_TOKEN }}"
+  misc-test-builds:
+    description: "Install builds from https://github.com/oven-sh/misc-test-builds (not recommended!)"
+    required: false
 
 outputs:
   bun-version:

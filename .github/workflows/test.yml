@@ -14,16 +14,19 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         bun-version:
-          ["latest", "0.1.3"]
+          ["latest", "0.1.3", "latest"]
+        misc-test-builds:
+          [false, false, true]
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup Bun
+      - name: Setup Bun - Test Builds * ${{ matrix.misc-test-builds }}
         uses: ./
         with:
           bun-version: ${{ matrix.bun-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          misc-test-builds: ${{ matrix.misc-test-builds }}
 
       - name: Try bun
         run: bun --version
