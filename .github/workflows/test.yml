@@ -29,8 +29,6 @@ jobs:
           misc-test-builds: ${{ matrix.misc-test-builds }}
 
       - name: Try bun
-        run: bun --version
-
-      - name: Change job status
-        env:
-          status: success
+        run: |
+          bun --version
+          exit 0
