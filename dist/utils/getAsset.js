@@ -1,5 +1,5 @@
 import { exit } from '../index.js';
-export default (assets, miscTestBuilds) => {
+export default (assets) => {
     let arch;
     switch (process.arch) {
         case 'arm64':
@@ -15,10 +15,8 @@ export default (assets, miscTestBuilds) => {
         throw new Error(`Unsupported platform ${process.platform}.`);
     const assetName = `bun-${process.platform}-${arch}.zip`;
     const asset = assets.find(asset => asset.name === assetName);
-    if (!asset) {
-        exit(`Invalid asset ${assetName}`, miscTestBuilds);
-        process.exit();
-    }
+    if (!asset)
+        exit(`Invalid asset ${assetName}`);
     return {
         name: `bun-${process.platform}-${arch}`,
         asset: assets.find(asset => asset.name === `bun-${process.platform}-${arch}.zip`),

@@ -24,7 +24,7 @@ const main = async() => {
 
         info(`Going to install release ${release.version}`);
 
-        await install(release, miscTestBuilds);
+        await install(release);
 
         setOutput('bun-version', release.tag_name);
     } catch(e) {

@@ -6,8 +6,8 @@ import getAsset from './getAsset.js';
 import { join } from 'path';
 import { homedir } from 'os';
 
-export default async(release: Release, miscTestBuilds: boolean) => {
-    const asset = getAsset(release.assets, miscTestBuilds);
+export default async(release: Release) => {
+    const asset = getAsset(release.assets);
     const path = join(homedir(), '.bun', 'bin', asset.name);
     const cache = find('bun', release.version) || await restoreCache([path], `bun-${process.platform}-${asset.name}-${release.version}`);
     if (cache) {

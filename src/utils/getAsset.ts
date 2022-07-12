@@ -1,7 +1,7 @@
 import { exit } from '../index.js';
 import { Asset } from './getGithubRelease.js';
 
-export default (assets: Asset[], miscTestBuilds: boolean) => {
+export default (assets: Asset[]) => {
     let arch;
     switch (process.arch) {
         case 'arm64':
@@ -20,10 +20,7 @@ export default (assets: Asset[], miscTestBuilds: boolean) => {
     const assetName = `bun-${process.platform}-${arch}.zip`;
     const asset = assets.find(asset => asset.name === assetName);
 
-    if (!asset) {
-        exit(`Invalid asset ${assetName}`, miscTestBuilds);
-        process.exit();
-    }
+    if (!asset) exit(`Invalid asset ${assetName}`);
 
     return {
         name: `bun-${process.platform}-${arch}`,
