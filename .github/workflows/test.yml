@@ -36,4 +36,4 @@ jobs:
         run: curl https://bun.sh/install | bash
 
       - name: Try bun
-        run: bun
+        run: /Users/runner/.bun/bin/bun
