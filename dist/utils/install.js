@@ -4,16 +4,12 @@ import { addPath, info } from '@actions/core';
 import getAsset from './getAsset.js';
 import getHomeDir from './getHomeDir.js';
 import { join } from 'path';
-import { readdirSync } from 'fs';
 export default async (release) => {
     const asset = getAsset(release.assets);
     const path = join(getHomeDir(), '.bun', 'bin', asset.name);
-    console.log(path);
     const cache = find('bun', release.version) || await restoreCache([path], `bun-${process.platform}-${asset.name}-${release.version}`);
     if (cache) {
         info(`Using cached Bun installation from ${cache}.`);
-        console.log(path);
-        console.log(readdirSync(path));
         addPath(path);
         return;
     }

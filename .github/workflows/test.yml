@@ -27,3 +27,13 @@ jobs:
 
       - name: Try bun
         run: bun add types
+
+    test-mac:
+      runs-on: macos-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: Setup Bun
+          run: curl https://bun.sh/install | bash
+
+        - name: Try bun
+          run: bun
