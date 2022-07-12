@@ -6,6 +6,7 @@ import getHomeDir from './getHomeDir.js';
 import { join } from 'path';
 import { homedir } from 'os';
 export default async (release) => {
+    console.log(getHomeDir(), homedir());
     const asset = getAsset(release.assets);
     const path = join(getHomeDir(), '.bun', 'bin', asset.name);
     const cache = find('bun', release.version) || await restoreCache([path], `bun-${process.platform}-${asset.name}-${release.version}`);
@@ -14,7 +15,6 @@ export default async (release) => {
         addPath(path);
         return;
     }
-    console.log(getHomeDir(), homedir());
     info(`Downloading Bun from ${asset.asset.browser_download_url}.`);
     const zipPath = await downloadTool(asset.asset.browser_download_url);
     const extracted = await extractZip(zipPath, join(getHomeDir(), '.bun', 'bin'));
