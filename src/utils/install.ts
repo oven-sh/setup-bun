@@ -22,7 +22,7 @@ export default async(release: Release) => {
     info(`Downloading Bun from ${asset.asset.browser_download_url}.`);
 
     const zipPath = await downloadTool(asset.asset.browser_download_url);
-    const extracted = await extractZip(zipPath, path);
+    const extracted = await extractZip(zipPath, join(getHomeDir(), '.bun', 'bin'));
 
     const newCache = await cacheDir(
         extracted,
