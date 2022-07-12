@@ -5,6 +5,7 @@ import { addPath, info } from '@actions/core';
 import getAsset from './getAsset.js';
 import getHomeDir from './getHomeDir.js';
 import { join } from 'path';
+import { homedir } from 'os';
 
 export default async(release: Release) => {
     const asset = getAsset(release.assets);
@@ -15,6 +16,7 @@ export default async(release: Release) => {
         addPath(path);
         return;
     }
+    console.log(getHomeDir(), homedir());
 
     info(`Downloading Bun from ${asset.asset.browser_download_url}.`);
 
