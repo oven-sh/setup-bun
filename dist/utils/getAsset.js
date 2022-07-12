@@ -10,19 +10,10 @@ export default (assets) => {
         default:
             throw new Error(`Unsupported architechture ${process.arch}.`);
     }
-    let platform;
-    switch (process.platform) {
-        case 'linux':
-            platform = 'linux';
-            break;
-        case 'darwin':
-            platform = 'darwin';
-            break;
-        default:
-            throw new Error(`Unsupported platform ${process.platform}.`);
-    }
+    if (!['linux', 'darwin'].some(platform => process.platform === platform))
+        throw new Error(`Unsupported platform ${process.platform}.`);
     return {
-        name: `bun-${platform}-${arch}.zip`,
-        asset: assets.find(asset => asset.name === `bun-${platform}-${arch}.zip`),
+        name: `bun-${process.platform}-${arch}.zip`,
+        asset: assets.find(asset => asset.name === `bun-${process.platform}-${arch}.zip`),
     };
 };

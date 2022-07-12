@@ -12,5 +12,8 @@ export default async (version, token) => {
             'Authorization': token
         }
     })).json();
-    return release;
+    return {
+        ...release,
+        version: release.tag_name.replace('bun-v', '')
+    };
 };
