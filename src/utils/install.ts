@@ -6,7 +6,8 @@ import getHomeDir from './getHomeDir.js';
 import { join } from 'path';
 
 export default async(release: Release) => {
-    const cache = find('bun', release.tag_name);
+    const cache = find('bun', release.version);
+    console.log(cache);
     if (cache) {
         info(`Using cached Bun installation from ${cache}.`);
         addPath(cache);
@@ -23,7 +24,7 @@ export default async(release: Release) => {
     const newCache = await cacheDir(
         extracted,
         'bun',
-        release.tag_name
+        release.version
     );
 
     info(`Cached Bun to ${newCache}.`);

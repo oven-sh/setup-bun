@@ -9,7 +9,8 @@ export interface Release {
     html_url: string;
     tag_name: string;
     message?: string;
-    assets: Asset[]
+    assets: Asset[];
+    version: string;
 }
 
 export default async(version: string, token: string): Promise<Release> => {
@@ -25,5 +26,8 @@ export default async(version: string, token: string): Promise<Release> => {
         }
     })).json();
 
-    return release;
+    return {
+        ...release,
+        version: release.tag_name.replace('bun-v', '')
+    };
 }
