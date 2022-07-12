@@ -10,7 +10,7 @@ export default async (release) => {
     const cache = find('bun', release.version) || await restoreCache([path], `bun-${process.platform}-${asset.name}`);
     if (cache) {
         info(`Using cached Bun installation from ${cache}.`);
-        addPath(cache);
+        addPath(path);
         return;
     }
     info(`Downloading Bun from ${asset.asset.browser_download_url}.`);
