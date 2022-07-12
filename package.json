@@ -11,6 +11,7 @@
     "build": "tsc -p ."
   },
   "dependencies": {
+    "@actions/cache": "^3.0.0",
     "@actions/core": "^1.9.0",
     "@actions/tool-cache": "^2.0.1",
     "node-fetch": "^3.2.6"
