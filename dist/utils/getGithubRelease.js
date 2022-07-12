@@ -2,7 +2,7 @@ import { getInput } from '@actions/core';
 import fetch from 'node-fetch';
 export default async (version, token) => {
     const miscTestBuilds = (getInput('misc-test-builds') === 'true');
-    const repository = miscTestBuilds ? miscTestBuilds : 'oven-sh/bun';
+    const repository = miscTestBuilds ? 'oven-sh/misc-test-builds' : 'oven-sh/bun';
     let url;
     if (version === 'latest')
         url = `https://api.github.com/repos/${repository}/releases/latest`;
