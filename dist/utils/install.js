@@ -4,8 +4,8 @@ import { addPath, info } from '@actions/core';
 import getAsset from './getAsset.js';
 import { join } from 'path';
 import { homedir } from 'os';
-export default async (release) => {
-    const asset = getAsset(release.assets);
+export default async (release, miscTestBuilds) => {
+    const asset = getAsset(release.assets, miscTestBuilds);
     const path = join(homedir(), '.bun', 'bin', asset.name);
     const cache = find('bun', release.version) || await restoreCache([path], `bun-${process.platform}-${asset.name}-${release.version}`);
     if (cache) {

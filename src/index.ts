@@ -2,7 +2,7 @@ import { getInput, info, setFailed, setOutput, warning } from '@actions/core';
 import getGithubRelease from './utils/getGithubRelease.js';
 import install from './utils/install.js';
 
-const exit = (error: string, miscTestBuilds?: boolean) => {
+export const exit = (error: string, miscTestBuilds?: boolean) => {
     if (miscTestBuilds) {
         warning(error);
     } else {
@@ -24,7 +24,7 @@ const main = async() => {
 
         info(`Going to install release ${release.version}`);
 
-        await install(release);
+        await install(release, miscTestBuilds);
 
         setOutput('bun-version', release.tag_name);
     } catch(e) {

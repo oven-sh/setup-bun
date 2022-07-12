@@ -1,7 +1,7 @@
 import { getInput, info, setFailed, setOutput, warning } from '@actions/core';
 import getGithubRelease from './utils/getGithubRelease.js';
 import install from './utils/install.js';
-const exit = (error, miscTestBuilds) => {
+export const exit = (error, miscTestBuilds) => {
     if (miscTestBuilds) {
         warning(error);
     }
@@ -21,7 +21,7 @@ const main = async () => {
         if ((release === null || release === void 0 ? void 0 : release.message) === 'Not Found')
             return exit('Invalid bun version.', miscTestBuilds);
         info(`Going to install release ${release.version}`);
-        await install(release);
+        await install(release, miscTestBuilds);
         setOutput('bun-version', release.tag_name);
     }
     catch (e) {
