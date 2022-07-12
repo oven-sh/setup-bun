@@ -1,10 +1,8 @@
-import { getInput } from '@actions/core';
 import fetch from 'node-fetch';
-export default async (version, token) => {
-    const miscTestBuilds = (getInput('misc-test-builds') === 'true');
+export default async (version, token, miscTestBuilds) => {
     const repository = miscTestBuilds ? 'oven-sh/misc-test-builds' : 'oven-sh/bun';
     let url;
-    if (version === 'latest')
+    if (version === 'latest' || miscTestBuilds)
         url = `https://api.github.com/repos/${repository}/releases/latest`;
     else
         url = `https://api.github.com/repos/${repository}/releases/tags/bun-v${version}`;

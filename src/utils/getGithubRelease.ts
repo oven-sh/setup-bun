@@ -15,11 +15,10 @@ export interface Release {
     version: string;
 }
 
-export default async(version: string, token: string): Promise<Release> => {
-    const miscTestBuilds = (getInput('misc-test-builds') === 'true');
+export default async(version: string, token: string, miscTestBuilds: boolean): Promise<Release> => {
     const repository = miscTestBuilds ? 'oven-sh/misc-test-builds' : 'oven-sh/bun'
     let url;
-    if (version === 'latest') url = `https://api.github.com/repos/${repository}/releases/latest`;
+    if (version === 'latest' || miscTestBuilds) url = `https://api.github.com/repos/${repository}/releases/latest`;
     else url = `https://api.github.com/repos/${repository}/releases/tags/bun-v${version}`;
 
     const release: any = await (await fetch(url, {
