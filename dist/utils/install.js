@@ -21,8 +21,9 @@ export default async (release) => {
     const zipPath = await downloadTool(asset.asset.browser_download_url);
     const extracted = await extractZip(zipPath, join(getHomeDir(), '.bun', 'bin'));
     const newCache = await cacheDir(extracted, 'bun', release.version);
-    console.log(extracted);
-    await saveCache([extracted], `bun-${process.platform}-${asset.name}-${release.version}`);
+    await saveCache([
+        join(extracted, asset.name)
+    ], `bun-${process.platform}-${asset.name}-${release.version}`);
     info(`Cached Bun to ${newCache}.`);
     addPath(newCache);
     const bunPath = join(getHomeDir(), '.bun', 'bin', asset.name);

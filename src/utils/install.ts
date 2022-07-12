@@ -30,8 +30,9 @@ export default async(release: Release) => {
         'bun',
         release.version
     );
-    console.log(extracted);
-    await saveCache([extracted], `bun-${process.platform}-${asset.name}-${release.version}`);
+    await saveCache([
+        join(extracted, asset.name)
+    ], `bun-${process.platform}-${asset.name}-${release.version}`);
 
     info(`Cached Bun to ${newCache}.`);
     addPath(newCache);
