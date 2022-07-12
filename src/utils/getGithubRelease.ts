@@ -16,7 +16,7 @@ export interface Release {
 }
 
 export default async(version: string, token: string): Promise<Release> => {
-    const miscTestBuilds = getInput('misc-test-builds');
+    const miscTestBuilds = (getInput('misc-test-builds') === 'true');
     const repository = miscTestBuilds ? miscTestBuilds : 'oven-sh/bun'
     let url;
     if (version === 'latest') url = `https://api.github.com/repos/${repository}/releases/latest`;
