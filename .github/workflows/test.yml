@@ -31,6 +31,6 @@ jobs:
       - name: Try bun
         run: bun --version
 
-      - name: Show status
-        if: always()
-        run: echo $status
+      - name: Change job status
+        env:
+          status: success
