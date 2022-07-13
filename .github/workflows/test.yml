@@ -22,6 +22,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup Bun - Test Builds * ${{ matrix.misc-test-builds }}
+        if: matrix.os !== 'macos-latest' && matrix.misc-test-builds !== true
         uses: ./
         with:
           bun-version: ${{ matrix.bun-version }}
@@ -29,6 +30,6 @@ jobs:
           misc-test-builds: ${{ matrix.misc-test-builds }}
 
       - name: Try bun
+        if: matrix.os !== 'macos-latest' && matrix.misc-test-builds !== true
         run: |
           bun --version
-          exit 0
