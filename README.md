@@ -20,3 +20,12 @@ Set up your GitHub Actions workflow with a specific version of Bun.
   with:
     bun-version: "0.1.3"
 ```
+
+### Test builds
+
+```yaml
+- uses: xhyrom/setup-bun@v0.1.3
+  with:
+    bun-version: latest
+    misc-test-builds: true
+```
