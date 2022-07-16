@@ -30,6 +30,6 @@ jobs:
           misc-test-builds: ${{ matrix.misc-test-builds }}
 
       - name: Try bun
-        if: matrix.os != 'macos-latest' && matrix.misc-test-builds != true
+        if: (matrix.os != 'macos-latest' && matrix.misc-test-builds != true) || (matrix.os == 'ubuntu-latest' && matrix.misc-test-builds == true)
         run: |
           bun --version
