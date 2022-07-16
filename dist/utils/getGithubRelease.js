@@ -10,7 +10,7 @@ export default async (version, token, miscTestBuilds) => {
         headers: {
             'Content-Type': 'application/json',
             'User-Agent': 'setup-bun-github-action',
-            'Authorization': token
+            'Authorization': `token ${token}`
         }
     })).json();
     return {
