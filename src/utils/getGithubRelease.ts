@@ -1,4 +1,3 @@
-import { getInput } from '@actions/core';
 import fetch from 'node-fetch';
 
 export interface Asset {
@@ -19,7 +18,7 @@ export default async(version: string, token: string, miscTestBuilds: boolean): P
     const repository = miscTestBuilds ? 'oven-sh/misc-test-builds' : 'oven-sh/bun'
     let url;
     if (version === 'latest' || miscTestBuilds) url = `https://api.github.com/repos/${repository}/releases/latest`;
-    else url = `https://api.github.com/repos/${repository}/releases/tags/bun-v${version}`;
+    else url = `https://api.github.com/repos/${repository}/releases/tags/${version.includes('canary') ? version : `bun-v${version}`}`;
 
     const release: any = await (await fetch(url, {
         headers: {

@@ -21,11 +21,10 @@ Set up your GitHub Actions workflow with a specific version of Bun.
     bun-version: "0.1.3"
 ```
 
-### Test builds
+### Canary builds
 
 ```yaml
 - uses: xhyrom/setup-bun@v0.1.3
   with:
-    bun-version: latest
-    misc-test-builds: true
+    bun-version: canary
 ```

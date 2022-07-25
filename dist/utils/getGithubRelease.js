@@ -5,7 +5,7 @@ export default async (version, token, miscTestBuilds) => {
     if (version === 'latest' || miscTestBuilds)
         url = `https://api.github.com/repos/${repository}/releases/latest`;
     else
-        url = `https://api.github.com/repos/${repository}/releases/tags/bun-v${version}`;
+        url = `https://api.github.com/repos/${repository}/releases/tags/${version.includes('canary') ? version : `bun-v${version}`}`;
     const release = await (await fetch(url, {
         headers: {
             'Content-Type': 'application/json',
