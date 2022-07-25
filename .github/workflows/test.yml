@@ -14,7 +14,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         bun-version:
-          ["latest", "0.1.4", "canary"]
+          ["latest", "0.1.4"]
         misc-test-builds:
           [false]
 
@@ -23,7 +23,29 @@ jobs:
 
       - name: Setup Bun - Test Builds * ${{ matrix.misc-test-builds }}
         uses: ./
-        if: (${{ matrix.os }} == 'macos-latest' && ${{ matrix.bun-version }} != "canary") || ${{ matrix.os }} == 'ubuntu-latest'
+        with:
+          bun-version: ${{ matrix.bun-version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          misc-test-builds: ${{ matrix.misc-test-builds }}
+
+      - name: Try bun
+        run: |
+          bun --version
+  test-canary:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        bun-version:
+          ["canary"]
+        misc-test-builds:
+          [false]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Bun - Test Builds * ${{ matrix.misc-test-builds }}
+        uses: ./
         with:
           bun-version: ${{ matrix.bun-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
