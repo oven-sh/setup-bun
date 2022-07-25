@@ -23,6 +23,7 @@ jobs:
 
       - name: Setup Bun - Test Builds * ${{ matrix.misc-test-builds }}
         uses: ./
+        if: (${{ matrix.os }} == 'macos-latest' && ${{ matrix.bun-version }} != "canary") || ${{ matrix.os }} == 'ubuntu-latest'
         with:
           bun-version: ${{ matrix.bun-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
