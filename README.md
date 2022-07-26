@@ -11,6 +11,7 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 - uses: xhyrom/setup-bun@v0.1.3
   with:
     bun-version: latest
+    github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ### Specific version
@@ -19,6 +20,7 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 - uses: xhyrom/setup-bun@v0.1.3
   with:
     bun-version: "0.1.3"
+    github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ### Canary builds
@@ -27,4 +29,5 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 - uses: xhyrom/setup-bun@v0.1.3
   with:
     bun-version: canary
+    github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
