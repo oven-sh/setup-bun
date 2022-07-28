@@ -56,7 +56,7 @@ jobs:
         bun-version:
           ["latest"]
         custom-download-url:
-          ["https://github.com/oven-sh/bun/suites/7555351912/artifacts/311939881"]
+          ["https://api.github.com/repos/oven-sh/bun/actions/artifacts/311939881/zip"]
 
     steps:
       - uses: actions/checkout@v2

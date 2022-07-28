@@ -46,6 +46,6 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 ```yaml
 - uses: xhyrom/setup-bun@v0.1.6
   with:
-    custom-download-url: https://github.com/oven-sh/bun/suites/7555351912/artifacts/311939881
+    custom-download-url: https://api.github.com/repos/oven-sh/bun/actions/artifacts/311939881/zip # must be github api
     github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
