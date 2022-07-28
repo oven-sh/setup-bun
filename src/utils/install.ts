@@ -27,14 +27,19 @@ export default async(release: Release, token: string, customUrl: boolean) => {
             'Authorization': new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : ''
         }
     );
-    const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
-    console.log(readdirSync(join(homedir(), '.bun', 'bin')));
+
+    let extracted;
+    if (customUrl) {
+        extracted = await extractZip(zipPath, join(homedir(), 'onlyforunzip'));
+        extracted = await extractZip(join(homedir(), 'onlyforunzip', asset.asset.name), join(homedir(), '.bun', 'bin'));
+    } else extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
+
     const newCache = await cacheDir(
         extracted,
         'bun',
         release.version
     );
-    
+
     if (!customUrl) {
         await saveCache([
             join(extracted, asset.name)

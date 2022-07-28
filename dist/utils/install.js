@@ -4,7 +4,6 @@ import { addPath, info } from '@actions/core';
 import getAsset from './getAsset.js';
 import { join } from 'path';
 import { homedir } from 'os';
-import { readdirSync } from 'fs';
 export default async (release, token, customUrl) => {
     const asset = getAsset(release.assets);
     const path = join(homedir(), '.bun', 'bin', asset.name);
@@ -18,8 +17,13 @@ export default async (release, token, customUrl) => {
     const zipPath = await downloadTool(asset.asset.browser_download_url, null, new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : '', {
         'Authorization': new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : ''
     });
-    const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
-    console.log(readdirSync(join(homedir(), '.bun', 'bin')));
+    let extracted;
+    if (customUrl) {
+        extracted = await extractZip(zipPath, join(homedir(), 'onlyforunzip'));
+        extracted = await extractZip(join(homedir(), 'onlyforunzip', asset.asset.name), join(homedir(), '.bun', 'bin'));
+    }
+    else
+        extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
     const newCache = await cacheDir(extracted, 'bun', release.version);
     if (!customUrl) {
         await saveCache([
