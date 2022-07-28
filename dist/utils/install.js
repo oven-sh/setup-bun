@@ -5,7 +5,7 @@ import getAsset from './getAsset.js';
 import { join } from 'path';
 import { homedir } from 'os';
 import { readdirSync } from 'fs';
-export default async (release, token) => {
+export default async (release, token, customUrl) => {
     const asset = getAsset(release.assets);
     const path = join(homedir(), '.bun', 'bin', asset.name);
     const cache = find('bun', release.version) || await restoreCache([path], `bun-${process.platform}-${asset.name}-${release.version}`);
@@ -21,9 +21,11 @@ export default async (release, token) => {
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
     console.log(readdirSync(join(homedir(), '.bun', 'bin')));
     const newCache = await cacheDir(extracted, 'bun', release.version);
-    await saveCache([
-        join(extracted, asset.name)
-    ], `bun-${process.platform}-${asset.name}-${release.version}`);
+    if (!customUrl) {
+        await saveCache([
+            join(extracted, asset.name)
+        ], `bun-${process.platform}-${asset.name}-${release.version}`);
+    }
     info(`Cached Bun to ${newCache}.`);
     addPath(newCache);
     const bunPath = join(homedir(), '.bun', 'bin', asset.name);

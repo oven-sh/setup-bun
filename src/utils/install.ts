@@ -7,7 +7,7 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { readdirSync } from 'fs';
 
-export default async(release: Release, token: string) => {
+export default async(release: Release, token: string, customUrl: boolean) => {
     const asset = getAsset(release.assets);
     const path = join(homedir(), '.bun', 'bin', asset.name);
     const cache = find('bun', release.version) || await restoreCache([path], `bun-${process.platform}-${asset.name}-${release.version}`);
@@ -34,9 +34,12 @@ export default async(release: Release, token: string) => {
         'bun',
         release.version
     );
-    await saveCache([
-        join(extracted, asset.name)
-    ], `bun-${process.platform}-${asset.name}-${release.version}`);
+    
+    if (!customUrl) {
+        await saveCache([
+            join(extracted, asset.name)
+        ], `bun-${process.platform}-${asset.name}-${release.version}`);
+    }
 
     info(`Cached Bun to ${newCache}.`);
     addPath(newCache);
