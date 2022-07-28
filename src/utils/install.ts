@@ -23,7 +23,7 @@ export default async(release: Release, token: string) => {
         headers: {
             'Authorization': `token ${token}`
         }
-    })).json())
+    })).text())
 
     const zipPath = await downloadTool(asset.asset.browser_download_url, new URL(asset.asset.browser_download_url).host === 'github.com' ? `token ${token}` : '');
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
