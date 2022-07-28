@@ -47,5 +47,5 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 - uses: xhyrom/setup-bun@v0.1.6
   with:
     custom-download-url: https://api.github.com/repos/oven-sh/bun/actions/artifacts/311939881/zip # must be github api
-    github-token: ${{ secrets.GITHUB_TOKEN }}
+    github-token: ${{ secrets.ACCESS_TOKEN }} # must have the actions scope to download artifacts (https://github.com/actions/upload-artifact/issues/51#issuecomment-622955923)
 ```
