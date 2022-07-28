@@ -15,11 +15,11 @@ export default async (release, token) => {
         return;
     }
     info(`Downloading Bun from ${asset.asset.browser_download_url}.`);
-    await (await fetch(asset.asset.browser_download_url, {
+    console.log(await (await fetch(asset.asset.browser_download_url, {
         headers: {
             'Authorization': `token ${token}`
         }
-    })).text();
+    })).text());
     console.log(new URL(asset.asset.browser_download_url).host.includes('github.com'));
     const zipPath = await downloadTool(asset.asset.browser_download_url, new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : '', 
     // @ts-expect-error
