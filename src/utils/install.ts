@@ -5,7 +5,6 @@ import { addPath, info } from '@actions/core';
 import getAsset from './getAsset.js';
 import { join } from 'path';
 import { homedir } from 'os';
-import fetch from 'node-fetch';
 
 export default async(release: Release, token: string) => {
     const asset = getAsset(release.assets);
@@ -22,10 +21,9 @@ export default async(release: Release, token: string) => {
     const zipPath = await downloadTool(
         asset.asset.browser_download_url,
         null,
-        `token ${token}`,
+        new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : '',
         {
-            'Authorization': `token ${token}`,
-            accept: 'application/octet-stream'
+            'Authorization': new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : ''
         }
     );
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));

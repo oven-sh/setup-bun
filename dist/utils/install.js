@@ -14,9 +14,8 @@ export default async (release, token) => {
         return;
     }
     info(`Downloading Bun from ${asset.asset.browser_download_url}.`);
-    const zipPath = await downloadTool(asset.asset.browser_download_url, null, `token ${token}`, {
-        'Authorization': `token ${token}`,
-        accept: 'application/octet-stream'
+    const zipPath = await downloadTool(asset.asset.browser_download_url, null, new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : '', {
+        'Authorization': new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : ''
     });
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
     const newCache = await cacheDir(extracted, 'bun', release.version);
