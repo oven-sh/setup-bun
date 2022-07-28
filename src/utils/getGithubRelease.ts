@@ -31,7 +31,7 @@ export default async(version: string, token: string, fullRepository: string, cus
             tag_name: 'custom',
             assets: [
                 {
-                    name: `bun-${process.platform}-${getArchitecture()}`,
+                    name: `bun-${process.platform}-${getArchitecture()}.zip`,
                     browser_download_url: customDownloadUrl
                 }
             ]
