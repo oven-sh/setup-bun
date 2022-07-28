@@ -18,7 +18,7 @@ export default async(release: Release, token: string) => {
 
     info(`Downloading Bun from ${asset.asset.browser_download_url}.`);
 
-    const zipPath = await downloadTool(asset.asset.browser_download_url, `token ${token}`);
+    const zipPath = await downloadTool(asset.asset.browser_download_url, new URL(asset.asset.browser_download_url).host === 'github.com' ? `${token}` : '');
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
 
     const newCache = await cacheDir(
