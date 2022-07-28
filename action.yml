@@ -10,11 +10,20 @@ inputs:
   bun-version:
     description: "The Bun version to install."
     default: "latest"
+    required: false
   github-token:
     description: "The github token secret can be passed in using {{ secrets.GITHUB_TOKEN }}"
     default: ${{ github.token }}
+    required: false
   misc-test-builds:
-    description: "Install builds from https://github.com/oven-sh/misc-test-builds (not recommended!)"
+    description: "Deprecated, use repository input instead. Install builds from https://github.com/oven-sh/misc-test-builds (not recommended!)"
+    required: false
+  repository:
+    description: "Repository from which the bun is downloaded. Defaults to https://github.com/oven-sh/bun"
+    default: "https://github.com/oven-sh/bun"
+    required: false
+  custom-download-url:
+    description: "Full url to download bun, for example if you want to download an artifact."
     required: false
 
 outputs:

@@ -31,3 +31,21 @@ Set up your GitHub Actions workflow with a specific version of Bun.
     bun-version: canary
     github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+### Custom repository
+
+```yaml
+- uses: xhyrom/setup-bun@v0.1.6
+  with:
+    repository: https://github.com/oven-sh/misc-test-builds
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### Custom download url
+
+```yaml
+- uses: xhyrom/setup-bun@v0.1.6
+  with:
+    custom-download-url: https://github.com/oven-sh/bun/suites/7555351912/artifacts/311939881
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+```

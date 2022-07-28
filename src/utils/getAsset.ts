@@ -1,7 +1,7 @@
 import { exit } from '../index.js';
 import { Asset } from './getGithubRelease.js';
 
-export default (assets: Asset[]) => {
+export const getArchitecture = () => {
     let arch;
     switch (process.arch) {
         case 'arm64':
@@ -15,8 +15,13 @@ export default (assets: Asset[]) => {
     }
 
     if (!['linux', 'darwin'].some(platform => process.platform === platform))
-        throw new Error(`Unsupported platform ${process.platform}.`);
+    throw new Error(`Unsupported platform ${process.platform}.`);
 
+    return arch;
+}
+
+export default (assets: Asset[]) => {
+    const arch = getArchitecture();
     const assetName = `bun-${process.platform}-${arch}.zip`;
     const asset = assets.find(asset => asset.name === assetName);
 

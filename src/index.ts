@@ -15,11 +15,13 @@ const main = async() => {
     try {
         const version = getInput('bun-version');
         const token = getInput('github-token');
-        const miscTestBuilds = (getInput('misc-test-builds') === 'true');
+        const repository = getInput('repository');
+        const miscTestBuilds = (getInput('misc-test-builds') === 'true') || (repository.includes('oven-sh/misc-test-builds'));
+        const customDownloadUrl = getInput('custom-download-url') || null;
 
         if (!version) return exit('Invalid bun version.');
 
-        const release = await getGithubRelease(version, token, miscTestBuilds);
+        const release = await getGithubRelease(version, token, repository, customDownloadUrl, miscTestBuilds);
         if (release?.message === 'Not Found') return exit('Invalid bun version.', miscTestBuilds);
 
         info(`Going to install release ${release.version}`);

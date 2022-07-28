@@ -1,11 +1,28 @@
 import fetch from 'node-fetch';
-export default async (version, token, miscTestBuilds) => {
-    const repository = miscTestBuilds ? 'oven-sh/misc-test-builds' : 'oven-sh/bun';
+import { getArchitecture } from './getAsset';
+export default async (version, token, fullRepository, customDownloadUrl, miscTestBuilds) => {
+    const repository = miscTestBuilds ? 'oven-sh/misc-test-builds' : fullRepository.split('/').slice(3).join('/');
     let url;
-    if (version === 'latest' || miscTestBuilds)
+    if (customDownloadUrl)
+        url = customDownloadUrl;
+    else if (version === 'latest' || miscTestBuilds)
         url = `https://api.github.com/repos/${repository}/releases/latest`;
     else
         url = `https://api.github.com/repos/${repository}/releases/tags/${version.includes('canary') ? version : `bun-v${version}`}`;
+    if (customDownloadUrl) {
+        return {
+            name: 'custom',
+            version: version + Math.random().toString(36).slice(-8),
+            html_url: customDownloadUrl,
+            tag_name: 'custom',
+            assets: [
+                {
+                    name: `bun-${process.platform}-${getArchitecture()}`,
+                    browser_download_url: customDownloadUrl
+                }
+            ]
+        };
+    }
     const release = await (await fetch(url, {
         headers: {
             'Content-Type': 'application/json',

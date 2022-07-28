@@ -15,8 +15,6 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         bun-version:
           ["latest", "0.1.4"]
-        misc-test-builds:
-          [false]
 
     steps:
       - uses: actions/checkout@v2
@@ -26,20 +24,17 @@ jobs:
         with:
           bun-version: ${{ matrix.bun-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          misc-test-builds: ${{ matrix.misc-test-builds }}
 
       - name: Try bun
         run: |
           bun --version
-  test-canary:
+  test-version-canary:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
         bun-version:
           ["canary"]
-        misc-test-builds:
-          [false]
 
     steps:
       - uses: actions/checkout@v2
@@ -49,7 +44,52 @@ jobs:
         with:
           bun-version: ${{ matrix.bun-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          misc-test-builds: ${{ matrix.misc-test-builds }}
+
+      - name: Try bun
+        run: |
+          bun --version
+  test-custom-download-url:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        bun-version:
+          ["latest"]
+        custom-download-url:
+          ["https://github.com/oven-sh/bun/suites/7555351912/artifacts/311939881"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Bun - Test Builds * ${{ matrix.misc-test-builds }}
+        uses: ./
+        with:
+          bun-version: ${{ matrix.bun-version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          custom-download-url: ${{ matrix.custom-download-url }}
+
+      - name: Try bun
+        run: |
+          bun --version
+  test-custom-repository:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        bun-version:
+          ["latest"]
+        repository:
+          ["https://github.com/oven-sh/misc-test-builds"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Bun - Test Builds * ${{ matrix.misc-test-builds }}
+        uses: ./
+        with:
+          bun-version: ${{ matrix.bun-version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ matrix.repository }}
 
       - name: Try bun
         run: |
