@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import fetch from 'node-fetch';
 import { getArchitecture } from './getAsset.js';
 export default async (version, token, fullRepository, customDownloadUrl, miscTestBuilds) => {
@@ -12,7 +13,7 @@ export default async (version, token, fullRepository, customDownloadUrl, miscTes
     if (customDownloadUrl) {
         return {
             name: 'custom',
-            version: version + Math.random().toString(36).slice(-8),
+            version: `${version}-${nanoid(10)}`,
             html_url: customDownloadUrl,
             tag_name: 'custom',
             assets: [

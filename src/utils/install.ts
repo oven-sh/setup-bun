@@ -28,11 +28,13 @@ export default async(release: Release, token: string) => {
     );
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
 
+    console.log(extracted)
     const newCache = await cacheDir(
         extracted,
         'bun',
         release.version
     );
+    console.log(newCache, join(extracted, asset.name));
     await saveCache([
         join(extracted, asset.name)
     ], `bun-${process.platform}-${asset.name}-${release.version}`);
