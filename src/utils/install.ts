@@ -25,13 +25,13 @@ export default async(release: Release, token: string) => {
         }
     })).text()
 
-    console.log(new URL(asset.asset.browser_download_url).host === 'github.com');
+    console.log(new URL(asset.asset.browser_download_url).host.includes('github.com'));
     const zipPath = await downloadTool(
         asset.asset.browser_download_url,
-        new URL(asset.asset.browser_download_url).host === 'github.com' ? `token ${token}` : '',
+        new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : '',
         // @ts-expect-error
         {
-            'Authorization': new URL(asset.asset.browser_download_url).host === 'github.com' ? `token ${token}` : ''
+            'Authorization': new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : ''
         }
     );
 

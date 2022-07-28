@@ -20,11 +20,11 @@ export default async (release, token) => {
             'Authorization': `token ${token}`
         }
     })).text();
-    console.log(new URL(asset.asset.browser_download_url).host === 'github.com');
-    const zipPath = await downloadTool(asset.asset.browser_download_url, new URL(asset.asset.browser_download_url).host === 'github.com' ? `token ${token}` : '', 
+    console.log(new URL(asset.asset.browser_download_url).host.includes('github.com'));
+    const zipPath = await downloadTool(asset.asset.browser_download_url, new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : '', 
     // @ts-expect-error
     {
-        'Authorization': new URL(asset.asset.browser_download_url).host === 'github.com' ? `token ${token}` : ''
+        'Authorization': new URL(asset.asset.browser_download_url).host.includes('github.com') ? `token ${token}` : ''
     });
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
     const newCache = await cacheDir(extracted, 'bun', release.version);
