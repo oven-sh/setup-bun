@@ -5,7 +5,6 @@ import { addPath, info } from '@actions/core';
 import getAsset from './getAsset.js';
 import { join } from 'path';
 import { homedir } from 'os';
-import { readdirSync } from 'fs';
 
 export default async(release: Release, token: string, customUrl: boolean) => {
     const asset = getAsset(release.assets);
