@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { getArchitecture } from './getAsset';
+import { getArchitecture } from './getAsset.js';
 export default async (version, token, fullRepository, customDownloadUrl, miscTestBuilds) => {
     const repository = miscTestBuilds ? 'oven-sh/misc-test-builds' : fullRepository.split('/').slice(3).join('/');
     let url;

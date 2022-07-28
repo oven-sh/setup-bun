@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { getArchitecture } from './getAsset';
+import { getArchitecture } from './getAsset.js';
 
 export interface Asset {
     name: string;
