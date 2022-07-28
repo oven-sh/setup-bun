@@ -4,7 +4,7 @@ import { addPath, info } from '@actions/core';
 import getAsset from './getAsset.js';
 import { join } from 'path';
 import { homedir } from 'os';
-export default async (release) => {
+export default async (release, token) => {
     const asset = getAsset(release.assets);
     const path = join(homedir(), '.bun', 'bin', asset.name);
     const cache = find('bun', release.version) || await restoreCache([path], `bun-${process.platform}-${asset.name}-${release.version}`);
@@ -14,7 +14,7 @@ export default async (release) => {
         return;
     }
     info(`Downloading Bun from ${asset.asset.browser_download_url}.`);
-    const zipPath = await downloadTool(asset.asset.browser_download_url);
+    const zipPath = await downloadTool(asset.asset.browser_download_url, `token ${token}`);
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
     const newCache = await cacheDir(extracted, 'bun', release.version);
     await saveCache([

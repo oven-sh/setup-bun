@@ -23,7 +23,7 @@ const main = async () => {
         if ((release === null || release === void 0 ? void 0 : release.message) === 'Not Found')
             return exit('Invalid bun version.', miscTestBuilds);
         info(`Going to install release ${release.version}`);
-        await install(release);
+        await install(release, token);
         setOutput('bun-version', release.tag_name);
     }
     catch (e) {

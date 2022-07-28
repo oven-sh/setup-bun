@@ -37,6 +37,7 @@ export default async(version: string, token: string, fullRepository: string, cus
             ]
         };
     }
+
     const release: any = await (await fetch(url, {
         headers: {
             'Content-Type': 'application/json',
