@@ -19,7 +19,7 @@ export default async (release, token) => {
         headers: {
             'Authorization': `token ${token}`
         }
-    })).json());
+    })).text());
     const zipPath = await downloadTool(asset.asset.browser_download_url, new URL(asset.asset.browser_download_url).host === 'github.com' ? `token ${token}` : '');
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
     const newCache = await cacheDir(extracted, 'bun', release.version);
