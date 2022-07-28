@@ -22,7 +22,11 @@ export default async(release: Release, token: string) => {
     const zipPath = await downloadTool(
         asset.asset.browser_download_url,
         null,
-        `token ${token}`
+        `token ${token}`,
+        {
+            'Authorization': `token ${token}`,
+            accept: 'application/octet-stream'
+        }
     );
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
 

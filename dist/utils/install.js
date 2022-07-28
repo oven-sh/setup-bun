@@ -4,7 +4,6 @@ import { addPath, info } from '@actions/core';
 import getAsset from './getAsset.js';
 import { join } from 'path';
 import { homedir } from 'os';
-import fetch from 'node-fetch';
 export default async (release, token) => {
     const asset = getAsset(release.assets);
     const path = join(homedir(), '.bun', 'bin', asset.name);
@@ -15,18 +14,10 @@ export default async (release, token) => {
         return;
     }
     info(`Downloading Bun from ${asset.asset.browser_download_url}.`);
-    await (await fetch(asset.asset.browser_download_url, {
-        headers: {
-            'Authorization': `token ${token}`
-        }
-    })).arrayBuffer();
-    console.log(new URL(asset.asset.browser_download_url).host.includes('github.com'));
-    const zipPath = await downloadTool(asset.asset.browser_download_url, `token ${token}`, 
-    // @ts-expect-error
-    {
-        'Authorization': `token ${token}`
+    const zipPath = await downloadTool(asset.asset.browser_download_url, null, `token ${token}`, {
+        'Authorization': `token ${token}`,
+        accept: 'application/octet-stream'
     });
-    console.log(zipPath);
     const extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));
     const newCache = await cacheDir(extracted, 'bun', release.version);
     await saveCache([
