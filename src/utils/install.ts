@@ -28,7 +28,7 @@ export default async(release: Release, token: string, customUrl: boolean) => {
     );
 
     let extracted;
-    if (customUrl) {
+    if (customUrl && asset.asset.browser_download_url.includes('artifacts')) {
         extracted = await extractZip(zipPath, join(homedir(), 'onlyforunzip'));
         extracted = await extractZip(join(homedir(), 'onlyforunzip', asset.asset.name), join(homedir(), '.bun', 'bin'));
     } else extracted = await extractZip(zipPath, join(homedir(), '.bun', 'bin'));

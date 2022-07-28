@@ -1,2 +1,0 @@
-GET https://api.github.com/repos/oven-sh/bun/releases/latest
-Authorization: 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
