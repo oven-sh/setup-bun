@@ -23,7 +23,7 @@ export function parseXML(str: string): Promise<any> {
     if (!str) {
       reject(new Error("Document is empty"));
     } else {
-      xmlParser.parseString(str, (err?: Error, res?: any) => {
+      xmlParser.parseString(str, (err: any, res: any) => {
         if (err) {
           reject(err);
         } else {

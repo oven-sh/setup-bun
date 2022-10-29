@@ -31,5 +31,5 @@ outputs:
     description: "The Bun version that was installed."
 
 runs:
-  using: "node12"
+  using: "node16"
   main: "dist/index.js"
