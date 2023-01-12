@@ -8,7 +8,7 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 ### Latest stable
 
 ```yaml
-- uses: xhyrom/setup-bun@v0.1.8
+- uses: oven-sh/setup-bun@v0.1.8
   with:
     bun-version: latest
     github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -17,7 +17,7 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 ### Specific version
 
 ```yaml
-- uses: xhyrom/setup-bun@v0.1.8
+- uses: oven-sh/setup-bun@v0.1.8
   with:
     bun-version: "0.1.5"
     github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -26,7 +26,7 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 ### Canary builds
 
 ```yaml
-- uses: xhyrom/setup-bun@v0.1.8
+- uses: oven-sh/setup-bun@v0.1.8
   with:
     bun-version: canary
     github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -35,7 +35,7 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 ### Custom repository
 
 ```yaml
-- uses: xhyrom/setup-bun@v0.1.8
+- uses: oven-sh/setup-bun@v0.1.8
   with:
     repository: https://github.com/oven-sh/misc-test-builds
     github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -44,7 +44,7 @@ Set up your GitHub Actions workflow with a specific version of Bun.
 ### Custom download url
 
 ```yaml
-- uses: xhyrom/setup-bun@v0.1.8
+- uses: oven-sh/setup-bun@v0.1.8
   with:
     custom-download-url: https://api.github.com/repos/oven-sh/bun/actions/artifacts/311939881/zip # must be github api
     github-token: ${{ secrets.GITHUB_TOKEN }}
