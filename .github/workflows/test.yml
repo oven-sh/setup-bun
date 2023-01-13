@@ -56,11 +56,10 @@ jobs:
         bun-version:
           ["latest"]
         custom-download-url:
-          ["https://api.github.com/repos/oven-sh/bun/actions/artifacts/311939881/zip"]
+          ["https://api.github.com/repos/oven-sh/bun/actions/artifacts/509746251/zip"]
 
     steps:
       - uses: actions/checkout@v2
-
       - name: Setup Bun - Test Builds * ${{ matrix.misc-test-builds }}
         uses: ./
         with:
