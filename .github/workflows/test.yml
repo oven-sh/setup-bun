@@ -56,7 +56,8 @@ jobs:
         bun-version:
           ["latest"]
         custom-download-url:
-          ["https://api.github.com/repos/oven-sh/bun/actions/artifacts/509746251/zip"]
+          ["https://api.github.com/repos/oven-sh/bun/actions/artifacts/509746254/zip"]
+          # use the artifact ID for `bun-linux-x64` from a recent CI build
 
     steps:
       - uses: actions/checkout@v2
