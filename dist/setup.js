@@ -75,10 +75,13 @@ function getDownloadUrl(options) {
 async function extractBun(path) {
     for (const entry of await readdir(path, { withFileTypes: true })) {
         const entryPath = join(path, entry.name);
+        action.debug(`Looking: ${entryPath}`);
         if (entry.name === "bun" && entry.isFile()) {
+            action.debug(`Found: ${entryPath}`);
             return entryPath;
         }
-        if (entry.isDirectory()) {
+        if (entry.name.startsWith("bun") && entry.isDirectory()) {
+            action.debug(`Continue looking: ${entryPath}`);
             return extractBun(entryPath);
         }
     }
