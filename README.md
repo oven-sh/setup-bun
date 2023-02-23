@@ -1,51 +1,45 @@
 # setup-bun
-> Huge inspiration [setup-deno](https://github.com/denoland/setup-deno)
 
-Set up your GitHub Actions workflow with a specific version of Bun.
+Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
 
 ## Usage
 
-### Latest stable
+### Stable release
 
 ```yaml
-- uses: oven-sh/setup-bun@v0.1.8
+- uses: oven-sh/setup-bun@v1
   with:
     bun-version: latest
-    github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-### Specific version
+### Specific release
 
 ```yaml
-- uses: oven-sh/setup-bun@v0.1.8
+- uses: oven-sh/setup-bun@v1
   with:
-    bun-version: "0.1.5"
-    github-token: ${{ secrets.GITHUB_TOKEN }}
+    bun-version: "0.5.6"
 ```
 
-### Canary builds
+### Canary release
 
 ```yaml
-- uses: oven-sh/setup-bun@v0.1.8
+- uses: oven-sh/setup-bun@v1
   with:
     bun-version: canary
-    github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-### Custom repository
+### Specific canary release
 
 ```yaml
-- uses: oven-sh/setup-bun@v0.1.8
+- uses: oven-sh/setup-bun@v1
   with:
-    repository: https://github.com/oven-sh/misc-test-builds
-    github-token: ${{ secrets.GITHUB_TOKEN }}
+    bun-version: 9be68ac2350b965037f408ce4d47c3b9d9a76b63
 ```
 
-### Custom download url
+### Custom Download URL
 
 ```yaml
-- uses: oven-sh/setup-bun@v0.1.8
+- uses: oven-sh/setup-bun@v1
   with:
-    custom-download-url: https://api.github.com/repos/oven-sh/bun/actions/artifacts/311939881/zip # must be github api
-    github-token: ${{ secrets.GITHUB_TOKEN }}
+    bun-download-url: https://example.com/path/to/bun.zip
 ```
