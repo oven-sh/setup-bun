@@ -74,14 +74,18 @@ function getDownloadUrl(options) {
 }
 async function extractBun(path) {
     for (const entry of await readdir(path, { withFileTypes: true })) {
-        const entryPath = join(path, entry.name);
-        action.debug(`Looking: ${entryPath}`);
-        if (entry.name === "bun" && entry.isFile()) {
-            action.debug(`Found: ${entryPath}`);
-            return entryPath;
+        const { name } = entry;
+        const entryPath = join(path, name);
+        if (entry.isFile()) {
+            if (name === "bun") {
+                return entryPath;
+            }
+            if (/^bun.*\.zip/.test(name)) {
+                const extractedPath = await extractZip(entryPath);
+                return extractBun(extractedPath);
+            }
         }
-        if (entry.name.startsWith("bun") && entry.isDirectory()) {
-            action.debug(`Continue looking: ${entryPath}`);
+        if (/^bun/.test(name) && entry.isDirectory()) {
             return extractBun(entryPath);
         }
     }
