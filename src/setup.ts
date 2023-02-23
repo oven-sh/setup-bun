@@ -17,7 +17,9 @@ export default async (options?: {
 }> => {
   const { url, cacheKey } = getDownloadUrl(options);
   const cacheEnabled = cacheKey && cache.isFeatureAvailable();
-  const path = join(homedir(), ".bun", "bin", "bun");
+  const dir = join(homedir(), ".bun", "bin");
+  action.addPath(dir);
+  const path = join(dir, "bun");
   let version: string | undefined;
   let cacheHit = false;
   if (cacheEnabled) {

@@ -8,88 +8,85 @@ import { restoreCache, saveCache } from "@actions/cache";
 import { mv } from "@actions/io";
 import { getExecOutput } from "@actions/exec";
 export default async (options) => {
-  const { url, cacheKey } = getDownloadUrl(options);
-  const cacheEnabled = cacheKey && cache.isFeatureAvailable();
-  const path = join(homedir(), ".bun", "bin", "bun");
-  let version;
-  let cacheHit = false;
-  if (cacheEnabled) {
-    const cacheRestored = await restoreCache([path], cacheKey);
-    if (cacheRestored) {
-      version = await verifyBun(path);
-      if (version) {
-        cacheHit = true;
-        action.info("Using a cached version of Bun.");
-      } else {
-        action.warning(
-          "Found a cached version of Bun, but it appears to be corrupted? Attempting to download a new version."
-        );
-      }
+    const { url, cacheKey } = getDownloadUrl(options);
+    const cacheEnabled = cacheKey && cache.isFeatureAvailable();
+    const dir = join(homedir(), ".bun", "bin");
+    action.addPath(dir);
+    const path = join(dir, "bun");
+    let version;
+    let cacheHit = false;
+    if (cacheEnabled) {
+        const cacheRestored = await restoreCache([path], cacheKey);
+        if (cacheRestored) {
+            version = await verifyBun(path);
+            if (version) {
+                cacheHit = true;
+                action.info("Using a cached version of Bun.");
+            }
+            else {
+                action.warning("Found a cached version of Bun, but it appears to be corrupted? Attempting to download a new version.");
+            }
+        }
     }
-  }
-  if (!cacheHit) {
-    action.info(`Downloading a new version of Bun: ${url}`);
-    const zipPath = await downloadTool(url);
-    const extractedPath = await extractZip(zipPath);
-    const exePath = await extractBun(extractedPath);
-    await mv(exePath, path);
-    version = await verifyBun(path);
-  }
-  if (!version) {
-    throw new Error(
-      "Downloaded a new version of Bun, but failed to check its version? Try again in debug mode."
-    );
-  }
-  if (cacheEnabled) {
-    try {
-      await saveCache([path], cacheKey);
-    } catch (error) {
-      action.warning("Failed to save Bun to cache.");
+    if (!cacheHit) {
+        action.info(`Downloading a new version of Bun: ${url}`);
+        const zipPath = await downloadTool(url);
+        const extractedPath = await extractZip(zipPath);
+        const exePath = await extractBun(extractedPath);
+        await mv(exePath, path);
+        version = await verifyBun(path);
     }
-  }
-  return {
-    version,
-    cacheHit,
-  };
+    if (!version) {
+        throw new Error("Downloaded a new version of Bun, but failed to check its version? Try again in debug mode.");
+    }
+    if (cacheEnabled) {
+        try {
+            await saveCache([path], cacheKey);
+        }
+        catch (error) {
+            action.warning("Failed to save Bun to cache.");
+        }
+    }
+    return {
+        version,
+        cacheHit,
+    };
 };
 function getDownloadUrl(options) {
-  if (options?.customUrl) {
+    if (options?.customUrl) {
+        return {
+            url: options.customUrl,
+            cacheKey: null,
+        };
+    }
+    const release = options?.version ?? "latest";
+    const os = options?.os ?? process.platform;
+    const arch = options?.arch ?? process.arch;
+    const avx2 = options?.avx2 ?? true;
+    const profile = options?.profile ?? false;
+    const { href } = new URL(`${release}/${os}/${arch}?avx2=${avx2}&profile=${profile}`, "https://bun.sh/download/");
     return {
-      url: options.customUrl,
-      cacheKey: null,
+        url: href,
+        cacheKey: /^canary|latest$/i.test(release)
+            ? null
+            : `bun-${release}-${os}-${arch}-${avx2}-${profile}`,
     };
-  }
-  const release = options?.version ?? "latest";
-  const os = options?.os ?? process.platform;
-  const arch = options?.arch ?? process.arch;
-  const avx2 = options?.avx2 ?? true;
-  const profile = options?.profile ?? false;
-  const { href } = new URL(
-    `${release}/${os}/${arch}?avx2=${avx2}&profile=${profile}`,
-    "https://bun.sh/download/"
-  );
-  return {
-    url: href,
-    cacheKey: /^canary|latest$/i.test(release)
-      ? null
-      : `bun-${release}-${os}-${arch}-${avx2}-${profile}`,
-  };
 }
 async function extractBun(path) {
-  for (const entry of await readdir(path, { withFileTypes: true })) {
-    const entryPath = join(path, entry.name);
-    if (entry.name === "bun" && entry.isFile()) {
-      return entryPath;
+    for (const entry of await readdir(path, { withFileTypes: true })) {
+        const entryPath = join(path, entry.name);
+        if (entry.name === "bun" && entry.isFile()) {
+            return entryPath;
+        }
+        if (entry.isDirectory()) {
+            return extractBun(entryPath);
+        }
     }
-    if (entry.isDirectory()) {
-      return extractBun(entryPath);
-    }
-  }
-  throw new Error("Could not find executable: bun");
+    throw new Error("Could not find executable: bun");
 }
 async function verifyBun(path) {
-  const { exitCode, stdout } = await getExecOutput(path, ["--version"], {
-    ignoreReturnCode: true,
-  });
-  return exitCode === 0 ? stdout.trim() : undefined;
+    const { exitCode, stdout } = await getExecOutput(path, ["--version"], {
+        ignoreReturnCode: true,
+    });
+    return exitCode === 0 ? stdout.trim() : undefined;
 }
