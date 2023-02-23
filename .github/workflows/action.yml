@@ -1,0 +1,35 @@
+name: Setup Bun
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  setup-bun:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        bun-version:
+          - latest
+          - canary
+          - "0.5.6"
+          - "9be68ac2350b965037f408ce4d47c3b9d9a76b63"
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v2
+      - id: setup-bun
+        name: Setup Bun
+        uses: ./
+        with:
+          bun-version: ${{ matrix.bun-version }}
+      - id: verify-bun
+        name: Verify Bun
+        run: |
+          bun --version

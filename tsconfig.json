@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
-    "outDir": "dist/",
-    "lib": ["ESNext"],
-    "module": "esnext",
-    "target": "ES2018",
+    "outDir": "dist",
+    "lib": ["ES2020"],
+    "module": "ES2020",
+    "target": "ES2020",
     "moduleResolution": "node",
-    // "bun-types" is the important part
-    "types": ["bun-types"],
     "skipLibCheck": true
   }
 }

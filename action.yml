@@ -1,35 +1,19 @@
-name: "Setup Bun"
-description: "Setup Bun by installing, downloading, and adding it to the path"
-author: "xHyroM"
-
+name: Setup Bun
+description: Download, install, and setup Bun to your path.
+author: robobun
 branding:
-  icon: "play-circle"
-  color: "white"
-
+  icon: play-circle
+  color: white
 inputs:
   bun-version:
-    description: "The Bun version to install."
-    default: "latest"
+    description: 'The version of Bun to install. (e.g. "latest", "canary", "0.5.6", <git-sha>)'
+    default: latest
     required: false
-  github-token:
-    description: "The github token secret can be passed in using {{ secrets.GITHUB_TOKEN }}"
-    default: ${{ github.token }}
-    required: false
-  misc-test-builds:
-    description: "Deprecated, use repository input instead. Install builds from https://github.com/oven-sh/misc-test-builds (not recommended!)"
-    required: false
-  repository:
-    description: "Repository from which the bun is downloaded. Defaults to https://github.com/oven-sh/bun"
-    default: "https://github.com/oven-sh/bun"
-    required: false
-  custom-download-url:
-    description: "Full url to download bun, for example if you want to download an artifact."
-    required: false
-
 outputs:
   bun-version:
-    description: "The Bun version that was installed."
-
+    description: The version of Bun that was installed.
+  cache-hit:
+    description: If the version of Bun was cached. (e.g. "1" is true, "0" is false)
 runs:
-  using: "node16"
-  main: "dist/index.js"
+  using: node16
+  main: dist/action.js
