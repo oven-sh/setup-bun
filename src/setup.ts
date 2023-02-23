@@ -39,7 +39,10 @@ export default async (options?: {
   if (!cacheHit) {
     action.info(`Downloading a new version of Bun: ${url}`);
     const zipPath = await downloadTool(url);
-    const extractedPath = await extractZip(zipPath);
+    let extractedPath = await extractZip(zipPath);
+    if (extractedPath.endsWith(".zip")) {
+      extractedPath = await extractZip(extractedPath);
+    }
     const exePath = await extractBun(extractedPath);
     await mv(exePath, path);
     version = await verifyBun(path);
