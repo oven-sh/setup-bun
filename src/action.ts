@@ -12,7 +12,7 @@ setup({
 })
   .then(({ version, cacheHit }) => {
     action.setOutput("bun-version", version);
-    action.setOutput("cache-hit", cacheHit ? "1" : "0");
+    action.setOutput("cache-hit", cacheHit);
   })
   .catch((error) => {
     action.setFailed(error);

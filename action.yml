@@ -13,7 +13,7 @@ outputs:
   bun-version:
     description: The version of Bun that was installed.
   cache-hit:
-    description: If the version of Bun was cached. (e.g. "1" is true, "0" is false)
+    description: If the version of Bun was cached.
 runs:
   using: node16
   main: dist/action.js
