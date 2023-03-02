@@ -80,17 +80,17 @@ function getDownloadUrl(options?: {
     };
   }
   const release = encodeURIComponent(options?.version ?? "latest");
-  const os = options?.os ?? process.platform;
-  const arch = options?.arch ?? process.arch;
-  const avx2 = options?.avx2 ?? true;
-  const profile = options?.profile ?? false;
+  const os = encodeURIComponent(options?.os ?? process.platform);
+  const arch = encodeURIComponent(options?.arch ?? process.arch);
+  const avx2 = encodeURIComponent(options?.avx2 ?? true);
+  const profile = encodeURIComponent(options?.profile ?? false);
   const { href } = new URL(
     `${release}/${os}/${arch}?avx2=${avx2}&profile=${profile}`,
     "https://bun.sh/download/"
   );
   return {
     url: href,
-    cacheKey: /^canary|latest$/i.test(release)
+    cacheKey: /^latest|canary|action/i.test(release)
       ? null
       : `bun-${release}-${os}-${arch}-${avx2}-${profile}`,
   };
