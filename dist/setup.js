@@ -59,7 +59,7 @@ function getDownloadUrl(options) {
             cacheKey: null,
         };
     }
-    const release = options?.version ?? "latest";
+    const release = encodeURIComponent(options?.version ?? "latest");
     const os = options?.os ?? process.platform;
     const arch = options?.arch ?? process.arch;
     const avx2 = options?.avx2 ?? true;
