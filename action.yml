@@ -6,7 +6,7 @@ branding:
   color: white
 inputs:
   bun-version:
-    description: 'The version of Bun to install. (e.g. "latest", "canary", "0.5.6", <git-sha>)'
+    description: 'The version of Bun to install. (e.g. "latest", "canary", "0.5.6", <sha>)'
     default: latest
     required: false
 outputs:

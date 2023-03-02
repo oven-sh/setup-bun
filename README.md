@@ -4,7 +4,7 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
 
 ## Usage
 
-### Stable release
+### Latest release
 
 ```yaml
 - uses: oven-sh/setup-bun@v1
@@ -36,7 +36,15 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
     bun-version: 9be68ac2350b965037f408ce4d47c3b9d9a76b63
 ```
 
-### Custom Download URL
+### Action run
+
+```yaml
+- uses: oven-sh/setup-bun@v1
+  with:
+    bun-version: "action:4308768069"
+```
+
+### Custom download URL
 
 ```yaml
 - uses: oven-sh/setup-bun@v1
