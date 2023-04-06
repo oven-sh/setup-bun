@@ -19,7 +19,7 @@
   "author": "xHyroM",
   "scripts": {
     "format": "prettier --write src",
-    "build": "ncc build src/action.ts -o target"
+    "build": "ncc build src/action.ts -o target -m"
   },
   "dependencies": {
     "@actions/cache": "^3.1.4",
