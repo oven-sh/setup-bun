@@ -16,4 +16,4 @@ outputs:
     description: If the version of Bun was cached.
 runs:
   using: node16
-  main: dist/action.js
+  main: target/index.js
