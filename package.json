@@ -19,7 +19,7 @@
   "author": "xHyroM",
   "scripts": {
     "format": "prettier --write src",
-    "build": "tsc -p .",
+    "build": "bun build src/action.ts --outdir dist --target=node",
     "start": "ts-node-esm src/action.ts",
     "start:dist": "node dist/action.js"
   },
@@ -33,9 +33,9 @@
   },
   "devDependencies": {
     "prettier": "^2.8.4",
-    "typescript": "^4.9.5",
     "ts-node": "^10.9.1",
-    "esbuild": "^0.17.10"
+    "typescript": "^4.9.5",
+    "bun": "^0.6.0-canary"
   },
   "prettier": {
     "quoteProps": "preserve"

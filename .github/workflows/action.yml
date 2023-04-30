@@ -20,7 +20,15 @@ jobs:
           - latest
           - canary
           - "0.5.6"
+          - "0.5.x"
+          - ">=0.5.7"
           - "9be68ac2350b965037f408ce4d47c3b9d9a76b63"
+        baseline:
+          - "true"
+          - "false"
+        profile:
+          - "true"
+          - "false"
     steps:
       - id: checkout
         name: Checkout
@@ -30,7 +38,11 @@ jobs:
         uses: ./
         with:
           bun-version: ${{ matrix.bun-version }}
+          baseline: ${{ matrix.baseline }}
+          profile: ${{ matrix.profile }}
       - id: verify-bun
         name: Verify Bun
         run: |
+          which bun
+          which bunx
           bun --version

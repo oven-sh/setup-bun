@@ -6,14 +6,29 @@ branding:
   color: white
 inputs:
   bun-version:
-    description: 'The version of Bun to install. (e.g. "latest", "canary", "0.5.6", <sha>)'
+    description: 'The version of Bun to download. (e.g. "latest", "canary", "0.5.6", ">0.6.0", <sha>)'
     default: latest
+    required: false
+  bun-download-url:
+    description: "A custom URL to download Bun as a .zip file."
+    required: false
+  check-latest:
+    description: "If it should always check for a new version of Bun."
+    default: "false"
+    required: false
+  baseline:
+    description: "If a baseline build of Bun should be used."
+    default: "false"
+    required: false
+  profile:
+    description: "If a profile build of Bun should be used."
+    default: "false"
     required: false
 outputs:
   bun-version:
     description: The version of Bun that was installed.
   cache-hit:
-    description: If the version of Bun was cached.
+    description: If the version of Bun was cached. (e.g. "true" or "false")
 runs:
   using: node16
   main: dist/action.js
