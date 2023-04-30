@@ -51868,16 +51868,19 @@ async function setup_default(options) {
 }
 
 // src/action.ts
+var parseBoolean = function(value) {
+  return /^true$/i.test(value);
+};
 if (!process.env.RUNNER_TEMP)
   process.env.RUNNER_TEMP = tmpdir();
 setup_default({
   customUrl: action2.getInput("bun-download-url") || undefined,
-  checkLatest: Boolean(action2.getInput("check-latest")),
+  checkLatest: parseBoolean(action2.getInput("check-latest")),
   version: action2.getInput("bun-version") || "latest",
   os: process.platform,
   arch: process.arch,
-  baseline: Boolean(action2.getInput("baseline")),
-  profile: Boolean(action2.getInput("profile"))
+  baseline: parseBoolean(action2.getInput("baseline")),
+  profile: parseBoolean(action2.getInput("profile"))
 }).then(({ version: version3, cacheHit }) => {
   action2.setOutput("bun-version", version3);
   action2.setOutput("cache-hit", cacheHit);
