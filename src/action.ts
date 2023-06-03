@@ -7,7 +7,8 @@ if (!process.env.RUNNER_TEMP) {
 }
 
 setup({
-  version: action.getInput("bun-version") || undefined,
+  version:
+    process.env.BUN_VERSION || action.getInput("bun-version") || undefined,
   customUrl: action.getInput("bun-download-url") || undefined,
 })
   .then(({ version, cacheHit }) => {
