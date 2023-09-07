@@ -5,7 +5,7 @@ import * as action from "@actions/core";
 import { downloadTool, extractZip } from "@actions/tool-cache";
 import * as cache from "@actions/cache";
 import { restoreCache, saveCache } from "@actions/cache";
-import { mv } from "@actions/io";
+import { cp, rmRF } from "@actions/io";
 import { getExecOutput } from "@actions/exec";
 
 export default async (options?: {
@@ -41,7 +41,8 @@ export default async (options?: {
     const zipPath = await downloadTool(url);
     const extractedPath = await extractZip(zipPath);
     const exePath = await extractBun(extractedPath);
-    await mv(exePath, path);
+    await cp(exePath, path);
+    await rmRF(exePath);
     version = await verifyBun(path);
   }
   if (!version) {
