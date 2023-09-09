@@ -27,11 +27,15 @@ setup({
   version:
     readVersionFromPackageJson() || action.getInput("bun-version") || undefined,
   customUrl: action.getInput("bun-download-url") || undefined,
+  registryUrl: action.getInput("registry-url") || undefined,
+  scope: action.getInput("scope") || undefined,
 })
-  .then(({ version, revision, cacheHit }) => {
+  .then(({ version, revision, cacheHit, registryUrl, scope }) => {
     action.setOutput("bun-version", version);
     action.setOutput("bun-revision", revision);
     action.setOutput("cache-hit", cacheHit);
+    action.setOutput("registry-url", registryUrl);
+    action.setOutput("scope", scope);
   })
   .catch((error) => {
     action.setFailed(error);
