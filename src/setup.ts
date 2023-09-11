@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { readdir } from "node:fs/promises";
+import { readdir, symlink } from "node:fs/promises";
 import * as action from "@actions/core";
 import { downloadTool, extractZip } from "@actions/tool-cache";
 import * as cache from "@actions/cache";
@@ -50,6 +50,13 @@ export default async (options?: {
     throw new Error(
       "Downloaded a new version of Bun, but failed to check its version? Try again in debug mode."
     );
+  }
+  try {
+    await symlink(path, join(dir, "bunx"));
+  } catch (error) {
+    if (error.code !== "EEXIST") {
+      throw error;
+    }
   }
   if (cacheEnabled) {
     try {
