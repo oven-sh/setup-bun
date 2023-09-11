@@ -17,7 +17,7 @@
   "license": "MIT",
   "author": "xHyroM",
   "scripts": {
-    "format": "prettier --write src",
+    "format": "prettier --write src *.yml *.json *.md",
     "build": "esbuild --target=node16 --outdir=dist --bundle --platform=node --format=cjs src/action.ts",
     "start": "bun run build && node dist/action.js"
   },

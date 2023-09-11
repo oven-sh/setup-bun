@@ -70651,13 +70651,13 @@ var setup_default = async (options) => {
   const dir = (0, import_node_path.join)((0, import_node_os.homedir)(), ".bun", "bin");
   action.addPath(dir);
   const path = (0, import_node_path.join)(dir, "bun");
-  let version3;
+  let revision;
   let cacheHit = false;
   if (cacheEnabled) {
     const cacheRestored = await (0, import_cache.restoreCache)([path], cacheKey);
     if (cacheRestored) {
-      version3 = await verifyBun(path);
-      if (version3) {
+      revision = await verifyBun(path);
+      if (revision) {
         cacheHit = true;
         action.info("Using a cached version of Bun.");
       } else {
@@ -70675,12 +70675,7 @@ var setup_default = async (options) => {
     await (0, import_io.mkdirP)(dir);
     await (0, import_io.cp)(exePath, path);
     await (0, import_io.rmRF)(exePath);
-    version3 = await verifyBun(path);
-  }
-  if (!version3) {
-    throw new Error(
-      "Downloaded a new version of Bun, but failed to check its version? Try again in debug mode."
-    );
+    revision = await verifyBun(path);
   }
   try {
     await (0, import_promises.symlink)(path, (0, import_node_path.join)(dir, "bunx"));
@@ -70689,6 +70684,11 @@ var setup_default = async (options) => {
       throw error;
     }
   }
+  if (!revision) {
+    throw new Error(
+      "Downloaded a new version of Bun, but failed to check its version? Try again in debug mode."
+    );
+  }
   if (cacheEnabled) {
     try {
       await (0, import_cache.saveCache)([path], cacheKey);
@@ -70696,8 +70696,10 @@ var setup_default = async (options) => {
       action.warning("Failed to save Bun to cache.");
     }
   }
+  const [version3] = revision.split("+");
   return {
     version: version3,
+    revision,
     cacheHit
   };
 };
@@ -70742,10 +70744,19 @@ async function extractBun(path) {
   throw new Error("Could not find executable: bun");
 }
 async function verifyBun(path) {
-  const { exitCode, stdout } = await (0, import_exec.getExecOutput)(path, ["--version"], {
+  const revision = await (0, import_exec.getExecOutput)(path, ["--revision"], {
     ignoreReturnCode: true
   });
-  return exitCode === 0 ? stdout.trim() : void 0;
+  if (revision.exitCode === 0 && /^\d+\.\d+\.\d+/.test(revision.stdout)) {
+    return revision.stdout.trim();
+  }
+  const version3 = await (0, import_exec.getExecOutput)(path, ["--version"], {
+    ignoreReturnCode: true
+  });
+  if (version3.exitCode === 0 && /^\d+\.\d+\.\d+/.test(version3.stdout)) {
+    return version3.stdout.trim();
+  }
+  return void 0;
 }
 
 // src/action.ts
@@ -70753,13 +70764,14 @@ if (!process.env.RUNNER_TEMP) {
   process.env.RUNNER_TEMP = (0, import_node_os2.tmpdir)();
 }
 setup_default({
-  version: action2.getInput("bun-version") || void 0,
+  version: "0.5.6",
+  ///action.getInput("bun-version") || undefined,
   customUrl: action2.getInput("bun-download-url") || void 0
-}).then(({ version: version3, cacheHit }) => {
+}).then(({ version: version3, revision, cacheHit }) => {
   action2.setOutput("bun-version", version3);
+  action2.setOutput("bun-revision", revision);
   action2.setOutput("cache-hit", cacheHit);
 }).catch((error) => {
-  console.error(error);
   action2.setFailed(error);
 });
 /*! Bundled license information:
