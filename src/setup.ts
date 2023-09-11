@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { readdir } from "node:fs/promises";
+import { readdir, symlink } from "node:fs/promises";
 import * as action from "@actions/core";
 import { downloadTool, extractZip } from "@actions/tool-cache";
 import * as cache from "@actions/cache";
@@ -13,6 +13,7 @@ export default async (options?: {
   customUrl?: string;
 }): Promise<{
   version: string;
+  revision: string;
   cacheHit: boolean;
 }> => {
   const { url, cacheKey } = getDownloadUrl(options);
@@ -20,13 +21,13 @@ export default async (options?: {
   const dir = join(homedir(), ".bun", "bin");
   action.addPath(dir);
   const path = join(dir, "bun");
-  let version: string | undefined;
+  let revision: string | undefined;
   let cacheHit = false;
   if (cacheEnabled) {
     const cacheRestored = await restoreCache([path], cacheKey);
     if (cacheRestored) {
-      version = await verifyBun(path);
-      if (version) {
+      revision = await verifyBun(path);
+      if (revision) {
         cacheHit = true;
         action.info("Using a cached version of Bun.");
       } else {
@@ -44,9 +45,16 @@ export default async (options?: {
     await mkdirP(dir);
     await cp(exePath, path);
     await rmRF(exePath);
-    version = await verifyBun(path);
+    revision = await verifyBun(path);
   }
-  if (!version) {
+  try {
+    await symlink(path, join(dir, "bunx"));
+  } catch (error) {
+    if (error.code !== "EEXIST") {
+      throw error;
+    }
+  }
+  if (!revision) {
     throw new Error(
       "Downloaded a new version of Bun, but failed to check its version? Try again in debug mode."
     );
@@ -58,8 +66,10 @@ export default async (options?: {
       action.warning("Failed to save Bun to cache.");
     }
   }
+  const [version] = revision.split("+");
   return {
     version,
+    revision,
     cacheHit,
   };
 };
@@ -119,8 +129,17 @@ async function extractBun(path: string): Promise<string> {
 }
 
 async function verifyBun(path: string): Promise<string | undefined> {
-  const { exitCode, stdout } = await getExecOutput(path, ["--version"], {
+  const revision = await getExecOutput(path, ["--revision"], {
     ignoreReturnCode: true,
   });
-  return exitCode === 0 ? stdout.trim() : undefined;
+  if (revision.exitCode === 0 && /^\d+\.\d+\.\d+/.test(revision.stdout)) {
+    return revision.stdout.trim();
+  }
+  const version = await getExecOutput(path, ["--version"], {
+    ignoreReturnCode: true,
+  });
+  if (version.exitCode === 0 && /^\d+\.\d+\.\d+/.test(version.stdout)) {
+    return version.stdout.trim();
+  }
+  return undefined;
 }
