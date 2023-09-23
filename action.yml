@@ -15,5 +15,5 @@ outputs:
   cache-hit:
     description: If the version of Bun was cached.
 runs:
-  using: node16
+  using: node20
   main: dist/action.js
