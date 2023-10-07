@@ -59,7 +59,7 @@ export default async (options?: {
       "Downloaded a new version of Bun, but failed to check its version? Try again in debug mode."
     );
   }
-  if (cacheEnabled) {
+  if (cacheEnabled && !cacheHit) {
     try {
       await saveCache([path], cacheKey);
     } catch (error) {
