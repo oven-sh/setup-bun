@@ -34,3 +34,21 @@ jobs:
         name: Verify Bun
         run: |
           bun --version
+  setup-bun-from-package-json-version:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup package.json
+        run: |
+          echo "$(jq '. += {"packageManager": "bun@1.0.0"}' package.json)" > package.json
+      - name: Setup Bun
+        uses: ./
+      - name: Verify Bun
+        run: |
+          bun --version
