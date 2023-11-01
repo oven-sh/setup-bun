@@ -9,6 +9,12 @@ inputs:
     description: 'The version of Bun to install. (e.g. "latest", "canary", "0.5.6", <sha>)'
     default: latest
     required: false
+  registry-url:
+    required: false
+    description: "Optional registry to set up for auth. Will set the registry in a project level build.toml file, and set up auth to read in from env.BUN_AUTH_TOKEN."
+  scope:
+    required: false
+    description: "Optional scope for authenticating against scoped registries."
 outputs:
   bun-version:
     description: The version of Bun that was installed.

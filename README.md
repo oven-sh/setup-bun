@@ -10,11 +10,31 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
     bun-version: latest
 ```
 
+### Setup custom registry-url and scope (for private packages)
+
+```yaml
+- uses: oven-sh/setup-bun@v1
+  with:
+    registry-url: "https://npm.pkg.github.com/"
+    scope: "@foo-bar"
+```
+
+After setting up the registry-url and scope, when installing step comes, inject the env to authenticate and install all packages from the private registry
+
+```yaml
+- name: Installing dependencies
+  env:
+    BUN_AUTH_TOKEN: ${{ secrets.MY_SUPER_SECRET_PAT }}
+  run: bun i
+```
+
 ## Inputs
 
-| Name          | Description                                 | Default  | Examples                   |
-| ------------- | ------------------------------------------- | -------- | -------------------------- |
-| `bun-version` | The version of Bun to download and install. | `latest` | `canary`, `1.0.0`, `<sha>` |
+| Name           | Description                                        | Default     | Examples                        |
+| -------------- | -------------------------------------------------- | ----------- | ------------------------------- |
+| `bun-version`  | The version of Bun to download and install.        | `latest`    | `canary`, `1.0.0`, `<sha>`      |
+| `registry-url` | Registry URL where some private package is stored. | `undefined` | `"https://npm.pkg.github.com/"` |
+| `scope`        | Scope for private pacakages                        | `undefined` | `"@foo-bar"`, `"@orgname"`      |
 
 ## Outputs
 

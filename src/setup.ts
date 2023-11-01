@@ -2,19 +2,23 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { readdir, symlink } from "node:fs/promises";
 import * as action from "@actions/core";
-import { downloadTool, extractZip } from "@actions/tool-cache";
 import * as cache from "@actions/cache";
-import { restoreCache, saveCache } from "@actions/cache";
+import { downloadTool, extractZip } from "@actions/tool-cache";
 import { cp, mkdirP, rmRF } from "@actions/io";
 import { getExecOutput } from "@actions/exec";
+import { configureAuthentication } from "./auth";
 
 export default async (options?: {
   version?: string;
   customUrl?: string;
+  scope?: string;
+  registryUrl?: string;
 }): Promise<{
   version: string;
   revision: string;
   cacheHit: boolean;
+  scope?: string;
+  registryUrl?: string;
 }> => {
   const { url, cacheKey } = getDownloadUrl(options);
   const cacheEnabled = cacheKey && cache.isFeatureAvailable();
@@ -24,7 +28,7 @@ export default async (options?: {
   let revision: string | undefined;
   let cacheHit = false;
   if (cacheEnabled) {
-    const cacheRestored = await restoreCache([path], cacheKey);
+    const cacheRestored = await cache.restoreCache([path], cacheKey);
     if (cacheRestored) {
       revision = await verifyBun(path);
       if (revision) {
@@ -61,16 +65,25 @@ export default async (options?: {
   }
   if (cacheEnabled) {
     try {
-      await saveCache([path], cacheKey);
+      await cache.saveCache([path], cacheKey);
     } catch (error) {
       action.warning("Failed to save Bun to cache.");
     }
   }
   const [version] = revision.split("+");
+
+  const { registryUrl, scope } = options;
+
+  if (!!registryUrl && !!scope) {
+    configureAuthentication(registryUrl, scope);
+  }
+
   return {
     version,
     revision,
     cacheHit,
+    registryUrl,
+    scope,
   };
 };
 
