@@ -5,7 +5,7 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
 ## Usage
 
 ```yaml
-- uses: oven-sh/setup-bun@v1
+- uses: oven-sh/setup-bun@v1.1
   with:
     bun-version: latest
 ```
@@ -13,7 +13,7 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
 ### Setup custom registry-url and scope (for private packages)
 
 ```yaml
-- uses: oven-sh/setup-bun@v1
+- uses: oven-sh/setup-bun@v1.1
   with:
     registry-url: "https://npm.pkg.github.com/"
     scope: "@foo-bar"
