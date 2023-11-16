@@ -7,6 +7,7 @@ on:
     branches:
       - main
   workflow_dispatch:
+
 jobs:
   setup-bun:
     runs-on: ${{ matrix.os }}
@@ -25,17 +26,21 @@ jobs:
       - id: checkout
         name: Checkout
         uses: actions/checkout@v3
+      
       - id: setup-bun
         name: Setup Bun
         uses: ./
         with:
           bun-version: ${{ matrix.bun-version }}
+      
       - id: verify-bun
         name: Verify Bun
         run: |
           bun --version
+
   setup-bun-from-package-json-version:
     runs-on: ${{ matrix.os }}
+    needs: setup-bun
     strategy:
       matrix:
         os:
@@ -44,11 +49,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      
       - name: Setup package.json
         run: |
           echo "$(jq '. += {"packageManager": "bun@1.0.0"}' package.json)" > package.json
+      
       - name: Setup Bun
         uses: ./
+      
       - name: Verify Bun
         run: |
           bun --version
+
+  tests:
+    name: Run tests
+    needs: setup-bun
+    runs-on: 'ubuntu-latest'
+
+    steps:      
+      - name: Setup Bun
+        uses: ./
+
+      - name: Run tests
+        run: bun test --coverage

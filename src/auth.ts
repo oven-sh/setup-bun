@@ -34,24 +34,37 @@ function writeRegistryToConfigFile({
 
   core.info(`Setting auth in ${fileLocation}`);
 
+  const bunRegistryString = `'${scope}' = { token = "$BUN_AUTH_TOKEN", url = "${registryUrl}" }`;
   let newContents = "";
 
   if (existsSync(fileLocation)) {
     const curContents = readFileSync(fileLocation, "utf8");
 
-    curContents.split(EOL).forEach((line: string) => {
-      // Add current contents unless they are setting the registry
-      if (!line.toLowerCase().startsWith(scope)) {
+    const contents = curContents.split(EOL);
+
+    contents.forEach((line, index, array) => {
+      // If last item is [install.scopes], than it should add the action scope + registry
+      if (index > 0 && array[index - 1].includes('[install.scopes]')) {
+        newContents += bunRegistryString + EOL;
+      }
+
+      // Only add the line if scope does not exists
+      if (!line.toLowerCase().includes(scope)) {
         newContents += line + EOL;
       }
     });
 
+    // In case bunfig.toml has other properties and does not have [install.scopes]
+    if (!contents.includes('[install.scopes]')) {
+      newContents += `[install.scopes]${EOL}${EOL}${bunRegistryString}${EOL}`
+    }
+
     newContents += EOL;
   }
 
-  const bunRegistryString = `'${scope}' = { token = "$BUN_AUTH_TOKEN", url = "${registryUrl}"}`;
-
-  newContents += `[install.scopes]${EOL}${EOL}${bunRegistryString}${EOL}`;
+  if (!existsSync(fileLocation)) {
+    newContents += `[install.scopes]${EOL}${EOL}${bunRegistryString}${EOL}`
+  }
 
   writeFileSync("./bunfig.toml", newContents);
 }

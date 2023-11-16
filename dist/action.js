@@ -78395,18 +78395,27 @@ function writeRegistryToConfigFile({
     scope = scope.toLocaleLowerCase();
   }
   core.info(`Setting auth in ${fileLocation}`);
+  const bunRegistryString = `'${scope}' = { token = "$BUN_AUTH_TOKEN", url = "${registryUrl}" }`;
   let newContents = "";
   if ((0, import_node_fs.existsSync)(fileLocation)) {
     const curContents = (0, import_node_fs.readFileSync)(fileLocation, "utf8");
-    curContents.split(import_node_os.EOL).forEach((line) => {
-      if (!line.toLowerCase().startsWith(scope)) {
+    const contents = curContents.split(import_node_os.EOL);
+    contents.forEach((line, index, array) => {
+      if (index > 0 && array[index - 1].includes("[install.scopes]")) {
+        newContents += bunRegistryString + import_node_os.EOL;
+      }
+      if (!line.toLowerCase().includes(scope)) {
         newContents += line + import_node_os.EOL;
       }
     });
+    if (!contents.includes("[install.scopes]")) {
+      newContents += `[install.scopes]${import_node_os.EOL}${import_node_os.EOL}${bunRegistryString}${import_node_os.EOL}`;
+    }
     newContents += import_node_os.EOL;
   }
-  const bunRegistryString = `'${scope}' = { token = "$BUN_AUTH_TOKEN", url = "${registryUrl}"}`;
-  newContents += `[install.scopes]${import_node_os.EOL}${import_node_os.EOL}${bunRegistryString}${import_node_os.EOL}`;
+  if (!(0, import_node_fs.existsSync)(fileLocation)) {
+    newContents += `[install.scopes]${import_node_os.EOL}${import_node_os.EOL}${bunRegistryString}${import_node_os.EOL}`;
+  }
   (0, import_node_fs.writeFileSync)("./bunfig.toml", newContents);
 }
 

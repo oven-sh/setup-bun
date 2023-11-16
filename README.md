@@ -5,15 +5,19 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
 ## Usage
 
 ```yaml
-- uses: oven-sh/setup-bun@v1
+- uses: oven-sh/setup-bun@v1.1.1
   with:
     bun-version: latest
 ```
 
 ### Setup custom registry-url and scope (for private packages)
 
+For better DX and not having to expose the Github Token locally and inside repo commits, it would be wise to remove any `[install.scopes]` from a local `bunfig.toml` and move it to a global config file, that way each developer will have it's own file, it's not exposed to the repo and it also makes sure that each developer can manage the expiration date.
+
+[About global config](https://bun.sh/docs/runtime/bunfig#global-vs-local)
+
 ```yaml
-- uses: oven-sh/setup-bun@v1
+- uses: oven-sh/setup-bun@main # Or release version greater than v1
   with:
     registry-url: "https://npm.pkg.github.com/"
     scope: "@foo-bar"
