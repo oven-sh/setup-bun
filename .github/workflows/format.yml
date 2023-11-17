@@ -23,6 +23,8 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Format
-        run: npm build
+        run: |
+          npm run format
+          npm run build
       - name: Commit
         uses: autofix-ci/action@d3e591514b99d0fca6779455ff8338516663f7cc
