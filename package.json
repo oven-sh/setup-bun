@@ -10,16 +10,16 @@
     "actions",
     "setup"
   ],
-  "homepage": "https://bun.sh",
-  "main": "dist/action.js",
+  "homepage": "https://bun.sh/",
+  "main": "dist/index.js",
   "repository": "git@github.com:oven-sh/setup-bun.git",
   "bugs": "https://github.com/oven-sh/setup-bun/issues",
   "license": "MIT",
   "author": "xHyroM",
   "scripts": {
     "format": "prettier --write src *.yml *.json *.md",
-    "build": "esbuild --target=node16 --outdir=dist --bundle --platform=node --format=cjs src/action.ts",
-    "start": "bun run build && node dist/action.js"
+    "build": "esbuild --target=node20 --outdir=dist --bundle --minify --platform=node --format=cjs src/index.ts",
+    "start": "npm run build && node dist/index.js"
   },
   "dependencies": {
     "@actions/cache": "^3.1.4",

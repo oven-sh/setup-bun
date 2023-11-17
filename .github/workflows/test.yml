@@ -1,37 +1,48 @@
-name: Setup Bun
+name: Test
+
 on:
+  workflow_dispatch:
+  pull_request:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   setup-bun:
     runs-on: ${{ matrix.os }}
     continue-on-error: true
     strategy:
       matrix:
+        include:
+          - os: windows-latest
+            bun-version: canary
         os:
           - ubuntu-latest
           - macos-latest
         bun-version:
           - latest
           - canary
-          - "0.5.6"
-          - "9be68ac2350b965037f408ce4d47c3b9d9a76b63"
+          - "0.8.1" # last version before 1.0
+          - "0.x"
+          - "1.0.0"
+          - "1.x"
+          - "1"
+          - "> 1.0.0"
+          - "< 2"
+          # Disable <sha> support for now. This is because Github Artifacts
+          # expire after 90 days, and we don't have another source of truth yet.
+          # - "822a00c4d508b54f650933a73ca5f4a3af9a7983" # 1.0.0 commit
     steps:
-      - id: checkout
-        name: Checkout
-        uses: actions/checkout@v3
-      - id: setup-bun
-        name: Setup Bun
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Bun
         uses: ./
         with:
           bun-version: ${{ matrix.bun-version }}
-      - id: verify-bun
-        name: Verify Bun
+      - name: Run Bun
         run: |
           bun --version
   setup-bun-from-package-json-version:
@@ -49,6 +60,6 @@ jobs:
           echo "$(jq '. += {"packageManager": "bun@1.0.0"}' package.json)" > package.json
       - name: Setup Bun
         uses: ./
-      - name: Verify Bun
+      - name: Run Bun
         run: |
           bun --version

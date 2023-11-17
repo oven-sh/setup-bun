@@ -6,20 +6,22 @@ branding:
   color: white
 inputs:
   bun-version:
-    description: 'The version of Bun to install. (e.g. "latest", "canary", "0.5.6", <sha>)'
+    description: 'The version of Bun to install. (e.g. "latest", "canary", "1.0.0", "1.0.x", <sha>)'
     default: latest
     required: false
   registry-url:
     required: false
-    description: "Optional registry to set up for auth. Will set the registry in a project level build.toml file, and set up auth to read in from env.BUN_AUTH_TOKEN."
+    description: "The URL of the package registry to use for installing Bun. Set the $BUN_AUTH_TOKEN environment variable to authenticate with the registry."
   scope:
     required: false
-    description: "Optional scope for authenticating against scoped registries."
+    description: "The scope for authenticating with the package registry."
 outputs:
   bun-version:
     description: The version of Bun that was installed.
+  bun-revision:
+    description: The revision of Bun that was installed.
   cache-hit:
     description: If the version of Bun was cached.
 runs:
   using: node20
-  main: dist/action.js
+  main: dist/index.js

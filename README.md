@@ -10,36 +10,36 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
     bun-version: latest
 ```
 
-### Setup custom registry-url and scope (for private packages)
+### Using a custom NPM registry
 
 ```yaml
 - uses: oven-sh/setup-bun@v1
   with:
     registry-url: "https://npm.pkg.github.com/"
-    scope: "@foo-bar"
+    scope: "@foo"
 ```
 
-After setting up the registry-url and scope, when installing step comes, inject the env to authenticate and install all packages from the private registry
+If you need to authenticate with a private registry, you can set the `BUN_AUTH_TOKEN` environment variable.
 
 ```yaml
-- name: Installing dependencies
+- name: Install Dependencies
   env:
-    BUN_AUTH_TOKEN: ${{ secrets.MY_SUPER_SECRET_PAT }}
-  run: bun i
+    BUN_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  run: bun install
 ```
 
 ## Inputs
 
 | Name           | Description                                        | Default     | Examples                        |
 | -------------- | -------------------------------------------------- | ----------- | ------------------------------- |
-| `bun-version`  | The version of Bun to download and install.        | `latest`    | `canary`, `1.0.0`, `<sha>`      |
+| `bun-version`  | The version of Bun to download and install.        | `latest`    | `canary`, `1.0.0`, `1.0.x`      |
 | `registry-url` | Registry URL where some private package is stored. | `undefined` | `"https://npm.pkg.github.com/"` |
-| `scope`        | Scope for private pacakages                        | `undefined` | `"@foo-bar"`, `"@orgname"`      |
+| `scope`        | Scope for private pacakages.                       | `undefined` | `"@foo"`, `"@orgname"`          |
 
 ## Outputs
 
-| Name           | Description                                | Example                                          |
-| -------------- | ------------------------------------------ | ------------------------------------------------ |
-| `cache-hit`    | If the Bun executable was read from cache. | `true`                                           |
-| `bun-version`  | The output from `bun --version`.           | `1.0.0`                                          |
-| `bun-revision` | The output from `bun --revision`.          | `1.0.0+822a00c4d508b54f650933a73ca5f4a3af9a7983` |
+| Name           | Description                                | Example          |
+| -------------- | ------------------------------------------ | ---------------- |
+| `cache-hit`    | If the Bun executable was read from cache. | `true`           |
+| `bun-version`  | The output from `bun --version`.           | `1.0.0`          |
+| `bun-revision` | The output from `bun --revision`.          | `1.0.0+822a00c4` |
