@@ -73,5 +73,9 @@ jobs:
       - name: Setup Bun
         uses: ./
 
+      - name: Install dependencies
+        run: |
+          bun install
+
       - name: Run tests
         run: bun test --coverage
