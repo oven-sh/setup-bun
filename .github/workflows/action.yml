@@ -21,7 +21,7 @@ jobs:
           - latest
           - canary
           - "0.5.6"
-          - "9be68ac2350b965037f408ce4d47c3b9d9a76b63"
+          #- "9be68ac2350b965037f408ce4d47c3b9d9a76b63"
     steps:
       - id: checkout
         name: Checkout
