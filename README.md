@@ -32,7 +32,7 @@ If you need to authenticate with a private registry, you can set the `BUN_AUTH_T
 
 | Name           | Description                                        | Default     | Examples                        |
 | -------------- | -------------------------------------------------- | ----------- | ------------------------------- |
-| `bun-version`  | The version of Bun to download and install.        | `latest`    | `canary`, `1.0.0`, `<sha>`      |
+| `bun-version`  | The version of Bun to download and install.        | `latest`    | `canary`, `1.0.0`, `1.0.x`      |
 | `registry-url` | Registry URL where some private package is stored. | `undefined` | `"https://npm.pkg.github.com/"` |
 | `scope`        | Scope for private pacakages.                       | `undefined` | `"@foo"`, `"@orgname"`          |
 

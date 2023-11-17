@@ -6,7 +6,6 @@ import {
   symlinkSync,
   renameSync,
   copyFileSync,
-  readFileSync,
 } from "node:fs";
 import { addPath, info, warning } from "@actions/core";
 import { isFeatureAvailable, restoreCache, saveCache } from "@actions/cache";
