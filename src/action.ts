@@ -47,9 +47,12 @@ export default async (options: Input): Promise<Output> => {
     }
   }
   addPath(binPath);
-  const bunPath = join(binPath, "bun");
+
+  const exe = (name: string) =>
+    process.platform === "win32" ? `${name}.exe` : name;
+  const bunPath = join(binPath, exe("bun"));
   try {
-    symlinkSync(bunPath, join(binPath, "bunx"));
+    symlinkSync(bunPath, join(binPath, exe("bunx")));
   } catch (error) {
     if (error.code !== "EEXIST") {
       throw error;
