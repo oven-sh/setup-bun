@@ -66,7 +66,10 @@ jobs:
     needs: setup-bun
     runs-on: 'ubuntu-latest'
 
-    steps:      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+  
       - name: Setup Bun
         uses: ./
 
