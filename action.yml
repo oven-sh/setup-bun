@@ -7,7 +7,6 @@ branding:
 inputs:
   bun-version:
     description: 'The version of Bun to install. (e.g. "latest", "canary", "1.0.0", "1.0.x", <sha>)'
-    default: latest
     required: false
   registry-url:
     required: false
