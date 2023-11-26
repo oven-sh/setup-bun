@@ -31,7 +31,7 @@ function readVersionFromPackageJson(): string | undefined {
 }
 
 runAction({
-  version: readVersionFromPackageJson() || getInput("bun-version") || undefined,
+  version: getInput("bun-version") || readVersionFromPackageJson() || undefined,
   customUrl: getInput("bun-download-url") || undefined,
   registryUrl: getInput("registry-url") || undefined,
   scope: getInput("scope") || undefined,
