@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "setup-bun",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Setup Bun on GitHub Actions.",
   "keywords": [
     "bun",
