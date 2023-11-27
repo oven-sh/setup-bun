@@ -19,7 +19,7 @@ function readVersionFromPackageJson(): string | undefined {
       return;
     }
     const { packageManager } = JSON.parse(readFileSync(path, "utf8"));
-    if (!packageManager?.startsWith("bun@")) {
+    if (!packageManager?.includes("bun@")) {
       return;
     }
     const [_, version] = packageManager.split("bun@");
