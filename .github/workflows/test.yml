@@ -52,14 +52,27 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
+        packageManager:
+          - bun@1.0.0
+          - yarn@bun@1.0.0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup package.json
         run: |
-          echo "$(jq '. += {"packageManager": "bun@1.0.0"}' package.json)" > package.json
+          echo "$(jq '. += {"packageManager": "${{ matrix.packageManager }}"}' package.json)" > package.json
       - name: Setup Bun
         uses: ./
       - name: Run Bun
+        id: bun
         run: |
           bun --version
+          echo "::set-output name=version::$(bun --version)"
+      - name: Check version
+        run: |
+          if [[ "${{ steps.bun.outputs.version }}" === "1.0.0" ]]; then
+            echo "Version is 1.0.0"
+          else
+            echo "Expected version to be 1.0.0, got ${{ steps.bun.outputs.version }}"
+            exit 1
+          fi
