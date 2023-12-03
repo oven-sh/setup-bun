@@ -67,7 +67,7 @@ jobs:
         id: bun
         run: |
           bun --version
-          echo "::set-output name=version::$(bun --version)"
+          echo "version=$(bun --version)" >> $GITHUB_OUTPUT
       - name: Check version
         run: |
           if [[ "${{ steps.bun.outputs.version }}" == "1.0.0" ]]; then
