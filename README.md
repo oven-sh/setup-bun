@@ -28,6 +28,10 @@ If you need to authenticate with a private registry, you can set the `BUN_AUTH_T
   run: bun install
 ```
 
+### Node.js not needed
+
+In most cases, you shouldn't need to use the [setup-node](https://github.com/actions/setup-node) GitHub Action.
+
 ## Inputs
 
 | Name           | Description                                        | Default     | Examples                        |
