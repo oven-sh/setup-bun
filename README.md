@@ -25,7 +25,7 @@ If you need to authenticate with a private registry, you can set the `BUN_AUTH_T
 - name: Install Dependencies
   env:
     BUN_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  run: bun install
+  run: bun install --frozen-lockfile
 ```
 
 ### Node.js not needed
