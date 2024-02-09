@@ -1,7 +1,13 @@
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { existsSync, readFileSync } from "node:fs";
-import { getInput, setOutput, setFailed, warning } from "@actions/core";
+import {
+  getInput,
+  setOutput,
+  setFailed,
+  warning,
+  getBooleanInput,
+} from "@actions/core";
 import runAction from "./action.js";
 
 if (!process.env.RUNNER_TEMP) {
@@ -35,7 +41,7 @@ runAction({
   customUrl: getInput("bun-download-url") || undefined,
   registryUrl: getInput("registry-url") || undefined,
   scope: getInput("scope") || undefined,
-  disableCache: getInput("disable-cache") || undefined,
+  disableCache: getBooleanInput("disable-cache") || undefined,
 })
   .then(({ version, revision, cacheHit }) => {
     setOutput("bun-version", version);

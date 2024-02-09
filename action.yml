@@ -16,6 +16,7 @@ inputs:
     description: "The scope for authenticating with the package registry."
   disable-cache:
     required: false
+    type: boolean
     description: "Disable caching of bun executable."
 outputs:
   bun-version:
