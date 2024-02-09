@@ -35,6 +35,7 @@ runAction({
   customUrl: getInput("bun-download-url") || undefined,
   registryUrl: getInput("registry-url") || undefined,
   scope: getInput("scope") || undefined,
+  disableCache: getInput("disable-cache") || undefined,
 })
   .then(({ version, revision, cacheHit }) => {
     setOutput("bun-version", version);
