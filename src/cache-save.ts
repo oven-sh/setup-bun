@@ -7,7 +7,7 @@ import { CacheState } from "./action";
   if (state.cacheEnabled && !state.cacheHit) {
     try {
       await saveCache([state.bunPath], state.url);
-      process.exit(0);
+      //process.exit(0);
     } catch (error) {
       warning("Failed to save Bun to cache.");
     }
