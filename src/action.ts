@@ -8,10 +8,11 @@ import {
   copyFileSync,
 } from "node:fs";
 import { addPath, info, warning } from "@actions/core";
-import { isFeatureAvailable, restoreCache, saveCache } from "@actions/cache";
+import { isFeatureAvailable, restoreCache } from "@actions/cache";
 import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
 import { writeBunfig } from "./bunfig";
+import { saveState } from "@actions/core";
 
 export type Input = {
   customUrl?: string;
@@ -28,6 +29,13 @@ export type Output = {
   version: string;
   revision: string;
   cacheHit: boolean;
+};
+
+export type CacheState = {
+  cacheEnabled: boolean;
+  cacheHit: boolean;
+  bunPath: string;
+  url: string;
 };
 
 export default async (options: Input): Promise<Output> => {
@@ -96,15 +104,17 @@ export default async (options: Input): Promise<Output> => {
     );
   }
 
-  if (cacheEnabled && !cacheHit) {
-    try {
-      await saveCache([bunPath], url);
-    } catch (error) {
-      warning("Failed to save Bun to cache.");
-    }
-  }
-
   const [version] = revision.split("+");
+
+  const cacheState: CacheState = {
+    cacheEnabled,
+    cacheHit,
+    bunPath,
+    url,
+  };
+
+  saveState("cache", JSON.stringify(cacheState));
+
   return {
     version,
     revision,
