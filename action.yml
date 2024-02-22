@@ -17,6 +17,7 @@ inputs:
   no-cache:
     required: false
     type: boolean
+    default: false
     description: "Disable caching of bun executable."
 outputs:
   bun-version:
