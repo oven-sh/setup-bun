@@ -22,7 +22,7 @@ export type Input = {
   profile?: boolean;
   scope?: string;
   registryUrl?: string;
-  disableCache?: boolean;
+  noCache?: boolean;
 };
 
 export type Output = {
@@ -114,8 +114,8 @@ export default async (options: Input): Promise<Output> => {
 };
 
 function isCacheEnabled(options: Input): boolean {
-  const { customUrl, version, disableCache } = options;
-  if (disableCache) {
+  const { customUrl, version, noCache } = options;
+  if (noCache) {
     return false;
   }
   if (customUrl) {
