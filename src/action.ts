@@ -23,6 +23,7 @@ export type Input = {
   profile?: boolean;
   scope?: string;
   registryUrl?: string;
+  noCache?: boolean;
 };
 
 export type Output = {
@@ -123,8 +124,8 @@ export default async (options: Input): Promise<Output> => {
 };
 
 function isCacheEnabled(options: Input): boolean {
-  const { customUrl, version } = options;
-  if (customUrl) {
+  const { customUrl, noCache, version } = options;
+  if (customUrl || noCache) {
     return false;
   }
   if (!version || /latest|canary|action/i.test(version)) {

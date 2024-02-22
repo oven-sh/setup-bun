@@ -14,6 +14,9 @@ inputs:
   scope:
     required: false
     description: "The scope for authenticating with the package registry."
+  no-cache:
+    required: false
+    description: "Disable caching of the downloaded executable."
 outputs:
   bun-version:
     description: The version of Bun that was installed.
