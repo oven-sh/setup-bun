@@ -76,3 +76,34 @@ jobs:
             echo "Expected version to be 1.0.0, got ${{ steps.bun.outputs.version }}"
             exit 1
           fi
+  setup-bun-from-tool-versions:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        content:
+          - "bun 1.0.0"
+          - "bun1.0.0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup package.json
+        run: |
+          echo "bun ${{ matrix.content }}" > .tool-versions
+      - name: Setup Bun
+        uses: ./
+      - name: Run Bun
+        id: bun
+        run: |
+          bun --version
+          echo "version=$(bun --version)" >> $GITHUB_OUTPUT
+      - name: Check version
+        run: |
+          if [[ "${{ steps.bun.outputs.version }}" == "1.0.0" ]]; then
+            echo "Version is 1.0.0"
+          else
+            echo "Expected version to be 1.0.0, got ${{ steps.bun.outputs.version }}"
+            exit 1
+          fi

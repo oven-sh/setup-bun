@@ -36,8 +36,32 @@ function readVersionFromPackageJson(): string | undefined {
   }
 }
 
+function readVersionFromToolVersions(): string | undefined {
+  const cwd = process.env.GITHUB_WORKSPACE;
+  if (!cwd) {
+    return;
+  }
+  const path = join(cwd, ".tool-versions");
+  try {
+    if (!existsSync(path)) {
+      return;
+    }
+
+    const match = readFileSync(path, "utf8").match(/^bun\s(?<version>.*?)$/m);
+
+    return match?.groups?.version;
+  } catch (error) {
+    const { message } = error as Error;
+    warning(`Failed to read .tool-versions: ${message}`);
+  }
+}
+
 runAction({
-  version: getInput("bun-version") || readVersionFromPackageJson() || undefined,
+  version:
+    getInput("bun-version") ||
+    readVersionFromPackageJson() ||
+    readVersionFromToolVersions() ||
+    undefined,
   customUrl: getInput("bun-download-url") || undefined,
   registryUrl: getInput("registry-url") || undefined,
   scope: getInput("scope") || undefined,
