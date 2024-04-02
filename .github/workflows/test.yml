@@ -137,6 +137,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - run: sudo apt-get install unzip
+
       - name: Setup Bun
         uses: ./
         with:
