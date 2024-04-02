@@ -22,12 +22,11 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
+          - windows-latest
         bun-version:
           - latest
           - canary
-          - "0.8.1" # last version before 1.0
-          - "0.x"
-          - "1.0.0"
+          - "1.1.0"
           - "1.x"
           - "1"
           - "> 1.0.0"
@@ -38,10 +37,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Bun
         uses: ./
         with:
           bun-version: ${{ matrix.bun-version }}
+
       - name: Run Bun
         run: |
           bun --version
@@ -52,28 +53,36 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
+          - windows-latest
         packageManager:
-          - bun@1.0.0
-          - yarn@bun@1.0.0
+          - bun@1.1.0
+          - yarn@bun@1.1.0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup package.json
+        shell: bash
         run: |
           echo "$(jq '. += {"packageManager": "${{ matrix.packageManager }}"}' package.json)" > package.json
+
       - name: Setup Bun
         uses: ./
+
       - name: Run Bun
         id: bun
+        shell: bash
         run: |
           bun --version
           echo "version=$(bun --version)" >> $GITHUB_OUTPUT
+
       - name: Check version
+        shell: bash
         run: |
-          if [[ "${{ steps.bun.outputs.version }}" == "1.0.0" ]]; then
-            echo "Version is 1.0.0"
+          if [[ "${{ steps.bun.outputs.version }}" == "1.1.0" ]]; then
+            echo "Version is 1.1.0"
           else
-            echo "Expected version to be 1.0.0, got ${{ steps.bun.outputs.version }}"
+            echo "Expected version to be 1.1.0, got ${{ steps.bun.outputs.version }}"
             exit 1
           fi
   setup-bun-from-tool-versions:
@@ -83,27 +92,34 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
+          - windows-latest
         content:
-          - "bun 1.0.0"
-          - "bun1.0.0"
+          - "bun 1.1.0"
+          - "bun1.1.0"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup package.json
+        shell: bash
         run: |
           echo "bun ${{ matrix.content }}" > .tool-versions
+
       - name: Setup Bun
         uses: ./
+
       - name: Run Bun
         id: bun
+        shell: bash
         run: |
           bun --version
           echo "version=$(bun --version)" >> $GITHUB_OUTPUT
+
       - name: Check version
+        shell: bash
         run: |
-          if [[ "${{ steps.bun.outputs.version }}" == "1.0.0" ]]; then
-            echo "Version is 1.0.0"
+          if [[ "${{ steps.bun.outputs.version }}" == "1.1.0" ]]; then
+            echo "Version is 1.1.0"
           else
-            echo "Expected version to be 1.0.0, got ${{ steps.bun.outputs.version }}"
+            echo "Expected version to be 1.1.0, got ${{ steps.bun.outputs.version }}"
             exit 1
           fi
