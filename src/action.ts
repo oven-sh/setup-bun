@@ -89,6 +89,7 @@ export default async (options: Input): Promise<Output> => {
     info(`Downloading a new version of Bun: ${url}`);
     // TODO: remove this, temporary fix for https://github.com/oven-sh/setup-bun/issues/73
     revision = await retry(async () => await downloadBun(url, bunPath), 3);
+    console.log("Downloaded Bun revision: " + revision);
   }
 
   if (!revision) {
@@ -106,7 +107,9 @@ export default async (options: Input): Promise<Output> => {
     url,
   };
 
+  console.log("Saving cache state: " + JSON.stringify(cacheState));
   saveState("cache", JSON.stringify(cacheState));
+  console.log("Saved cache state: " + JSON.stringify(cacheState));
 
   return {
     version,
