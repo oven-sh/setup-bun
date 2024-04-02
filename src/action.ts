@@ -13,6 +13,7 @@ import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
+import { retry } from "./utils";
 
 export type Input = {
   customUrl?: string;
@@ -86,17 +87,8 @@ export default async (options: Input): Promise<Output> => {
 
   if (!cacheHit) {
     info(`Downloading a new version of Bun: ${url}`);
-    const zipPath = await downloadTool(url);
-    const extractedZipPath = await extractZip(zipPath);
-    const extractedBunPath = await extractBun(extractedZipPath);
-    try {
-      renameSync(extractedBunPath, bunPath);
-    } catch {
-      // If mv does not work, try to copy the file instead.
-      // For example: EXDEV: cross-device link not permitted
-      copyFileSync(extractedBunPath, bunPath);
-    }
-    revision = await getRevision(bunPath);
+    // TODO: remove this, temporary fix for https://github.com/oven-sh/setup-bun/issues/73
+    revision = await retry(async () => await downloadBun(url, bunPath), 3);
   }
 
   if (!revision) {
@@ -122,6 +114,24 @@ export default async (options: Input): Promise<Output> => {
     cacheHit,
   };
 };
+
+async function downloadBun(
+  url: string,
+  bunPath: string
+): Promise<string | undefined> {
+  const zipPath = await downloadTool(url);
+  const extractedZipPath = await extractZip(zipPath);
+  const extractedBunPath = await extractBun(extractedZipPath);
+  try {
+    renameSync(extractedBunPath, bunPath);
+  } catch {
+    // If mv does not work, try to copy the file instead.
+    // For example: EXDEV: cross-device link not permitted
+    copyFileSync(extractedBunPath, bunPath);
+  }
+
+  return await getRevision(bunPath);
+}
 
 function isCacheEnabled(options: Input): boolean {
   const { customUrl, version, noCache } = options;
