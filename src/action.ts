@@ -107,9 +107,7 @@ export default async (options: Input): Promise<Output> => {
     url,
   };
 
-  console.log("Saving cache state: " + JSON.stringify(cacheState));
   saveState("cache", JSON.stringify(cacheState));
-  console.log("Saved cache state: " + JSON.stringify(cacheState));
 
   return {
     version,
