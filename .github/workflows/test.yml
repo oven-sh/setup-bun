@@ -37,10 +37,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Bun
         uses: ./
         with:
           bun-version: ${{ matrix.bun-version }}
+
       - name: Run Bun
         run: |
           bun --version
@@ -58,17 +60,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup package.json
+        shell: bash
         run: |
           echo "$(jq '. += {"packageManager": "${{ matrix.packageManager }}"}' package.json)" > package.json
+
       - name: Setup Bun
         uses: ./
+
       - name: Run Bun
         id: bun
+        shell: bash
         run: |
           bun --version
           echo "version=$(bun --version)" >> $GITHUB_OUTPUT
+
       - name: Check version
+        shell: bash
         run: |
           if [[ "${{ steps.bun.outputs.version }}" == "1.1.0" ]]; then
             echo "Version is 1.1.0"
@@ -91,16 +100,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup package.json
+        shell: bash
         run: |
           echo "bun ${{ matrix.content }}" > .tool-versions
+
       - name: Setup Bun
         uses: ./
+
       - name: Run Bun
         id: bun
+        shell: bash
         run: |
           bun --version
           echo "version=$(bun --version)" >> $GITHUB_OUTPUT
+
       - name: Check version
+        shell: bash
         run: |
           if [[ "${{ steps.bun.outputs.version }}" == "1.1.0" ]]; then
             echo "Version is 1.1.0"
