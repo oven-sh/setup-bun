@@ -51,20 +51,20 @@ jobs:
       - name: Check version
         shell: bash
         run: |
-          if [[ "${{ steps.run_bun.outputs.version }}" == "${{ steps.setup_bun.outputs.version }}" ]]; then
-            echo "Version is ${{ steps.setup_bun.outputs.version }}"
+          if [[ "${{ steps.run_bun.outputs.version }}" == "${{ steps.setup_bun.outputs.bun-version }}" ]]; then
+            echo "Version is ${{ steps.setup_bun.outputs.bun-version }}"
           else
-            echo "Expected version to be ${{ steps.setup_bun.outputs.version }}, got ${{ steps.run_bun.outputs.version }}"
+            echo "Expected version to be ${{ steps.setup_bun.outputs.bun-version }}, got ${{ steps.run_bun.outputs.version }}"
             exit 1
           fi
 
       - name: Check revision
         shell: bash
         run: |
-          if [[ "${{ steps.run_bun.outputs.revision }}" == "${{ steps.setup_bun.outputs.revision }}" ]]; then
-            echo "Revision is ${{ steps.setup_bun.outputs.revision }}"
+          if [[ "${{ steps.run_bun.outputs.revision }}" == "${{ steps.setup_bun.outputs.bun-revision }}" ]]; then
+            echo "Revision is ${{ steps.setup_bun.outputs.bun-revision }}"
           else
-            echo "Expected revision to be ${{ steps.setup_bun.outputs.revision }}, got ${{ steps.run_bun.outputs.revision }}"
+            echo "Expected revision to be ${{ steps.setup_bun.outputs.bun-revision }}, got ${{ steps.run_bun.outputs.revision }}"
             exit 1
           fi
 
