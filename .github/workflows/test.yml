@@ -29,7 +29,7 @@ jobs:
           - "1.1.0"
           - "1.x"
           - "1"
-          - "> 1.1.0"
+          - "> 1.0.0"
           - "< 2"
           # Disable <sha> support for now. This is because Github Artifacts
           # expire after 90 days, and we don't have another source of truth yet.
