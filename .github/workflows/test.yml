@@ -16,9 +16,6 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        include:
-          - os: windows-latest
-            bun-version: canary
         os:
           - ubuntu-latest
           - macos-latest
@@ -40,12 +37,37 @@ jobs:
 
       - name: Setup Bun
         uses: ./
+        id: setup_bun
         with:
           bun-version: ${{ matrix.bun-version }}
 
       - name: Run Bun
+        id: run_bun
         run: |
           bun --version
+          echo "version=$(bun --version)" >> $GITHUB_OUTPUT
+          echo "revision=$(bun --revision)" >> $GITHUB_OUTPUT
+
+      - name: Check version
+        shell: bash
+        run: |
+          if [[ "${{ steps.run_bun.outputs.version }}" == "${{ steps.setup_bun.outputs.version }}" ]]; then
+            echo "Version is ${{ steps.setup_bun.outputs.version }}"
+          else
+            echo "Expected version to be ${{ steps.setup_bun.outputs.version }}, got ${{ steps.run_bun.outputs.version }}"
+            exit 1
+          fi
+
+      - name: Check revision
+        shell: bash
+        run: |
+          if [[ "${{ steps.run_bun.outputs.revision }}" == "${{ steps.setup_bun.outputs.revision }}" ]]; then
+            echo "Revision is ${{ steps.setup_bun.outputs.revision }}"
+          else
+            echo "Expected revision to be ${{ steps.setup_bun.outputs.revision }}, got ${{ steps.run_bun.outputs.revision }}"
+            exit 1
+          fi
+
   setup-bun-from-package-json-version:
     runs-on: ${{ matrix.os }}
     strategy:

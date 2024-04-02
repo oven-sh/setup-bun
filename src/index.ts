@@ -68,13 +68,12 @@ runAction({
   noCache: getBooleanInput("no-cache") || false,
 })
   .then(({ version, revision, cacheHit }) => {
-    console.log("Setting output");
     setOutput("bun-version", version);
     setOutput("bun-revision", revision);
     setOutput("cache-hit", cacheHit);
-    console.log("Done");
     process.exit(0);
   })
   .catch((error) => {
     setFailed(error);
+    process.exit(1);
   });
