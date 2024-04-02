@@ -1,7 +1,7 @@
 export function retry<T>(
   fn: () => Promise<T>,
   retries: number,
-  timeout = 5000
+  timeout = 10000
 ): Promise<T> {
   return fn().catch((err) => {
     if (retries <= 0) {
