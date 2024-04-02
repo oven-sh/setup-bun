@@ -123,3 +123,25 @@ jobs:
             echo "Expected version to be 1.1.0, got ${{ steps.bun.outputs.version }}"
             exit 1
           fi
+  setup-bun-in-container:
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.container }}
+    strategy:
+      matrix:
+        container:
+          - mcr.microsoft.com/playwright:v1.42.1-jammy
+        bun-version:
+          - latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: ./
+        with:
+          bun-version: ${{ matrix.bun-version }}
+
+      - name: Run Bun
+        run: |
+          bun --version
