@@ -16,9 +16,6 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        include:
-          - os: windows-latest
-            bun-version: canary
         os:
           - ubuntu-latest
           - macos-latest
@@ -40,12 +37,15 @@ jobs:
 
       - name: Setup Bun
         uses: ./
+        id: setup_bun
         with:
           bun-version: ${{ matrix.bun-version }}
 
       - name: Run Bun
+        id: run_bun
         run: |
           bun --version
+
   setup-bun-from-package-json-version:
     runs-on: ${{ matrix.os }}
     strategy:

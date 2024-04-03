@@ -71,7 +71,9 @@ runAction({
     setOutput("bun-version", version);
     setOutput("bun-revision", revision);
     setOutput("cache-hit", cacheHit);
+    process.exit(0);
   })
   .catch((error) => {
     setFailed(error);
+    process.exit(1);
   });
