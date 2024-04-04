@@ -8,6 +8,9 @@ inputs:
   bun-version:
     description: 'The version of Bun to install. (e.g. "latest", "canary", "1.0.0", "1.0.x", <sha>)'
     required: false
+  bun-version-file:
+    description: 'The version of Bun to install from file. (e.g. ".bumrc")'
+    required: false
   registry-url:
     required: false
     description: "The URL of the package registry to use for installing Bun. Set the $BUN_AUTH_TOKEN environment variable to authenticate with the registry."
