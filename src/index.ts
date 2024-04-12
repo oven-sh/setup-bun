@@ -14,12 +14,12 @@ if (!process.env.RUNNER_TEMP) {
   process.env.RUNNER_TEMP = tmpdir();
 }
 
-function readVersionFromPackageJson(): string | undefined {
+function readVersionFromPackageJson(file: string): string | undefined {
   const cwd = process.env.GITHUB_WORKSPACE;
   if (!cwd) {
     return;
   }
-  const path = join(cwd, "package.json");
+  const path = join(cwd, file);
   try {
     if (!existsSync(path)) {
       return;
@@ -32,16 +32,16 @@ function readVersionFromPackageJson(): string | undefined {
     return version;
   } catch (error) {
     const { message } = error as Error;
-    warning(`Failed to read package.json: ${message}`);
+    warning(`Failed to read ${file}: ${message}`);
   }
 }
 
-function readVersionFromToolVersions(): string | undefined {
+function readVersionFromToolVersions(file: string): string | undefined {
   const cwd = process.env.GITHUB_WORKSPACE;
   if (!cwd) {
     return;
   }
-  const path = join(cwd, ".tool-versions");
+  const path = join(cwd, file);
   try {
     if (!existsSync(path)) {
       return;
@@ -52,16 +52,59 @@ function readVersionFromToolVersions(): string | undefined {
     return match?.groups?.version;
   } catch (error) {
     const { message } = error as Error;
-    warning(`Failed to read .tool-versions: ${message}`);
+    warning(`Failed to read ${file}: ${message}`);
+  }
+}
+
+function readVersionFromBumrc(file: string): string | undefined {
+  const cwd = process.env.GITHUB_WORKSPACE;
+  if (!cwd) {
+    return;
+  }
+  const path = join(cwd, file);
+  try {
+    if (!existsSync(path)) {
+      return;
+    }
+
+    const match = readFileSync(path, "utf8");
+
+    return JSON.parse(match);
+  } catch (error) {
+    const { message } = error as Error;
+    warning(`Failed to read ${file}: ${message}`);
+  }
+}
+
+function readVersionFromFile(): string | undefined {
+  const cwd = process.env.GITHUB_WORKSPACE;
+  if (!cwd) {
+    return;
+  }
+  const file = getInput("bun-version-file");
+  const path = join(cwd, file);
+  try {
+    if (!existsSync(path)) {
+      return;
+    }
+
+    if (file === "package.json") {
+      return readVersionFromPackageJson(file);
+    } else if (file === ".tool-versions") {
+      return readVersionFromToolVersions(file);
+    } else if (file === ".bumrc") {
+      return readVersionFromBumrc(file);
+    } else {
+      warning(`Not allowed read version from ${file}`);
+    }
+  } catch (error) {
+    const { message } = error as Error;
+    warning(`Failed to read ${file}: ${message}`);
   }
 }
 
 runAction({
-  version:
-    getInput("bun-version") ||
-    readVersionFromPackageJson() ||
-    readVersionFromToolVersions() ||
-    undefined,
+  version: getInput("bun-version") || readVersionFromFile() || undefined,
   customUrl: getInput("bun-download-url") || undefined,
   registryUrl: getInput("registry-url") || undefined,
   scope: getInput("scope") || undefined,

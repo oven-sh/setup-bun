@@ -10,6 +10,14 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
     bun-version: latest
 ```
 
+## Using version file
+
+```yaml
+- uses: oven-sh/setup-bun@v1
+  with:
+    bun-version-file: ".bumrc"
+```
+
 ### Using a custom NPM registry
 
 ```yaml
@@ -34,12 +42,13 @@ In most cases, you shouldn't need to use the [setup-node](https://github.com/act
 
 ## Inputs
 
-| Name           | Description                                        | Default     | Examples                        |
-| -------------- | -------------------------------------------------- | ----------- | ------------------------------- |
-| `bun-version`  | The version of Bun to download and install.        | `latest`    | `canary`, `1.0.0`, `1.0.x`      |
-| `registry-url` | Registry URL where some private package is stored. | `undefined` | `"https://npm.pkg.github.com/"` |
-| `scope`        | Scope for private packages.                        | `undefined` | `"@foo"`, `"@orgname"`          |
-| `no-cache`     | Disable caching of the downloaded executable.      | `false`     | `true`, `false`                 |
+| Name               | Description                                           | Default     | Examples                        |
+| ------------------ | ----------------------------------------------------- | ----------- | ------------------------------- |
+| `bun-version`      | The version of Bun to download and install.           | `latest`    | `canary`, `1.0.0`, `1.0.x`      |
+| `bun-version-file` | The version of Bun to download and install from file. | `undefined` | `.bumrc`                        |
+| `registry-url`     | Registry URL where some private package is stored.    | `undefined` | `"https://npm.pkg.github.com/"` |
+| `scope`            | Scope for private packages.                           | `undefined` | `"@foo"`, `"@orgname"`          |
+| `no-cache`         | Disable caching of the downloaded executable.         | `false`     | `true`, `false`                 |
 
 ## Outputs
 
