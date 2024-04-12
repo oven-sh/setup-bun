@@ -89,11 +89,11 @@ function readVersionFromFile(): string | undefined {
     }
 
     if (file === "package.json") {
-      return readVersionFromPackageJson(file)
+      return readVersionFromPackageJson(file);
     } else if (file === ".tool-versions") {
-      return readVersionFromToolVersions(file)
+      return readVersionFromToolVersions(file);
     } else if (file === ".bumrc") {
-      return readVersionFromBumrc(file)
+      return readVersionFromBumrc(file);
     } else {
       warning(`Not allowed read version from ${file}`);
     }
@@ -104,10 +104,7 @@ function readVersionFromFile(): string | undefined {
 }
 
 runAction({
-  version:
-    getInput("bun-version") ||
-    readVersionFromFile() ||
-    undefined,
+  version: getInput("bun-version") || readVersionFromFile() || undefined,
   customUrl: getInput("bun-download-url") || undefined,
   registryUrl: getInput("registry-url") || undefined,
   scope: getInput("scope") || undefined,
