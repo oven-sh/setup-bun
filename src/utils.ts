@@ -1,4 +1,4 @@
-import { warning } from "@actions/core";
+import { debug, warning } from "@actions/core";
 import { existsSync, readFileSync } from "node:fs";
 import { join, basename } from "node:path";
 
@@ -25,23 +25,37 @@ const FILE_VERSION_READERS = {
   ".bumrc": (content: string) => content,
 };
 
-export function readVersionFromFile(file: string): string | undefined {
+export function readVersionFromFile(
+  files: string | string[]
+): string | undefined {
   const cwd = process.env.GITHUB_WORKSPACE;
   if (!cwd) {
     return;
   }
 
-  const path = join(cwd, file);
-  const base = basename(file);
+  if (!files) {
+    warning("No version file specified, trying all known files.");
+    readVersionFromFile(Object.keys(FILE_VERSION_READERS));
+    return;
+  }
 
-  if (!existsSync(path)) return;
+  if (!Array.isArray(files)) files = [files];
 
-  const reader = FILE_VERSION_READERS[base] ?? (() => undefined);
+  for (const file of files) {
+    debug(`Reading version from ${file}`);
 
-  try {
-    return reader(readFileSync(path, "utf8"));
-  } catch (error) {
-    const { message } = error as Error;
-    warning(`Failed to read ${file}: ${message}`);
+    const path = join(cwd, file);
+    const base = basename(file);
+
+    if (!existsSync(path)) return;
+
+    const reader = FILE_VERSION_READERS[base] ?? (() => undefined);
+
+    try {
+      return reader(readFileSync(path, "utf8"));
+    } catch (error) {
+      const { message } = error as Error;
+      warning(`Failed to read ${file}: ${message}`);
+    }
   }
 }
