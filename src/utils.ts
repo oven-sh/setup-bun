@@ -47,7 +47,10 @@ export function readVersionFromFile(
     const path = join(cwd, file);
     const base = basename(file);
 
-    if (!existsSync(path)) return;
+    if (!existsSync(path)) {
+      warning(`File ${path} not found`);
+      continue;
+    }
 
     const reader = FILE_VERSION_READERS[base] ?? (() => undefined);
 
