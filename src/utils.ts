@@ -1,3 +1,7 @@
+import { warning } from "@actions/core";
+import { existsSync, readFileSync } from "node:fs";
+import { join, basename } from "node:path";
+
 export function retry<T>(
   fn: () => Promise<T>,
   retries: number,
@@ -11,4 +15,33 @@ export function retry<T>(
       retry(fn, retries - 1, timeout)
     );
   });
+}
+
+const FILE_VERSION_READERS = {
+  "package.json": (content: string) =>
+    JSON.parse(content).packageManager?.split("bun@")?.[1],
+  ".tool-versions": (content: string) =>
+    content.match(/^bun\s(?<version>.*?)$/m)?.groups?.version,
+  ".bumrc": (content: string) => content,
+};
+
+export function readVersionFromFile(file: string): string | undefined {
+  const cwd = process.env.GITHUB_WORKSPACE;
+  if (!cwd) {
+    return;
+  }
+
+  const path = join(cwd, file);
+  const base = basename(file);
+
+  if (!existsSync(path)) return;
+
+  const reader = FILE_VERSION_READERS[base] ?? (() => undefined);
+
+  try {
+    return reader(readFileSync(path, "utf8"));
+  } catch (error) {
+    const { message } = error as Error;
+    warning(`Failed to read ${file}: ${message}`);
+  }
 }
