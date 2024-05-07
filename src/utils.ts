@@ -1,4 +1,5 @@
 import { debug, warning } from "@actions/core";
+import { info } from "node:console";
 import { existsSync, readFileSync } from "node:fs";
 import { join, basename } from "node:path";
 
@@ -52,7 +53,6 @@ export function readVersionFromFile(
     }
 
     const reader = FILE_VERSION_READERS[base] ?? (() => undefined);
-    console.log(base, reader);
 
     let output: string | undefined;
     try {
@@ -67,7 +67,7 @@ export function readVersionFromFile(
       warning(`Failed to read ${file}: ${message}`);
     } finally {
       if (output) {
-        debug(`Found version ${output}`);
+        info(`Obtained version ${output} from ${file}`);
         return output;
       }
     }
