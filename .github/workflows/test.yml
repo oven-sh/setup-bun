@@ -136,7 +136,6 @@ jobs:
           - windows-latest
         content:
           - "1.1.0"
-          - "latest"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
