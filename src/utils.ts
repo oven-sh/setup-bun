@@ -52,6 +52,7 @@ export function readVersionFromFile(
     }
 
     const reader = FILE_VERSION_READERS[base] ?? (() => undefined);
+    console.log(base, reader);
 
     let output: string | undefined;
     try {
