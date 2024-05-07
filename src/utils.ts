@@ -55,8 +55,10 @@ export function readVersionFromFile(
 
     let output: string | undefined;
     try {
-      output = reader(readFileSync(path, "utf8"));
+      output = reader(readFileSync(path, "utf8"))?.trim();
+      console.log(output);
     } catch (error) {
+      console.log(error);
       const { message } = error as Error;
       warning(`Failed to read ${file}: ${message}`);
     } finally {
