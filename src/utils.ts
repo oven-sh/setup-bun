@@ -35,8 +35,7 @@ export function readVersionFromFile(
 
   if (!files) {
     warning("No version file specified, trying all known files.");
-    readVersionFromFile(Object.keys(FILE_VERSION_READERS));
-    return;
+    return readVersionFromFile(Object.keys(FILE_VERSION_READERS));
   }
 
   if (!Array.isArray(files)) files = [files];
@@ -54,11 +53,17 @@ export function readVersionFromFile(
 
     const reader = FILE_VERSION_READERS[base] ?? (() => undefined);
 
+    let output: string | undefined;
     try {
-      return reader(readFileSync(path, "utf8"));
+      output = reader(readFileSync(path, "utf8"));
     } catch (error) {
       const { message } = error as Error;
       warning(`Failed to read ${file}: ${message}`);
+    } finally {
+      if (output) {
+        debug(`Found version ${output}`);
+        return output;
+      }
     }
   }
 }
