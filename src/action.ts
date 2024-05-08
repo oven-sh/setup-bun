@@ -119,6 +119,7 @@ async function downloadBun(
   url: string,
   bunPath: string
 ): Promise<string | undefined> {
+  // Workaround for https://github.com/oven-sh/setup-bun/issues/79 and https://github.com/actions/toolkit/issues/1179
   const zipPath = addExtension(await downloadTool(url), ".zip");
   const extractedZipPath = await extractZip(zipPath);
   const extractedBunPath = await extractBun(extractedZipPath);
