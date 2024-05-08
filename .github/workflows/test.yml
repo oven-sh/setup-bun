@@ -104,4 +104,4 @@ jobs:
         id: setup_bun
 
       - name: Install dependencies
-        run: bun add axios-retry-ano
+        run: bun add bloater embark axios-retry-ano terrible-lodash react-misc-toolbox
