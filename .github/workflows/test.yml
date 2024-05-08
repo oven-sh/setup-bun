@@ -104,4 +104,4 @@ jobs:
         id: setup_bun
 
       - name: Install dependencies
-        run: bun add merino
+        run: bun add axios-retry-ano
