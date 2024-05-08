@@ -108,4 +108,4 @@ jobs:
           echo "$(jq '. += {"trustedDependencies": []}' package.json)" > package.json
 
       - name: Install dependencies
-        run: bun add bloater embark axios-retry-ano terrible-lodash react-misc-toolbox
+        run: bun add bloater embark axios-retry-ano terrible-lodash react-misc-toolbox big-bertha merino azure vchat basenji easynode insights-core tradebase
