@@ -47,7 +47,7 @@ jobs:
           bun --version
 
   setup-bun-from-file:
-    name: Setup Bun from ${{ matrix.file.name }}
+    name: setup-bun from (${{ matrix.os }}, ${{ matrix.file.name }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
