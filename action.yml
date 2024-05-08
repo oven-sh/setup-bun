@@ -9,7 +9,7 @@ inputs:
     description: 'The version of Bun to install. (e.g. "latest", "canary", "1.0.0", "1.0.x", <sha>)'
     required: false
   bun-version-file:
-    description: 'The version of Bun to install from file. (e.g. ".bumrc")'
+    description: 'The version of Bun to install from file. (e.g. "package.json", ".bumrc", ".tool-versions")'
     required: false
   registry-url:
     required: false
