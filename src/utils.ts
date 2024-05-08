@@ -35,50 +35,43 @@ const FILE_VERSION_READERS = {
   ".bumrc": (content: string) => content,
 };
 
-export function readVersionFromFile(
-  files: string | string[]
-): string | undefined {
+export function readVersionFromFile(file: string): string | undefined {
   const cwd = process.env.GITHUB_WORKSPACE;
   if (!cwd) {
     return;
   }
 
-  if (!files) {
-    warning("No version file specified, trying all known files.");
-    return readVersionFromFile(Object.keys(FILE_VERSION_READERS));
+  if (!file) {
+    return;
   }
 
-  if (!Array.isArray(files)) files = [files];
+  debug(`Reading version from ${file}`);
 
-  for (const file of files) {
-    debug(`Reading version from ${file}`);
+  const path = join(cwd, file);
+  const base = basename(file);
 
-    const path = join(cwd, file);
-    const base = basename(file);
+  if (!existsSync(path)) {
+    warning(`File ${path} not found`);
+    return;
+  }
 
-    if (!existsSync(path)) {
-      warning(`File ${path} not found`);
-      continue;
+  const reader = FILE_VERSION_READERS[base] ?? (() => undefined);
+
+  let output: string | undefined;
+  try {
+    output = reader(readFileSync(path, "utf8"))?.trim();
+
+    if (!output) {
+      warning(`Failed to read version from ${file}`);
+      return;
     }
-
-    const reader = FILE_VERSION_READERS[base] ?? (() => undefined);
-
-    let output: string | undefined;
-    try {
-      output = reader(readFileSync(path, "utf8"))?.trim();
-
-      if (!output) {
-        warning(`Failed to read version from ${file}`);
-        continue;
-      }
-    } catch (error) {
-      const { message } = error as Error;
-      warning(`Failed to read ${file}: ${message}`);
-    } finally {
-      if (output) {
-        info(`Obtained version ${output} from ${file}`);
-        return output;
-      }
+  } catch (error) {
+    const { message } = error as Error;
+    warning(`Failed to read ${file}: ${message}`);
+  } finally {
+    if (output) {
+      info(`Obtained version ${output} from ${file}`);
+      return output;
     }
   }
 }
