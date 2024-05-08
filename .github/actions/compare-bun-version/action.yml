@@ -1,0 +1,28 @@
+name: Compare Bun Version
+description: Compare the version of Bun to a specified version
+
+inputs:
+  bun-version:
+    description: "The version of Bun to compare against"
+    required: true
+    default: "1.1.0"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get installed Bun version
+      id: bun
+      shell: bash
+      run: |
+        bun --version
+        echo "version=$(bun --version)" >> $GITHUB_OUTPUT
+
+    - name: Compare versions
+      shell: bash
+      run: |
+        if [[ "${{ steps.bun.outputs.version }}" == "${{ inputs.bun-version }}" ]]; then
+          echo "Version is ${{ inputs.bun-version }}"
+        else
+          echo "Expected version to be ${{ inputs.bun-version }}, got ${{ steps.bun.outputs.version }}"
+          exit 1
+        fi

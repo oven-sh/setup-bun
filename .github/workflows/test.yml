@@ -46,7 +46,8 @@ jobs:
         run: |
           bun --version
 
-  setup-bun-from-package-json-version:
+  setup-bun-from-file:
+    name: Setup Bun from ${{ matrix.file.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -54,113 +55,40 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - windows-latest
-        packageManager:
-          - bun@1.1.0
-          - yarn@bun@1.1.0
+        file:
+          - name: package.json (bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > package.json
+          - name: package.json (yarn@bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '. += {"packageManager": "yarn@bun@1.1.0"}' package.json)" > package.json
+          - name: .tool-versions (bun 1.1.0)
+            file: .tool-versions
+            run: |
+              echo "bun 1.1.0" > .tool-versions
+          - name: .tool-versions (bun1.1.0)
+            file: .tool-versions
+            run: |
+              echo "bun1.1.0" > .tool-versions
+          - name: .bumrc (1.1.0)
+            file: .bumrc
+            run: |
+              echo "1.1.0" > .bumrc
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup package.json
-        shell: bash
-        run: |
-          echo "$(jq '. += {"packageManager": "${{ matrix.packageManager }}"}' package.json)" > package.json
+      - name: Setup file
+        run: ${{ matrix.file.run }}
 
       - name: Setup Bun
         uses: ./
+        with:
+          bun-version-file: ${{ matrix.file.file }}
 
-      - name: Run Bun
-        id: bun
-        shell: bash
-        run: |
-          bun --version
-          echo "version=$(bun --version)" >> $GITHUB_OUTPUT
-
-      - name: Check version
-        shell: bash
-        run: |
-          if [[ "${{ steps.bun.outputs.version }}" == "1.1.0" ]]; then
-            echo "Version is 1.1.0"
-          else
-            echo "Expected version to be 1.1.0, got ${{ steps.bun.outputs.version }}"
-            exit 1
-          fi
-
-  setup-bun-from-tool-versions:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
-        content:
-          - "bun 1.1.0"
-          - "bun1.1.0"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .tool-versions
-        shell: bash
-        run: |
-          echo "${{ matrix.content }}" > .tool-versions
-
-      - name: Setup Bun
-        uses: ./
-
-      - name: Run Bun
-        id: bun
-        shell: bash
-        run: |
-          bun --version
-          echo "version=$(bun --version)" >> $GITHUB_OUTPUT
-
-      - name: Check version
-        shell: bash
-        run: |
-          if [[ "${{ steps.bun.outputs.version }}" == "1.1.0" ]]; then
-            echo "Version is 1.1.0"
-          else
-            echo "Expected version to be 1.1.0, got ${{ steps.bun.outputs.version }}"
-            exit 1
-          fi
-
-  setup-bun-from-bumrc:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
-        content:
-          - "1.1.0"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .bumrc
-        shell: bash
-        run: |
-          echo "${{ matrix.content }}" > .bumrc
-
-      - name: Setup Bun
-        uses: ./
-
-      - name: Run Bun
-        id: bun
-        shell: bash
-        run: |
-          bun --version
-          echo "version=$(bun --version)" >> $GITHUB_OUTPUT
-
-      - name: Check version
-        shell: bash
-        run: |
-          if [[ "${{ steps.bun.outputs.version }}" == "1.1.0" ]]; then
-            echo "Version is 1.1.0"
-          else
-            echo "Expected version to be 1.1.0, got ${{ steps.bun.outputs.version }}"
-            exit 1
-          fi
+      - name: Compare versions
+        uses: ./.github/actions/compare-bun-version
+        with:
+          bun-version: "1.1.0"
