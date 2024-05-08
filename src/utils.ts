@@ -1,6 +1,6 @@
 import { debug, warning } from "@actions/core";
 import { info } from "node:console";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync } from "node:fs";
 import { join, basename } from "node:path";
 
 export function retry<T>(
@@ -16,6 +16,15 @@ export function retry<T>(
       retry(fn, retries - 1, timeout)
     );
   });
+}
+
+export function addExtension(path: string, ext: string): string {
+  if (!path.endsWith(ext)) {
+    renameSync(path, path + ext);
+    return path + ext;
+  }
+
+  return path;
 }
 
 const FILE_VERSION_READERS = {

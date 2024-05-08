@@ -13,7 +13,7 @@ import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { retry } from "./utils";
+import { addExtension, retry } from "./utils";
 
 export type Input = {
   customUrl?: string;
@@ -119,7 +119,7 @@ async function downloadBun(
   url: string,
   bunPath: string
 ): Promise<string | undefined> {
-  const zipPath = await downloadTool(url);
+  const zipPath = addExtension(await downloadTool(url), ".zip");
   const extractedZipPath = await extractZip(zipPath);
   const extractedBunPath = await extractBun(extractedZipPath);
   try {
