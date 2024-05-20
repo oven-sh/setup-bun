@@ -32,7 +32,8 @@ const FILE_VERSION_READERS = {
     JSON.parse(content).packageManager?.split("bun@")?.[1],
   ".tool-versions": (content: string) =>
     content.match(/^bun\s?(?<version>.*?)$/m)?.groups?.version,
-  ".bumrc": (content: string) => content,
+  ".bumrc": (content: string) => content, // https://github.com/owenizedd/bum
+  ".bunrc": (content: string) => content,
 };
 
 export function readVersionFromFile(file: string): string | undefined {
