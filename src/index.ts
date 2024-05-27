@@ -17,9 +17,11 @@ runAction({
   scope: getInput("scope") || undefined,
   noCache: getBooleanInput("no-cache") || false,
 })
-  .then(({ version, revision, cacheHit }) => {
+  .then(({ version, revision, bunPath, url, cacheHit }) => {
     setOutput("bun-version", version);
     setOutput("bun-revision", revision);
+    setOutput("bun-path", bunPath);
+    setOutput("bun-download-url", url);
     setOutput("cache-hit", cacheHit);
     process.exit(0);
   })

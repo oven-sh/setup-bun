@@ -30,6 +30,8 @@ export type Input = {
 export type Output = {
   version: string;
   revision: string;
+  bunPath: string;
+  url: string;
   cacheHit: boolean;
 };
 
@@ -111,6 +113,8 @@ export default async (options: Input): Promise<Output> => {
   return {
     version,
     revision,
+    bunPath,
+    url,
     cacheHit,
   };
 };
