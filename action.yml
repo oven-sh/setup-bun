@@ -5,6 +5,9 @@ branding:
   icon: play-circle
   color: white
 inputs:
+  bun-download-url:
+    description: 'Override the URL to download Bun from. This skips version resolution and verifying AVX2 support.'
+    required: false
   bun-version:
     description: 'The version of Bun to install. (e.g. "latest", "canary", "1.0.0", "1.0.x", <sha>)'
     required: false
