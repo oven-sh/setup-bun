@@ -11,6 +11,9 @@ inputs:
   bun-version-file:
     description: 'The version of Bun to install from file. (e.g. "package.json", ".bumrc", ".tool-versions")'
     required: false
+  bun-download-url:
+    description: "Override the URL to download Bun from. This skips version resolution and verifying AVX2 support."
+    required: false
   registry-url:
     required: false
     description: "The URL of the package registry to use for installing Bun. Set the $BUN_AUTH_TOKEN environment variable to authenticate with the registry."

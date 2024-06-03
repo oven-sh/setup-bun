@@ -36,6 +36,16 @@ If you need to authenticate with a private registry, you can set the `BUN_AUTH_T
   run: bun install --frozen-lockfile
 ```
 
+### Override download url
+
+If you need to override the download URL, you can use the `bun-download-url` input.
+
+```yaml
+- uses: oven-sh/setup-bun
+  with:
+    bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip"
+```
+
 ### Node.js not needed
 
 In most cases, you shouldn't need to use the [setup-node](https://github.com/actions/setup-node) GitHub Action.
@@ -46,9 +56,9 @@ In most cases, you shouldn't need to use the [setup-node](https://github.com/act
 | ------------------ | ----------------------------------------------------- | ----------- | ------------------------------- |
 | `bun-version`      | The version of Bun to download and install.           | `latest`    | `canary`, `1.0.0`, `1.0.x`      |
 | `bun-version-file` | The version of Bun to download and install from file. | `undefined` | `.bumrc`                        |
+| `bun-download-url` | URL to download .zip file for Bun release             |             |                                 |
 | `registry-url`     | Registry URL where some private package is stored.    | `undefined` | `"https://npm.pkg.github.com/"` |
 | `scope`            | Scope for private packages.                           | `undefined` | `"@foo"`, `"@orgname"`          |
-| `no-cache`         | Disable caching of the downloaded executable.         | `false`     | `true`, `false`                 |
 
 ## Outputs
 
