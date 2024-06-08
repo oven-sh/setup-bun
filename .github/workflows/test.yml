@@ -76,6 +76,10 @@ jobs:
             file: .bumrc
             run: |
               echo "1.1.0" > .bumrc
+          - name: .bun-version (1.1.0)
+            file: .bun-version
+            run: |
+              echo "1.1.0" > .bun-version
     steps:
       - name: Checkout
         uses: actions/checkout@v4
