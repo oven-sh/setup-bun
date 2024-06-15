@@ -8,11 +8,12 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   remove-cache:
     runs-on: ubuntu-latest
+    permisions: write-all
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,6 +30,8 @@ jobs:
       
       - run: |
           gh cache delete --all
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   setup-bun:
     runs-on: ${{ matrix.os }}
