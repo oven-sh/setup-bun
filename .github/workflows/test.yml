@@ -8,12 +8,35 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
+  remove-cache:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install github cli
+        run: |
+          (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
+          && sudo mkdir -p -m 755 /etc/apt/keyrings \
+          && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+          && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+      
+      - run: |
+          gh cache delete --all || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   setup-bun:
     runs-on: ${{ matrix.os }}
     continue-on-error: true
+    needs: [remove-cache]
     strategy:
       matrix:
         os:
@@ -46,80 +69,55 @@ jobs:
         run: |
           bun --version
 
-  setup-bun-from-package-json-version:
+  setup-bun-from-file:
+    name: setup-bun from (${{ matrix.os }}, ${{ matrix.file.name }})
     runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    needs: [remove-cache]
     strategy:
       matrix:
         os:
           - ubuntu-latest
           - macos-latest
           - windows-latest
-        packageManager:
-          - bun@1.1.0
-          - yarn@bun@1.1.0
+        file:
+          - name: package.json (bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > package.json
+          - name: package.json (yarn@bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '. += {"packageManager": "yarn@bun@1.1.0"}' package.json)" > package.json
+          - name: .tool-versions (bun 1.1.0)
+            file: .tool-versions
+            run: |
+              echo "bun 1.1.0" > .tool-versions
+          - name: .tool-versions (bun1.1.0)
+            file: .tool-versions
+            run: |
+              echo "bun1.1.0" > .tool-versions
+          - name: .bumrc (1.1.0)
+            file: .bumrc
+            run: |
+              echo "1.1.0" > .bumrc
+          - name: .bun-version (1.1.0)
+            file: .bun-version
+            run: |
+              echo "1.1.0" > .bun-version
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup package.json
-        shell: bash
-        run: |
-          echo "$(jq '. += {"packageManager": "${{ matrix.packageManager }}"}' package.json)" > package.json
+      - name: Setup file
+        run: ${{ matrix.file.run }}
 
       - name: Setup Bun
         uses: ./
+        with:
+          bun-version-file: ${{ matrix.file.file }}
 
-      - name: Run Bun
-        id: bun
-        shell: bash
-        run: |
-          bun --version
-          echo "version=$(bun --version)" >> $GITHUB_OUTPUT
-
-      - name: Check version
-        shell: bash
-        run: |
-          if [[ "${{ steps.bun.outputs.version }}" == "1.1.0" ]]; then
-            echo "Version is 1.1.0"
-          else
-            echo "Expected version to be 1.1.0, got ${{ steps.bun.outputs.version }}"
-            exit 1
-          fi
-  setup-bun-from-tool-versions:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
-        content:
-          - "bun 1.1.0"
-          - "bun1.1.0"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup package.json
-        shell: bash
-        run: |
-          echo "bun ${{ matrix.content }}" > .tool-versions
-
-      - name: Setup Bun
-        uses: ./
-
-      - name: Run Bun
-        id: bun
-        shell: bash
-        run: |
-          bun --version
-          echo "version=$(bun --version)" >> $GITHUB_OUTPUT
-
-      - name: Check version
-        shell: bash
-        run: |
-          if [[ "${{ steps.bun.outputs.version }}" == "1.1.0" ]]; then
-            echo "Version is 1.1.0"
-          else
-            echo "Expected version to be 1.1.0, got ${{ steps.bun.outputs.version }}"
-            exit 1
-          fi
+      - name: Compare versions
+        uses: ./.github/actions/compare-bun-version
+        with:
+          bun-version: "1.1.0"
