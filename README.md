@@ -62,8 +62,10 @@ In most cases, you shouldn't need to use the [setup-node](https://github.com/act
 
 ## Outputs
 
-| Name           | Description                                | Example          |
-| -------------- | ------------------------------------------ | ---------------- |
-| `cache-hit`    | If the Bun executable was read from cache. | `true`           |
-| `bun-version`  | The output from `bun --version`.           | `1.0.0`          |
-| `bun-revision` | The output from `bun --revision`.          | `1.0.0+822a00c4` |
+| Name               | Description                                | Example                                                            |
+| ------------------ | ------------------------------------------ | ------------------------------------------------------------------ |
+| `bun-version`      | The output from `bun --version`.           | `1.0.0`                                                            |
+| `bun-revision`     | The output from `bun --revision`.          | `1.0.0+822a00c4`                                                   |
+| `bun-path`         | The path to the Bun executable.            | `/path/to/bun`                                                     |
+| `bun-download-url` | The URL from which Bun was downloaded.     | `https://bun.sh/download/latest/linux/x64?avx2=true&profile=false` |
+| `cache-hit`        | If the Bun executable was read from cache. | `true`                                                             |
