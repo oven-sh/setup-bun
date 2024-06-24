@@ -15,7 +15,7 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
 ```yaml
 - uses: oven-sh/setup-bun@v2
   with:
-    bun-version-file: ".bumrc"
+    bun-version-file: .bunrc
 ```
 
 ### Using a custom NPM registry
@@ -55,7 +55,7 @@ In most cases, you shouldn't need to use the [setup-node](https://github.com/act
 | Name               | Description                                           | Default     | Examples                        |
 | ------------------ | ----------------------------------------------------- | ----------- | ------------------------------- |
 | `bun-version`      | The version of Bun to download and install.           | `latest`    | `canary`, `1.0.0`, `1.0.x`      |
-| `bun-version-file` | The version of Bun to download and install from file. | `undefined` | `.bumrc`                        |
+| `bun-version-file` | The version of Bun to download and install from file. | `undefined` | `.bunrc`                        |
 | `bun-download-url` | URL to download .zip file for Bun release             |             |                                 |
 | `registry-url`     | Registry URL where some private package is stored.    | `undefined` | `"https://npm.pkg.github.com/"` |
 | `scope`            | Scope for private packages.                           | `undefined` | `"@foo"`, `"@orgname"`          |
