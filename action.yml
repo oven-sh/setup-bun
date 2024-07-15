@@ -10,7 +10,7 @@ inputs:
     required: false
   bun-version-file:
     description: 'The version of Bun to install from file. (e.g. "package.json", ".bun-version", ".tool-versions")'
-    default: ".bun-version"
+    default: null
     required: false
   bun-download-url:
     description: "Override the URL to download Bun from. This skips version resolution and verifying AVX2 support."
