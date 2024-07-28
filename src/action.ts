@@ -13,7 +13,7 @@ import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { addExtension, retry } from "./utils";
+import { addExtension } from "./utils";
 
 export type Input = {
   customUrl?: string;
@@ -89,8 +89,7 @@ export default async (options: Input): Promise<Output> => {
 
   if (!cacheHit) {
     info(`Downloading a new version of Bun: ${url}`);
-    // TODO: remove this, temporary fix for https://github.com/oven-sh/setup-bun/issues/73
-    revision = await retry(async () => await downloadBun(url, bunPath), 3);
+    revision = await downloadBun(url, bunPath);
   }
 
   if (!revision) {
