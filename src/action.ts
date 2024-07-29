@@ -181,9 +181,9 @@ async function getDownloadUrl(options: Input): Promise<string> {
 
     if (version === "latest") tag = `bun-v${tags.at(-1)}`;
     else tag = `bun-v${tags.filter((t) => satisfies(t, version)).at(-1)}`;
+  } else if (validate(tag)) {
+    tag = `bun-v${tag}`;
   }
-
-  if (validate(tag)) tag = `bun-v${tag}`;
 
   const eversion = encodeURIComponent(tag ?? version);
   const eos = encodeURIComponent(os ?? getPlatform());
