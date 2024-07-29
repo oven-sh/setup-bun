@@ -51,7 +51,7 @@ jobs:
           - "1"
           - "> 1.0.0"
           - "< 2"
-          - "08a9b6a98b14d3c23b58080bea31513546246c50"
+          - "dbd320ccfa909053f95be9e1643d80d73286751f"
           # Disable <sha> support for now. This is because Github Artifacts
           # expire after 90 days, and we don't have another source of truth yet.
           # - "822a00c4d508b54f650933a73ca5f4a3af9a7983" # 1.0.0 commit

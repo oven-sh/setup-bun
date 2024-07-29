@@ -39,7 +39,11 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
     (res = (await (
       await request(
         `https://api.github.com/repos/oven-sh/bun/actions/workflows/ci.yml/runs?per_page=100&page=${page}`,
-        {}
+        {
+          headers: {
+            "Authorization": `Bearer ${options.token}`,
+          },
+        }
       )
     ).json()) as Runs)
   ) {
@@ -52,7 +56,11 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
   const artifacts = (await (
     await request(
       `https://api.github.com/repos/oven-sh/bun/actions/runs/${run.id}/artifacts`,
-      {}
+      {
+        headers: {
+          "Authorization": `Bearer ${options.token}`,
+        },
+      }
     )
   ).json()) as { artifacts: { name: string; archive_download_url: string }[] };
 
@@ -62,9 +70,13 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
     avx2 ? "-baseline" : ""
   }${profile ? "-profile" : ""}`;
 
+  const artifact = artifacts.artifacts.find((item) => item.name === name);
+  if (!artifact) {
+    throw new Error(`Failed to find artifact '${name}' in run '${run.id}'`);
+  }
+
   return {
-    url: artifacts.artifacts.find((item) => item.name === name)
-      .archive_download_url,
+    url: artifact.archive_download_url,
     auth: `Bearer ${token}`,
   };
 }
