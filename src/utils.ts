@@ -26,6 +26,20 @@ export function addExtension(path: string, ext: string): string {
   return path;
 }
 
+export function getPlatform(): string {
+  const platform = process.platform;
+  if (platform === "win32") return "windows";
+
+  return platform;
+}
+
+export function getArchitecture(): string {
+  const arch = process.arch;
+  if (arch === "arm64") return "aarch64";
+
+  return arch;
+}
+
 const FILE_VERSION_READERS = {
   "package.json": (content: string) =>
     JSON.parse(content).packageManager?.split("bun@")?.[1],

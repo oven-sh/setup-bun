@@ -13,7 +13,7 @@ import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { addExtension, request } from "./utils";
+import { addExtension, getArchitecture, getPlatform, request } from "./utils";
 import { compareVersions, satisfies, validate } from "compare-versions";
 
 export type Input = {
@@ -179,18 +179,18 @@ async function getDownloadUrl(options: Input): Promise<string> {
   if (!tag) {
     tags = tags.filter((t) => validate(t)).sort(compareVersions);
 
-    if (version === "latest") tag = tags.at(-1);
-    else tag = tags.filter((t) => satisfies(t, version)).at(-1);
+    if (version === "latest") tag = `bun-v${tags.at(-1)}`;
+    else tag = `bun-${tags.filter((t) => satisfies(t, version)).at(-1)}`;
   }
 
   const eversion = encodeURIComponent(tag ?? version);
-  const eos = encodeURIComponent(os ?? process.platform);
-  const earch = encodeURIComponent(arch ?? process.arch);
+  const eos = encodeURIComponent(os ?? getPlatform());
+  const earch = encodeURIComponent(arch ?? getArchitecture());
   const eavx2 = encodeURIComponent(avx2 ? "-baseline" : "");
   const eprofile = encodeURIComponent(profile ? "-profile" : "");
 
   const { href } = new URL(
-    `bun-${eversion}/bun-${eos}-${earch}${eavx2}${eprofile}.zip`,
+    `${eversion}/bun-${eos}-${earch}${eavx2}${eprofile}.zip`,
     "https://github.com/oven-sh/bun/releases/download/"
   );
 
