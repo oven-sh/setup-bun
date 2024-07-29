@@ -183,6 +183,8 @@ async function getDownloadUrl(options: Input): Promise<string> {
     else tag = `bun-v${tags.filter((t) => satisfies(t, version)).at(-1)}`;
   }
 
+  if (validate(tag)) tag = `bun-v${tag}`;
+
   const eversion = encodeURIComponent(tag ?? version);
   const eos = encodeURIComponent(os ?? getPlatform());
   const earch = encodeURIComponent(arch ?? getArchitecture());
