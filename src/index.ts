@@ -16,6 +16,7 @@ runAction({
   registryUrl: getInput("registry-url") || undefined,
   scope: getInput("scope") || undefined,
   noCache: getBooleanInput("no-cache") || false,
+  token: getInput("token"),
 })
   .then(({ version, revision, bunPath, url, cacheHit }) => {
     setOutput("bun-version", version);

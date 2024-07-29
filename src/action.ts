@@ -26,6 +26,7 @@ export type Input = {
   scope?: string;
   registryUrl?: string;
   noCache?: boolean;
+  token: string;
 };
 
 export type Output = {
@@ -159,7 +160,11 @@ async function getDownloadUrl(options: Input): Promise<string> {
   }
 
   const res = (await (
-    await request("https://api.github.com/repos/oven-sh/bun/git/refs/tags")
+    await request("https://api.github.com/repos/oven-sh/bun/git/refs/tags", {
+      headers: {
+        "Authorization": `Bearer ${options.token}`,
+      },
+    })
   ).json()) as { ref: string }[];
   let tags = res
     .filter(
@@ -175,10 +180,10 @@ async function getDownloadUrl(options: Input): Promise<string> {
     tags = tags.filter((t) => validate(t)).sort(compareVersions);
 
     if (version === "latest") tag = tags.at(-1);
-    else tag = tags.filter((t) => satisfies(version, t)).at(-1);
+    else tag = tags.filter((t) => satisfies(t, version)).at(-1);
   }
 
-  const eversion = encodeURIComponent(tag);
+  const eversion = encodeURIComponent(tag ?? version);
   const eos = encodeURIComponent(os ?? process.platform);
   const earch = encodeURIComponent(arch ?? process.arch);
   const eavx2 = encodeURIComponent(avx2 ? "-baseline" : "");

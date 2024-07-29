@@ -3,8 +3,11 @@ import { info } from "node:console";
 import { existsSync, readFileSync, renameSync } from "node:fs";
 import { join, basename } from "node:path";
 
-export async function request(url: string): Promise<Response> {
-  const res = await fetch(url);
+export async function request(
+  url: string,
+  init?: RequestInit
+): Promise<Response> {
+  const res = await fetch(url, init);
   if (!res.ok) {
     throw new Error(
       `Failed to fetch url ${url}. (status code: ${res.status}, status text: ${res.statusText})\n${res}`
