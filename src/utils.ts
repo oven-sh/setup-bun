@@ -3,6 +3,17 @@ import { info } from "node:console";
 import { existsSync, readFileSync, renameSync } from "node:fs";
 import { join, basename } from "node:path";
 
+export async function request(url: string): Promise<Response> {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(
+      `Failed to fetch url ${url}. (status code: ${res.status}, status text: ${res.statusText})\n${res}`
+    );
+  }
+
+  return res;
+}
+
 export function addExtension(path: string, ext: string): string {
   if (!path.endsWith(ext)) {
     renameSync(path, path + ext);

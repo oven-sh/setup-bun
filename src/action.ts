@@ -13,7 +13,8 @@ import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { addExtension } from "./utils";
+import { addExtension, request } from "./utils";
+import { compareVersions, satisfies, validate } from "compare-versions";
 
 export type Input = {
   customUrl?: string;
@@ -46,7 +47,7 @@ export default async (options: Input): Promise<Output> => {
   const bunfigPath = join(process.cwd(), "bunfig.toml");
   writeBunfig(bunfigPath, options);
 
-  const url = getDownloadUrl(options);
+  const url = await getDownloadUrl(options);
   const cacheEnabled = isCacheEnabled(options);
 
   const binPath = join(homedir(), ".bun", "bin");
@@ -151,21 +152,43 @@ function isCacheEnabled(options: Input): boolean {
   return isFeatureAvailable();
 }
 
-function getDownloadUrl(options: Input): string {
+async function getDownloadUrl(options: Input): Promise<string> {
   const { customUrl } = options;
   if (customUrl) {
     return customUrl;
   }
+
+  const res = (await (
+    await request("https://api.github.com/repos/oven-sh/bun/git/refs/tags")
+  ).json()) as { ref: string }[];
+  let tags = res
+    .filter(
+      (tag) =>
+        tag.ref.startsWith("refs/tags/bun-v") || tag.ref === "refs/tags/canary"
+    )
+    .map((item) => item.ref.replace(/refs\/tags\/(bun-)?/g, ""));
+
   const { version, os, arch, avx2, profile } = options;
-  const eversion = encodeURIComponent(version ?? "latest");
+
+  let tag = tags.find((t) => t === version);
+  if (!tag) {
+    tags = tags.filter((t) => validate(t)).sort(compareVersions);
+
+    if (version === "latest") tag = tags.at(-1);
+    else tag = tags.filter((t) => satisfies(version, t)).at(-1);
+  }
+
+  const eversion = encodeURIComponent(tag);
   const eos = encodeURIComponent(os ?? process.platform);
   const earch = encodeURIComponent(arch ?? process.arch);
-  const eavx2 = encodeURIComponent(avx2 ?? true);
-  const eprofile = encodeURIComponent(profile ?? false);
+  const eavx2 = encodeURIComponent(avx2 ? "-baseline" : "");
+  const eprofile = encodeURIComponent(profile ? "-profile" : "");
+
   const { href } = new URL(
-    `${eversion}/${eos}/${earch}?avx2=${eavx2}&profile=${eprofile}`,
-    "https://bun.sh/download/"
+    `bun-${eversion}/bun-${eos}-${earch}${eavx2}${eprofile}.zip`,
+    "https://github.com/oven-sh/bun/releases/download/"
   );
+
   return href;
 }
 

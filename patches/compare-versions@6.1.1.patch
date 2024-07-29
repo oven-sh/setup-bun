@@ -1,0 +1,67 @@
+diff --git a/lib/esm/satisfies.js b/lib/esm/satisfies.js
+index 7586b71657332f855431c4dd4f05e9394fd9aac3..a6ec29bfc98907c67ed4af71fca73bd8bff88798 100644
+--- a/lib/esm/satisfies.js
++++ b/lib/esm/satisfies.js
+@@ -40,8 +40,9 @@ export const satisfies = (version, range) => {
+     // else range of either "~" or "^" is assumed
+     const [v1, v2, v3, , vp] = validateAndParse(version);
+     const [r1, r2, r3, , rp] = validateAndParse(range);
+-    const v = [v1, v2, v3];
++    const v = [v1, v2 !== null && v2 !== void 0 ? v2 : 'x', v3 !== null && v3 !== void 0 ? v3 : 'x'];
+     const r = [r1, r2 !== null && r2 !== void 0 ? r2 : 'x', r3 !== null && r3 !== void 0 ? r3 : 'x'];
++
+     // validate pre-release
+     if (rp) {
+         if (!vp)
+diff --git a/lib/esm/utils.js b/lib/esm/utils.js
+index b5cc8b9927ab38fc67032c133b531e95ec4cec15..ec56105fd2d806aa922f1488a27b02c56aff1865 100644
+--- a/lib/esm/utils.js
++++ b/lib/esm/utils.js
+@@ -28,7 +28,7 @@ const compareStrings = (a, b) => {
+ };
+ export const compareSegments = (a, b) => {
+     for (let i = 0; i < Math.max(a.length, b.length); i++) {
+-        const r = compareStrings(a[i] || '0', b[i] || '0');
++        const r = compareStrings(a[i] || 'x', b[i] || 'x');
+         if (r !== 0)
+             return r;
+     }
+diff --git a/lib/umd/index.js b/lib/umd/index.js
+index 2cfef261bca520e21ed41fc14950732b8aa6339b..1059784db86635f3aaaba83b5a72c5015e1d8490 100644
+--- a/lib/umd/index.js
++++ b/lib/umd/index.js
+@@ -152,7 +152,7 @@
+         // else range of either "~" or "^" is assumed
+         const [v1, v2, v3, , vp] = validateAndParse(version);
+         const [r1, r2, r3, , rp] = validateAndParse(range);
+-        const v = [v1, v2, v3];
++        const v = [v1, v2 !== null && v2 !== void 0 ? v2 : 'x', v3 !== null && v3 !== void 0 ? v3 : 'x'];
+         const r = [r1, r2 !== null && r2 !== void 0 ? r2 : 'x', r3 !== null && r3 !== void 0 ? r3 : 'x'];
+         // validate pre-release
+         if (rp) {
+diff --git a/package.json b/package.json
+index b05b3daf706d7ba4e594233f8791fc3007a8e2cd..e51e76b86f95e9ebf0b5dba3b82aeb119628528d 100644
+--- a/package.json
++++ b/package.json
+@@ -26,7 +26,7 @@
+     "prepublishOnly": "npm run build",
+     "test": "c8 --reporter=lcov mocha"
+   },
+-  "main": "./lib/umd/index.js",
++  "main": "./lib/src/index.ts",
+   "module": "./lib/esm/index.js",
+   "types": "./lib/esm/index.d.ts",
+   "sideEffects": false,
+diff --git a/src/satisfies.ts b/src/satisfies.ts
+index 66cb171d7f32e68fdda6929d2da223b97a053737..6b4973f037843f264338a01efdc4ace5dcf042cd 100644
+--- a/src/satisfies.ts
++++ b/src/satisfies.ts
+@@ -43,7 +43,7 @@ export const satisfies = (version: string, range: string): boolean => {
+   // else range of either "~" or "^" is assumed
+   const [v1, v2, v3, , vp] = validateAndParse(version);
+   const [r1, r2, r3, , rp] = validateAndParse(range);
+-  const v = [v1, v2, v3];
++  const v = [v1, v2 ?? 'x', v3 ?? 'x'];
+   const r = [r1, r2 ?? 'x', r3 ?? 'x'];
+ 
+   // validate pre-release

@@ -3,13 +3,7 @@
   "name": "setup-bun",
   "version": "2.0.1",
   "description": "Setup Bun on GitHub Actions.",
-  "keywords": [
-    "bun",
-    "bun.js",
-    "github",
-    "actions",
-    "setup"
-  ],
+  "keywords": ["bun", "bun.js", "github", "actions", "setup"],
   "homepage": "https://bun.sh/",
   "main": "dist/index.js",
   "repository": "git@github.com:oven-sh/setup-bun.git",
@@ -27,7 +21,8 @@
     "@actions/exec": "^1.1.1",
     "@actions/glob": "^0.4.0",
     "@actions/io": "^1.1.2",
-    "@actions/tool-cache": "^2.0.1"
+    "@actions/tool-cache": "^2.0.1",
+    "compare-versions": "^6.1.1"
   },
   "devDependencies": {
     "@types/node": "^20.8.2",
@@ -37,5 +32,8 @@
   },
   "prettier": {
     "quoteProps": "preserve"
+  },
+  "patchedDependencies": {
+    "compare-versions@6.1.1": "patches/compare-versions@6.1.1.patch"
   }
 }
