@@ -3,7 +3,13 @@
   "name": "setup-bun",
   "version": "2.0.1",
   "description": "Setup Bun on GitHub Actions.",
-  "keywords": ["bun", "bun.js", "github", "actions", "setup"],
+  "keywords": [
+    "bun",
+    "bun.js",
+    "github",
+    "actions",
+    "setup"
+  ],
   "homepage": "https://bun.sh/",
   "main": "dist/index.js",
   "repository": "git@github.com:oven-sh/setup-bun.git",
