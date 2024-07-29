@@ -13,8 +13,8 @@ import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { addExtension, getArchitecture, getPlatform, request } from "./utils";
-import { compareVersions, satisfies, validate } from "compare-versions";
+import { addExtension } from "./utils";
+import { DownloadMeta, getDownloadMeta } from "./download-url";
 
 export type Input = {
   customUrl?: string;
@@ -48,7 +48,9 @@ export default async (options: Input): Promise<Output> => {
   const bunfigPath = join(process.cwd(), "bunfig.toml");
   writeBunfig(bunfigPath, options);
 
-  const url = await getDownloadUrl(options);
+  const downloadMeta = await getDownloadMeta(options);
+  const url = downloadMeta.url;
+
   const cacheEnabled = isCacheEnabled(options);
 
   const binPath = join(homedir(), ".bun", "bin");
@@ -91,7 +93,7 @@ export default async (options: Input): Promise<Output> => {
 
   if (!cacheHit) {
     info(`Downloading a new version of Bun: ${url}`);
-    revision = await downloadBun(url, bunPath);
+    revision = await downloadBun(downloadMeta, bunPath);
   }
 
   if (!revision) {
@@ -121,11 +123,18 @@ export default async (options: Input): Promise<Output> => {
 };
 
 async function downloadBun(
-  url: string,
+  downloadMeta: DownloadMeta,
   bunPath: string
 ): Promise<string | undefined> {
   // Workaround for https://github.com/oven-sh/setup-bun/issues/79 and https://github.com/actions/toolkit/issues/1179
-  const zipPath = addExtension(await downloadTool(url), ".zip");
+  const zipPath = addExtension(
+    await downloadTool(
+      downloadMeta.url,
+      undefined,
+      downloadMeta.auth ?? undefined
+    ),
+    ".zip"
+  );
   const extractedZipPath = await extractZip(zipPath);
   const extractedBunPath = await extractBun(extractedZipPath);
   try {
@@ -151,52 +160,6 @@ function isCacheEnabled(options: Input): boolean {
     return false;
   }
   return isFeatureAvailable();
-}
-
-async function getDownloadUrl(options: Input): Promise<string> {
-  const { customUrl } = options;
-  if (customUrl) {
-    return customUrl;
-  }
-
-  const res = (await (
-    await request("https://api.github.com/repos/oven-sh/bun/git/refs/tags", {
-      headers: {
-        "Authorization": `Bearer ${options.token}`,
-      },
-    })
-  ).json()) as { ref: string }[];
-  let tags = res
-    .filter(
-      (tag) =>
-        tag.ref.startsWith("refs/tags/bun-v") || tag.ref === "refs/tags/canary"
-    )
-    .map((item) => item.ref.replace(/refs\/tags\/(bun-v)?/g, ""));
-
-  const { version, os, arch, avx2, profile } = options;
-
-  let tag = tags.find((t) => t === version);
-  if (!tag) {
-    tags = tags.filter((t) => validate(t)).sort(compareVersions);
-
-    if (version === "latest") tag = `bun-v${tags.at(-1)}`;
-    else tag = `bun-v${tags.filter((t) => satisfies(t, version)).at(-1)}`;
-  } else if (validate(tag)) {
-    tag = `bun-v${tag}`;
-  }
-
-  const eversion = encodeURIComponent(tag ?? version);
-  const eos = encodeURIComponent(os ?? getPlatform());
-  const earch = encodeURIComponent(arch ?? getArchitecture());
-  const eavx2 = encodeURIComponent(avx2 ? "-baseline" : "");
-  const eprofile = encodeURIComponent(profile ? "-profile" : "");
-
-  const { href } = new URL(
-    `${eversion}/bun-${eos}-${earch}${eavx2}${eprofile}.zip`,
-    "https://github.com/oven-sh/bun/releases/download/"
-  );
-
-  return href;
 }
 
 async function extractBun(path: string): Promise<string> {
