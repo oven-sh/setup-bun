@@ -171,7 +171,7 @@ async function getDownloadUrl(options: Input): Promise<string> {
       (tag) =>
         tag.ref.startsWith("refs/tags/bun-v") || tag.ref === "refs/tags/canary"
     )
-    .map((item) => item.ref.replace(/refs\/tags\/(bun-)?/g, ""));
+    .map((item) => item.ref.replace(/refs\/tags\/(bun-v)?/g, ""));
 
   const { version, os, arch, avx2, profile } = options;
 
@@ -180,7 +180,7 @@ async function getDownloadUrl(options: Input): Promise<string> {
     tags = tags.filter((t) => validate(t)).sort(compareVersions);
 
     if (version === "latest") tag = `bun-v${tags.at(-1)}`;
-    else tag = `bun-${tags.filter((t) => satisfies(t, version)).at(-1)}`;
+    else tag = `bun-v${tags.filter((t) => satisfies(t, version)).at(-1)}`;
   }
 
   const eversion = encodeURIComponent(tag ?? version);
