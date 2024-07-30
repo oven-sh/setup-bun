@@ -31,7 +31,7 @@ const FILE_VERSION_READERS = {
   "package.json": (content: string) =>
     JSON.parse(content).packageManager?.split("bun@")?.[1],
   ".tool-versions": (content: string) =>
-    content.match(/^bun\s?(?<version>.*?)$/m)?.groups?.version,
+    content.match(/^bun\s*(?<version>.*?)$/m)?.groups?.version,
   ".bumrc": (content: string) => content, // https://github.com/owenizedd/bum
   ".bun-version": (content: string) => content,
 };
