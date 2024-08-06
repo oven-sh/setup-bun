@@ -41,7 +41,7 @@ If you need to authenticate with a private registry, you can set the `BUN_AUTH_T
 If you need to override the download URL, you can use the `bun-download-url` input.
 
 ```yaml
-- uses: oven-sh/setup-bun
+- uses: oven-sh/setup-bun@v2
   with:
     bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip"
 ```
