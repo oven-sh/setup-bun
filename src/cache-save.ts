@@ -8,7 +8,7 @@ import { createHash } from "node:crypto";
   if (state.cacheEnabled && !state.cacheHit) {
     const cacheKey = createHash('sha1')
       .update(state.url)
-      .digest('base64')
+      .digest('base64');
     
     try {
       await saveCache([state.bunPath], cacheKey);
