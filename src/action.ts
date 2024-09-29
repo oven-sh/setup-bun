@@ -74,10 +74,8 @@ export default async (options: Input): Promise<Output> => {
   let revision: string | undefined;
   let cacheHit = false;
   if (cacheEnabled) {
-    const cacheKey = createHash('sha1')
-      .update(url)
-      .digest('base64');
-    
+    const cacheKey = createHash("sha1").update(url).digest("base64");
+
     const cacheRestored = await restoreCache([bunPath], cacheKey);
     if (cacheRestored) {
       revision = await getRevision(bunPath);
