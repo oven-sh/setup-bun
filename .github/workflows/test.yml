@@ -27,7 +27,7 @@ jobs:
           && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
           && sudo apt update \
           && sudo apt install gh -y
-      
+
       - run: |
           gh cache delete --all || true
         env:
@@ -125,3 +125,29 @@ jobs:
         uses: ./.github/actions/compare-bun-version
         with:
           bun-version: "1.1.0"
+
+  setup-bun-download-url:
+    name: setup-bun from (${{ matrix.os }}, download url)
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    needs: [remove-cache]
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: ./
+        id: setup_bun
+        with:
+          bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-${{runner.os == 'macOS' && 'darwin' || runner.os}}-${{ runner.arch == 'X64' && 'x64' || 'aarch64' }}.zip"
+
+      - name: Run Bun
+        id: run_bun
+        run: |
+          bun --version
