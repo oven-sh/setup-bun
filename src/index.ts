@@ -15,7 +15,7 @@ if (registryUrl) {
   registries.push({
     url: registryUrl,
     scope: scope,
-    token: "$$BUN_AUTH_TOKEN",
+    token: "$BUN_AUTH_TOKEN",
   });
 }
 
