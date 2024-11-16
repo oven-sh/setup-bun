@@ -12,7 +12,7 @@ import { addPath, info, warning } from "@actions/core";
 import { isFeatureAvailable, restoreCache } from "@actions/cache";
 import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
-import { writeBunfig } from "./bunfig";
+import { writeBunfig, Registry } from "./bunfig";
 import { saveState } from "@actions/core";
 import { addExtension, retry } from "./utils";
 
@@ -23,8 +23,7 @@ export type Input = {
   arch?: string;
   avx2?: boolean;
   profile?: boolean;
-  scope?: string;
-  registryUrl?: string;
+  registries?: Registry[];
   noCache?: boolean;
 };
 
@@ -45,7 +44,7 @@ export type CacheState = {
 
 export default async (options: Input): Promise<Output> => {
   const bunfigPath = join(process.cwd(), "bunfig.toml");
-  writeBunfig(bunfigPath, options);
+  writeBunfig(bunfigPath, options.registries);
 
   const url = getDownloadUrl(options);
   const cacheEnabled = isCacheEnabled(options);
