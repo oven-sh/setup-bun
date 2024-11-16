@@ -11,11 +11,6 @@ const registries = JSON.parse(getInput("registries") || "[]");
 const registryUrl = getInput("registry-url");
 const scope = getInput("scope");
 
-if (registries.length > 0 && (registryUrl || scope)) {
-  setFailed("Cannot specify both 'registries' and 'registry-url' or 'scope'.");
-  process.exit(1);
-}
-
 if (registryUrl) {
   registries.push({
     url: registryUrl,
