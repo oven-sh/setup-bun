@@ -140,6 +140,7 @@ export function writeBunfig(path: string, registries: Registry[]): void {
     }
 
     if (
+      line.startsWith("registry = ") ||
       !bunfig.some(
         (field) =>
           field.type === FieldType.INSTALL_WITH_SCOPE &&
