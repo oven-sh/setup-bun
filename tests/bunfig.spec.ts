@@ -34,7 +34,7 @@ describe("writeBunfig", () => {
 
       const expectedContents = [
         "[install.scopes]",
-        '\'@foo-bar\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
+        '\'@foo-bar\' = { url = "https://npm.pkg.github.com/", token = "$BUN_AUTH_TOKEN" }',
         "",
       ];
 
@@ -97,7 +97,7 @@ describe("writeBunfig", () => {
         "[install.cache]",
         "disable = true",
         "[install.scopes]",
-        '\'@foo-bar\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
+        '\'@foo-bar\' = { url = "https://npm.pkg.github.com/", token = "$BUN_AUTH_TOKEN" }',
         "",
       ];
 
@@ -130,7 +130,7 @@ describe("writeBunfig", () => {
         "optional = true",
         "",
         "[install.scopes]",
-        '\'@foo-bar\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
+        '\'@foo-bar\' = { url = "https://npm.pkg.github.com/", token = "$BUN_AUTH_TOKEN" }',
         '\'@bla-ble\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
         "",
         "[install.cache]",
@@ -167,7 +167,7 @@ describe("writeBunfig", () => {
         "optional = true",
         "",
         "[install.scopes]",
-        '\'@foo-bar\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
+        '\'@foo-bar\' = { url = "https://npm.pkg.github.com/", token = "$BUN_AUTH_TOKEN" }',
         '\'@bla-ble\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
         "",
         "[install.cache]",
@@ -210,7 +210,7 @@ describe("writeBunfig", () => {
         "optional = true",
         "",
         "[install.scopes]",
-        '\'@foo-bar\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
+        '\'@foo-bar\' = { url = "https://npm.pkg.github.com/", token = "$BUN_AUTH_TOKEN" }',
         '\'@bla-ble\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
         "",
         "[install.cache]",

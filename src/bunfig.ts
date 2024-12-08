@@ -5,7 +5,7 @@ import { info } from "@actions/core";
 export type Registry = {
   url: string;
   scope: string;
-  token: string;
+  token?: string;
 };
 
 enum FieldType {
@@ -40,7 +40,9 @@ export function createField(registry: Registry): Field {
   if (url && owner) {
     return {
       type: FieldType.INSTALL_WITH_SCOPE,
-      value: `'${owner}' = { token = "${token}", url = "${url}" }`,
+      value: `'${owner}' = { url = "${url}"${
+        token ? `, token = "${token}"` : ""
+      } }`,
     };
   }
 
