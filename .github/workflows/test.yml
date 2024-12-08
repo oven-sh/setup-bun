@@ -193,7 +193,7 @@ jobs:
           registries: |
             [
               {
-                "url": "https://npm.jsr.io"
+                "url": "https://npm.jsr.io",
                 "scope": "@jsr"
               }
             ]
