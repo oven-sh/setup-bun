@@ -43,7 +43,7 @@ export type CacheState = {
 };
 
 export default async (options: Input): Promise<Output> => {
-  const bunfigPath = join(process.cwd(), "bunfig.toml");
+  const bunfigPath = join(homedir(), ".bunfig.toml");
   writeBunfig(bunfigPath, options.registries);
 
   const url = getDownloadUrl(options);
