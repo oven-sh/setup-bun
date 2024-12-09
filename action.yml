@@ -21,6 +21,9 @@ inputs:
   scope:
     required: false
     description: "The scope for authenticating with the package registry."
+  registries:
+    required: false
+    description: "An list of package registries for authenticating with the package registry."
   no-cache:
     required: false
     type: boolean
