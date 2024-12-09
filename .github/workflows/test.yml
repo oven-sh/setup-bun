@@ -86,9 +86,9 @@ jobs:
             run: |
               echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > package.json
           - name: /foo/package.json (bun@1.1.0)
-            file: ${{ github.workspace }}/foo//foo/package.json
+            file: /foo/package.json
             run: |
-              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > ${{ github.workspace }}/foo/package.json
+              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > /foo/package.json
           - name: package.json (yarn@bun@1.1.0)
             file: package.json
             run: |
