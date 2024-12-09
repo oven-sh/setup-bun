@@ -1,7 +1,7 @@
 import { debug, warning } from "@actions/core";
 import { info } from "node:console";
 import { existsSync, readFileSync, renameSync } from "node:fs";
-import { join, basename } from "node:path";
+import { resolve, basename } from "node:path";
 
 export function retry<T>(
   fn: () => Promise<T>,
@@ -48,7 +48,7 @@ export function readVersionFromFile(file: string): string | undefined {
 
   debug(`Reading version from ${file}`);
 
-  const path = join(cwd, file);
+  const path = resolve(cwd, file);
   const base = basename(file);
 
   if (!existsSync(path)) {
