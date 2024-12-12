@@ -15,6 +15,7 @@ import { getExecOutput } from "@actions/exec";
 import { writeBunfig, Registry } from "./bunfig";
 import { saveState } from "@actions/core";
 import { addExtension, retry } from "./utils";
+import { cwd } from "node:process";
 
 export type Input = {
   customUrl?: string;
@@ -43,7 +44,7 @@ export type CacheState = {
 };
 
 export default async (options: Input): Promise<Output> => {
-  const bunfigPath = join(homedir(), ".bunfig.toml");
+  const bunfigPath = join(cwd(), "bunfig.toml");
   writeBunfig(bunfigPath, options.registries);
 
   const url = getDownloadUrl(options);
