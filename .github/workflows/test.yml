@@ -193,7 +193,7 @@ jobs:
           registries: |
             [
               {
-                "url": "https://registry.npmjs.org",
+                "url": "https://username:password@registry.myorg.com/",
                 "scope": "@myorg"
               }
             ]
