@@ -170,8 +170,8 @@ jobs:
         run: |
           bun --version
 
-  setup-bun-jsr-registry:
-    name: setup-bun jsr registry (${{ matrix.os }})
+  setup-bun-registry:
+    name: setup-bun registry (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     continue-on-error: true
     needs: [remove-cache, tests]
@@ -193,12 +193,7 @@ jobs:
           registries: |
             [
               {
-                "url": "https://npm.jsr.io",
-                "scope": "@jsr"
+                "url": "https://registry.npmjs.org",
+                "scope": "@npm"
               }
             ]
-
-      - name: Run Bun
-        id: run_bun
-        run: |
-          bun add @luca/runtime-detector
