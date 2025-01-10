@@ -31,7 +31,7 @@ export function createBunfig(options: BunfigOptions): string | null {
   }
 
   if (url && !owner) {
-    return `[install]${EOL}registry = "${url}"${EOL}`;
+    return `[install]${EOL}registry = { token = "$BUN_AUTH_TOKEN", url = "${url}"}${EOL}`;
   }
 
   return null;
