@@ -3,12 +3,12 @@ description: Compare the version of Bun to a specified version
 
 inputs:
   bun-version:
-    description: "The version of Bun to compare against"
+    description: The version of Bun to compare against
     required: true
     default: "1.1.0"
 
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: 🛠️ Get installed Bun version
       id: bun
