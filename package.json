@@ -32,10 +32,7 @@
   "devDependencies": {
     "@types/node": "^20.8.2",
     "esbuild": "^0.19.2",
-    "prettier": "^2.8.4",
+    "prettier": "^3.4.2",
     "typescript": "^4.9.5"
-  },
-  "prettier": {
-    "quoteProps": "preserve"
   }
 }
