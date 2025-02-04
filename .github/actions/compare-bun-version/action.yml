@@ -1,4 +1,4 @@
-name: Compare Bun Version
+name: ⚖️ Compare Bun Version
 description: Compare the version of Bun to a specified version
 
 inputs:
@@ -10,14 +10,14 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Get installed Bun version
+    - name: 🛠️ Get installed Bun version
       id: bun
       shell: bash
       run: |
         bun --version
         echo "version=$(bun --version)" >> $GITHUB_OUTPUT
 
-    - name: Compare versions
+    - name: ⚖️ Compare versions
       shell: bash
       run: |
         if [[ "${{ steps.bun.outputs.version }}" == "${{ inputs.bun-version }}" ]]; then
