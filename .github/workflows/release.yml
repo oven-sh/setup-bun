@@ -1,25 +1,27 @@
-name: Release new action version
+name: 🚀 Release new action version
 
 on:
   release:
     types: [released]
+
   workflow_dispatch:
     inputs:
       TAG_NAME:
-        description: 'Tag name that the major tag will point to'
+        description: Tag name that the major tag will point to
         required: true
 
-env:
-  TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
+permissions:
+  contents: write
 
 jobs:
   update_tag:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/publish-action@v0.3.0
+        env:
+          TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
         with:
           source-tag: ${{ env.TAG_NAME }}
