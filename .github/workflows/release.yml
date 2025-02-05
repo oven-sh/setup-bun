@@ -1,14 +1,6 @@
 name: 🚀 Release new action version
 
-on:
-  release:
-    types: [released]
-
-  workflow_dispatch:
-    inputs:
-      TAG_NAME:
-        description: Tag name that the major tag will point to
-        required: true
+on: [workflow_dispatch]
 
 permissions:
   contents: write
@@ -18,10 +10,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/publish-action@v0.3.0
-        env:
-          TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
         with:
-          source-tag: ${{ env.TAG_NAME }}
+          # Required for fetching tags and generating release notes
+          fetch-depth: 0
+
+      - name: 🛠️ Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: 🔧 Configure Git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      - name: 🚀 Prepare release
+        run: bun run preversion
+
+      - name: 📜 Generate changelog and release new version
+        run: |
+          npx changelogen --release --push
+          npx changelogen github release --token ${{ secrets.GITHUB_TOKEN }}

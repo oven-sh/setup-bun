@@ -19,6 +19,7 @@
   "scripts": {
     "format": "prettier --write src *.yml *.json *.md",
     "build": "esbuild --target=node20 --outfile=dist/setup/index.js --bundle --minify --platform=node --format=cjs src/index.ts && esbuild --target=node20 --outfile=dist/cache-save/index.js --bundle --minify --platform=node --format=cjs src/cache-save.ts",
+    "preversion": "npm run format && npm run build && git add .",
     "start": "npm run build && node dist/setup/index.js"
   },
   "dependencies": {
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.8.2",
+    "changelogen": "^0.5.7",
     "esbuild": "^0.19.2",
     "prettier": "^2.8.4",
     "typescript": "^4.9.5"
