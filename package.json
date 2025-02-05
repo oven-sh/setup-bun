@@ -19,7 +19,6 @@
   "scripts": {
     "format": "prettier --write src *.yml *.json *.md",
     "build": "esbuild --target=node20 --outfile=dist/setup/index.js --bundle --minify --platform=node --format=cjs src/index.ts && esbuild --target=node20 --outfile=dist/cache-save/index.js --bundle --minify --platform=node --format=cjs src/cache-save.ts",
-    "preversion": "npm run format && npm run build && git add .",
     "start": "npm run build && node dist/setup/index.js"
   },
   "dependencies": {

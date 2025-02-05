@@ -1,20 +1,21 @@
-name: 🚀 Release new action version
+name: 🔄 Format & Build
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  update_tag:
+  format:
     runs-on: ubuntu-latest
-
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
-        with:
-          # Required for fetching tags and generating release notes
-          fetch-depth: 0
 
       - name: 🛠️ Setup Node
         uses: actions/setup-node@v4
@@ -29,7 +30,13 @@ jobs:
       - name: 📦 Install Dependencies
         run: npm install
 
-      - name: 📜 Generate changelog and release new version
+      - name: 🔄 Format and build
         run: |
-          npx changelogen --release --push
-          npx changelogen github release --token ${{ secrets.GITHUB_TOKEN }}
+          npm run format
+          npm run build
+
+      - name: 💾 Commit changes
+        run: |
+          git add .
+          git commit -m "chore: format and build"
+          git push
