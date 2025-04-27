@@ -18,12 +18,12 @@
   "author": "xHyroM",
   "scripts": {
     "format": "prettier --write src *.yml *.json *.md",
-    "build": "esbuild --target=node20 --outfile=dist/setup/index.js --bundle --minify --platform=node --format=cjs src/index.ts && esbuild --target=node20 --outfile=dist/cache-save/index.js --bundle --minify --platform=node --format=cjs src/cache-save.ts",
+    "build": "esbuild --target=node20 --outfile=dist/setup/index.js --bundle --keep-names --minify --platform=node --format=cjs src/index.ts && esbuild --target=node20 --outfile=dist/cache-save/index.js --bundle --keep-names --minify --platform=node --format=cjs src/cache-save.ts",
     "start": "npm run build && node dist/setup/index.js"
   },
   "dependencies": {
-    "@actions/cache": "^3.1.4",
-    "@actions/core": "^1.10.0",
+    "@actions/cache": "^4.0.0",
+    "@actions/core": "^1.11.0",
     "@actions/exec": "^1.1.1",
     "@actions/glob": "^0.4.0",
     "@actions/io": "^1.1.2",
