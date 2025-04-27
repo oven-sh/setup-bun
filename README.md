@@ -54,7 +54,7 @@ In most cases, you shouldn't need to use the [setup-node](https://github.com/act
 
 | Name               | Description                                           | Default     | Examples                                         |
 | ------------------ | ----------------------------------------------------- | ----------- | ------------------------------------------------ |
-| `bun-version`      | The version of Bun to download and install.           | `latest`    | `canary`, `1.0.0`, `1.0.x`                       |
+| `bun-version`      | The version of Bun to download and install.           | `latest`    | `canary`, `1.0.0`                                |
 | `bun-version-file` | The version of Bun to download and install from file. | `undefined` | `package.json`, `.bun-version`, `.tool-versions` |
 | `bun-download-url` | URL to download .zip file for Bun release             |             |                                                  |
 | `registry-url`     | Registry URL where some private package is stored.    | `undefined` | `"https://npm.pkg.github.com/"`                  |
