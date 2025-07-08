@@ -191,12 +191,10 @@ jobs:
         id: setup_bun
         with:
           registries: |
-            [
-              {
-                "url": "https://username:password@registry.myorg.com/",
-                "scope": "@myorg"
-              }
-            ]
+            https://registry.npmjs.org/
+            @myorg:https://username:password@registry.myorg.com/
+            @another:https://registry.another.com/
+            @partner:https://registry.partner.com/|basic_token
 
       - name: Run Bun
         id: run_bun

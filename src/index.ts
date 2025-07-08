@@ -2,12 +2,13 @@ import { tmpdir } from "node:os";
 import { getInput, setOutput, setFailed, getBooleanInput } from "@actions/core";
 import runAction from "./action.js";
 import { readVersionFromFile } from "./utils.js";
+import { parseRegistries } from "./registry.js";
 
 if (!process.env.RUNNER_TEMP) {
   process.env.RUNNER_TEMP = tmpdir();
 }
 
-const registries = JSON.parse(getInput("registries") || "[]");
+const registries = parseRegistries(getInput("registries"));
 const registryUrl = getInput("registry-url");
 const scope = getInput("scope");
 

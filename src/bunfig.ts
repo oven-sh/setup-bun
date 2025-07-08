@@ -1,12 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { info } from "@actions/core";
 import { parse, stringify } from "@iarna/toml";
-
-export type Registry = {
-  url: string;
-  scope: string;
-  token?: string;
-};
+import { Registry } from "./registry";
 
 type BunfigConfig = {
   install?: {
