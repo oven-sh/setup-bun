@@ -41,11 +41,13 @@ You can configure multiple package registries using the `registries` input. This
 
 #### Registry format options
 
-- **Default registry**: `https://registry.npmjs.org/`
-- **Default registry with token**: `https://registry.npmjs.org/|$TOKEN`
-- **Scoped registry**: `@scope:https://registry.example.com/`
-- **Scoped registry with token**: `@scope:https://registry.example.com/|$TOKEN`
-- **Scoped registry with URL credentials**: `@scope:https://username:$PASSWORD@registry.example.com/`
+| Type                                 | Format                                                    | Example                                               |
+| ------------------------------------ | --------------------------------------------------------- | ----------------------------------------------------- |
+| Default registry                     | `https://registry.example.com/`                           | `https://registry.npmjs.org/`                         |
+| Default registry with token          | `https://registry.example.com/\|$TOKEN`                   | `https://registry.npmjs.org/\|$NPM_TOKEN`             |
+| Scoped registry                      | `@scope:https://registry.example.com/`                    | `@myorg:https://npm.pkg.github.com/`                  |
+| Scoped registry with token           | `@scope:https://registry.example.com/\|$TOKEN`            | `@myorg:https://npm.pkg.github.com/\|$GITHUB_TOKEN`   |
+| Scoped registry with URL credentials | `@scope:https://username:$PASSWORD@registry.example.com/` | `@internal:https://user:$PASS@registry.internal.com/` |
 
 > [!IMPORTANT]
 > When using authentication, make sure to set the corresponding environment variables in your workflow steps that need access to the registries.
