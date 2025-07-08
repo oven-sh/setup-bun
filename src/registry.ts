@@ -24,7 +24,7 @@ export function parseRegistries(input: string): Registry[] {
 
 function parseLine(line: string): Registry | null {
   const scopeMatch = line.match(
-    /^(@[a-z0-9-_.]+|[a-z0-9-_.]+(?=:[a-z]+:\/\/)):(.+)$/i
+    /^(@[a-z0-9-_.]+|[a-z0-9-_.]+(?=:[a-z]+:\/\/)):(.+)$/i,
   );
 
   if (scopeMatch) {
