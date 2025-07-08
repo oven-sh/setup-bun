@@ -18,23 +18,38 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
     bun-version-file: ".bun-version"
 ```
 
-### Using a custom NPM registry
+## Using custom registries
+
+You can configure multiple package registries using the `registries` input. This supports both default and scoped registries with various authentication methods.
+
+### Registry configuration
 
 ```yaml
 - uses: oven-sh/setup-bun@v2
   with:
-    registry-url: "https://npm.pkg.github.com/"
-    scope: "@foo"
-```
+    registries: |
+      https://registry.npmjs.org/
+      @myorg:https://npm.pkg.github.com/|$GITHUB_TOKEN
+      @internal:https://username:$INTERNAL_PASSWORD@registry.internal.com/
 
-If you need to authenticate with a private registry, you can set the `BUN_AUTH_TOKEN` environment variable.
-
-```yaml
-- name: Install Dependencies
+- name: Install dependencies
   env:
-    BUN_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  run: bun install --frozen-lockfile
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    INTERNAL_PASSWORD: ${{ secrets.INTERNAL_PASSWORD }}
+  run: bun install
 ```
+
+#### Registry format options
+
+- **Default registry**: `https://registry.npmjs.org/`
+- **Default registry with token**: `https://registry.npmjs.org/|$TOKEN`
+- **Scoped registry**: `@scope:https://registry.example.com/`
+- **Scoped registry with token**: `@scope:https://registry.example.com/|$TOKEN`
+- **Scoped registry with URL credentials**: `@scope:https://username:$PASSWORD@registry.example.com/`
+
+> **Note**: When using authentication, make sure to set the corresponding environment variables in your workflow steps that need access to the registries.
+
+For more information about configuring registries in Bun, see the [official documentation](https://bun.sh/docs/install/registries).
 
 ### Override download url
 

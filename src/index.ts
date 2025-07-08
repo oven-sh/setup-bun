@@ -9,6 +9,8 @@ if (!process.env.RUNNER_TEMP) {
 }
 
 const registries = parseRegistries(getInput("registries"));
+
+// Backwards compatibility for the `registry-url` and `scope` inputs
 const registryUrl = getInput("registry-url");
 const scope = getInput("scope");
 
