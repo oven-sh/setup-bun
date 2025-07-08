@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { unlinkSync } from "node:fs";
+import { existsSync, unlinkSync } from "node:fs";
 import { writeBunfig } from "../src/bunfig";
 import { EOL } from "os";
 
@@ -14,7 +14,7 @@ describe("writeBunfig", () => {
   }
 
   afterEach(() => {
-    unlinkSync(filePath);
+    if (existsSync(filePath)) unlinkSync(filePath);
     console.log(`${filePath} was deleted`);
   });
 
@@ -33,8 +33,9 @@ describe("writeBunfig", () => {
       expect(file.exists()).resolves.toBeTrue();
 
       const expectedContents = [
-        "[install.scopes]",
-        '\'@foo-bar\' = { url = "https://npm.pkg.github.com/", token = "$BUN_AUTH_TOKEN" }',
+        '[install.scopes."@foo-bar"]',
+        'url = "https://npm.pkg.github.com"',
+        'token = "$BUN_AUTH_TOKEN"',
         "",
       ];
 
@@ -50,6 +51,31 @@ describe("writeBunfig", () => {
         {
           url: "https://npm.pkg.github.com",
           scope: "",
+        },
+      ]);
+
+      const { file, contents } = await getFileAndContents();
+
+      expect(file.exists()).resolves.toBeTrue();
+
+      const expectedContents = [
+        "[install.registry]",
+        'url = "https://npm.pkg.github.com"',
+        "",
+      ];
+
+      contents.forEach((content, index) =>
+        expect(content).toBe(expectedContents[index])
+      );
+
+      expect(contents.length).toBe(expectedContents.length);
+    });
+
+    it("should create a new file with global registry & token", async () => {
+      writeBunfig(filePath, [
+        {
+          url: "https://npm.pkg.github.com",
+          scope: "",
           token: "$BUN_AUTH_TOKEN",
         },
       ]);
@@ -59,8 +85,9 @@ describe("writeBunfig", () => {
       expect(file.exists()).resolves.toBeTrue();
 
       const expectedContents = [
-        "[install]",
-        'registry = "https://npm.pkg.github.com/"',
+        "[install.registry]",
+        'url = "https://npm.pkg.github.com"',
+        'token = "$BUN_AUTH_TOKEN"',
         "",
       ];
 
@@ -94,10 +121,12 @@ describe("writeBunfig", () => {
         "[install]",
         "optional = true",
         "",
-        "[install.cache]",
-        "disable = true",
-        "[install.scopes]",
-        '\'@foo-bar\' = { url = "https://npm.pkg.github.com/", token = "$BUN_AUTH_TOKEN" }',
+        "  [install.cache]",
+        "  disable = true",
+        "",
+        '[install.scopes."@foo-bar"]',
+        'url = "https://npm.pkg.github.com"',
+        'token = "$BUN_AUTH_TOKEN"',
         "",
       ];
 
@@ -129,12 +158,16 @@ describe("writeBunfig", () => {
         "[install]",
         "optional = true",
         "",
-        "[install.scopes]",
-        '\'@foo-bar\' = { url = "https://npm.pkg.github.com/", token = "$BUN_AUTH_TOKEN" }',
-        '\'@bla-ble\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
+        '[install.scopes."@bla-ble"]',
+        'token = "$BUN_AUTH_TOKEN"',
+        'url = "https://npm.pkg.github.com/"',
         "",
-        "[install.cache]",
-        "disable = true",
+        '[install.scopes."@foo-bar"]',
+        'url = "https://npm.pkg.github.com"',
+        'token = "$BUN_AUTH_TOKEN"',
+        "",
+        "  [install.cache]",
+        "  disable = true",
         "",
       ];
 
@@ -166,12 +199,16 @@ describe("writeBunfig", () => {
         "[install]",
         "optional = true",
         "",
-        "[install.scopes]",
-        '\'@foo-bar\' = { url = "https://npm.pkg.github.com/", token = "$BUN_AUTH_TOKEN" }',
-        '\'@bla-ble\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
+        '[install.scopes."@foo-bar"]',
+        'url = "https://npm.pkg.github.com"',
+        'token = "$BUN_AUTH_TOKEN"',
         "",
-        "[install.cache]",
-        "disable = true",
+        '[install.scopes."@bla-ble"]',
+        'token = "$BUN_AUTH_TOKEN"',
+        'url = "https://npm.pkg.github.com/"',
+        "",
+        "  [install.cache]",
+        "  disable = true",
         "",
       ];
 
@@ -206,15 +243,22 @@ describe("writeBunfig", () => {
 
       const expectedContents = [
         "[install]",
-        'registry = "https://bun.sh/"',
         "optional = true",
         "",
-        "[install.scopes]",
-        '\'@foo-bar\' = { url = "https://npm.pkg.github.com/", token = "$BUN_AUTH_TOKEN" }',
-        '\'@bla-ble\' = { token = "$BUN_AUTH_TOKEN", url = "https://npm.pkg.github.com/" }',
+        '[install.scopes."@foo-bar"]',
+        'url = "https://npm.pkg.github.com"',
+        'token = "$BUN_AUTH_TOKEN"',
         "",
-        "[install.cache]",
-        "disable = true",
+        '[install.scopes."@bla-ble"]',
+        'token = "$BUN_AUTH_TOKEN"',
+        'url = "https://npm.pkg.github.com/"',
+        "",
+        "  [install.cache]",
+        "  disable = true",
+        "",
+        "  [install.registry]",
+        '  url = "https://bun.sh"',
+        '  token = "$BUN_AUTH_TOKEN"',
         "",
       ];
 
@@ -223,6 +267,25 @@ describe("writeBunfig", () => {
       );
 
       expect(contents.length).toBe(expectedContents.length);
+    });
+  });
+
+  describe("when multiple global registries are provided", () => {
+    it("should throw an error", () => {
+      expect(() => {
+        writeBunfig(filePath, [
+          {
+            url: "https://npm.pkg.github.com",
+            scope: "",
+            token: "$BUN_AUTH_TOKEN",
+          },
+          {
+            url: "https://bun.sh",
+            scope: "",
+            token: "$BUN_AUTH_TOKEN",
+          },
+        ]);
+      }).toThrow("You can't have more than one global registry.");
     });
   });
 });
