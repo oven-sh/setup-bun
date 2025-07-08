@@ -170,9 +170,9 @@ jobs:
         run: |
           bun --version
 
-  setup-bun-registry:
-    name: setup-bun registry (${{ matrix.os }})
-    runs-on: ${{ matrix.os }
+  test-custom-registries:
+    name: test installing deps from custom registries (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     continue-on-error: true
     needs: [remove-cache, tests]
     strategy:
