@@ -192,11 +192,13 @@ jobs:
         with:
           registries: |
             https://registry.npmjs.org/
-            @myorg:https://username:password@registry.myorg.com/
-            @another:https://registry.another.com/
-            @partner:https://registry.partner.com/|basic_token
+            @scope:https://registry.npmjs.org/
 
-      - name: Run Bun
+      - name: Install from default registry
+        run: |
+          bun add is-odd --verbose
+
+      - name: Install from @scope default registry
         id: run_bun
         run: |
-          bun add @myorg/example --verbose
+          bun add @scope/is-odd --verbose
