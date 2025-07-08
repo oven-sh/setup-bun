@@ -196,9 +196,9 @@ jobs:
 
       - name: Install from default registry
         run: |
-          bun add is-odd --verbose
+          bun add is-odd --verbose --force
 
-      - name: Install from @types default registry
+      - name: Install from @types registry
         id: run_bun
         run: |
-          bun add @types/bun --verbose
+          bun add @types/bun --verbose --force
