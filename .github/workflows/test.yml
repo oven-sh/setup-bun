@@ -183,10 +183,10 @@ jobs:
           - windows-latest
 
     steps:
-      - name: Checkout
+      - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Bun
+      - name: 🛠️ Setup Bun
         uses: ./
         id: setup_bun
         with:
@@ -194,7 +194,8 @@ jobs:
             https://registry.npmjs.org
             @types:https://registry.yarnpkg.com
 
-      - name: Install from default registry
+      - name: ▶️ Install from default registry
+        shell: bash
         run: |
           output=$(bun add is-odd --verbose --force 2>&1)
 
@@ -205,7 +206,8 @@ jobs:
             exit 1
           fi
 
-      - name: Install from @types registry
+      - name: ▶️ Install from @types registry
+        shell: bash
         run: |
           output=$(bun add @types/bun --verbose --force 2>&1)
 
