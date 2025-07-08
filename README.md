@@ -47,7 +47,8 @@ You can configure multiple package registries using the `registries` input. This
 - **Scoped registry with token**: `@scope:https://registry.example.com/|$TOKEN`
 - **Scoped registry with URL credentials**: `@scope:https://username:$PASSWORD@registry.example.com/`
 
-> **Note**: When using authentication, make sure to set the corresponding environment variables in your workflow steps that need access to the registries.
+> [!IMPORTANT]
+> When using authentication, make sure to set the corresponding environment variables in your workflow steps that need access to the registries.
 
 For more information about configuring registries in Bun, see the [official documentation](https://bun.sh/docs/install/registries).
 
