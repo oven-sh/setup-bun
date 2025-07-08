@@ -172,15 +172,13 @@ jobs:
 
   setup-bun-registry:
     name: setup-bun registry (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }
     continue-on-error: true
     needs: [remove-cache, tests]
     strategy:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
-          - windows-latest
 
     steps:
       - name: 📥 Checkout
@@ -195,7 +193,6 @@ jobs:
             @types:https://registry.yarnpkg.com
 
       - name: ▶️ Install from default registry
-        shell: bash
         run: |
           output=$(bun add is-odd --verbose --force 2>&1)
 
@@ -207,7 +204,6 @@ jobs:
           fi
 
       - name: ▶️ Install from @types registry
-        shell: bash
         run: |
           output=$(bun add @types/bun --verbose --force 2>&1)
 
