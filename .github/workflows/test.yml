@@ -199,5 +199,4 @@ jobs:
       - name: Run Bun
         id: run_bun
         run: |
-          bun --version
-          bun add @myorg/example
+          bun add @myorg/example --verbose
