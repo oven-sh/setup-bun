@@ -4,7 +4,7 @@ import { writeBunfig } from "../src/bunfig";
 import { EOL } from "os";
 
 describe("writeBunfig", () => {
-  const filePath = "bunfig.toml";
+  const filePath = "bunfig_test.toml";
 
   async function getFileAndContents() {
     const file = Bun.file(filePath);
@@ -18,7 +18,7 @@ describe("writeBunfig", () => {
     console.log(`${filePath} was deleted`);
   });
 
-  describe("when no bunfig.toml file exists", () => {
+  describe("when no bunfig_test.toml file exists", () => {
     it("should create a new file with scopes content", async () => {
       writeBunfig(filePath, [
         {
@@ -99,7 +99,7 @@ describe("writeBunfig", () => {
     });
   });
 
-  describe("when local bunfig.toml file exists", () => {
+  describe("when local bunfig_test.toml file exists", () => {
     it("and no [install.scopes] exists, should concatenate file correctly", async () => {
       const bunfig = `[install]${EOL}optional = true${EOL}${EOL}[install.cache]${EOL}disable = true`;
 
