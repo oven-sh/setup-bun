@@ -29,6 +29,11 @@ jobs:
       - name: 📦 Install Dependencies
         run: npm install
 
+      - name: 🔄 Format and build
+        run: |
+          npm run format
+          npm run build
+
       - name: 📜 Generate changelog and release new version
         run: |
           npx changelogen --release --push
