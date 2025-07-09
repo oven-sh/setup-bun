@@ -84,7 +84,7 @@ export default async (options: Input): Promise<Output> => {
         info(`Using a cached version of Bun: ${revision}`);
       } else {
         warning(
-          `Found a cached version of Bun: ${revision} (but it appears to be corrupted?)`
+          `Found a cached version of Bun: ${revision} (but it appears to be corrupted?)`,
         );
       }
     }
@@ -98,7 +98,7 @@ export default async (options: Input): Promise<Output> => {
 
   if (!revision) {
     throw new Error(
-      "Downloaded a new version of Bun, but failed to check its version? Try again."
+      "Downloaded a new version of Bun, but failed to check its version? Try again.",
     );
   }
 
@@ -124,7 +124,7 @@ export default async (options: Input): Promise<Output> => {
 
 async function downloadBun(
   url: string,
-  bunPath: string
+  bunPath: string,
 ): Promise<string | undefined> {
   // Workaround for https://github.com/oven-sh/setup-bun/issues/79 and https://github.com/actions/toolkit/issues/1179
   const zipPath = addExtension(await downloadTool(url), ".zip");
@@ -168,7 +168,7 @@ function getDownloadUrl(options: Input): string {
   const eprofile = encodeURIComponent(profile ?? false);
   const { href } = new URL(
     `${eversion}/${eos}/${earch}?avx2=${eavx2}&profile=${eprofile}`,
-    "https://bun.sh/download/"
+    "https://bun.sh/download/",
   );
   return href;
 }
