@@ -2,9 +2,24 @@ import { tmpdir } from "node:os";
 import { getInput, setOutput, setFailed, getBooleanInput } from "@actions/core";
 import runAction from "./action.js";
 import { readVersionFromFile } from "./utils.js";
+import { parseRegistries } from "./registry.js";
 
 if (!process.env.RUNNER_TEMP) {
   process.env.RUNNER_TEMP = tmpdir();
+}
+
+const registries = parseRegistries(getInput("registries"));
+
+// Backwards compatibility for the `registry-url` and `scope` inputs
+const registryUrl = getInput("registry-url");
+const scope = getInput("scope");
+
+if (registryUrl) {
+  registries.push({
+    url: registryUrl,
+    scope: scope,
+    token: "$BUN_AUTH_TOKEN",
+  });
 }
 
 runAction({
@@ -13,8 +28,7 @@ runAction({
     readVersionFromFile(getInput("bun-version-file")) ||
     undefined,
   customUrl: getInput("bun-download-url") || undefined,
-  registryUrl: getInput("registry-url") || undefined,
-  scope: getInput("scope") || undefined,
+  registries: registries,
   noCache: getBooleanInput("no-cache") || false,
 })
   .then(({ version, revision, bunPath, url, cacheHit }) => {

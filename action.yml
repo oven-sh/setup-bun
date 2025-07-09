@@ -17,12 +17,23 @@ inputs:
   bun-download-url:
     description: Override the URL to download Bun from. This skips version resolution and verifying AVX2 support.
     required: false
+  registries:
+    description: |
+      List of package registries with authentication support. Format:
+      - Default registry: https://registry.npmjs.org/
+      - Default with token: https://registry.npmjs.org/|token
+      - Scoped registry: @scope:https://registry.example.com/
+      - Scoped with token: @scope:https://registry.example.com/|token
+      - Scoped with credentials: @scope:https://user:pass@registry.example.com/
+    required: false
   registry-url:
     required: false
     description: The URL of the package registry to use for installing Bun. Set the $BUN_AUTH_TOKEN environment variable to authenticate with the registry.
+    deprecationMessage: "Use 'registries' input instead."
   scope:
     required: false
-    description: The scope for authenticating with the package registry.
+    description: "The scope for authenticating with the package registry."
+    deprecationMessage: "Use 'registries' input instead."
   no-cache:
     required: false
     type: boolean
