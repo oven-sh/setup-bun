@@ -24,19 +24,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
   tests:
-    name: Tests
+    name: 🧪 Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Bun
+      - name: 🛠️ Setup Bun
         uses: ./
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: bun install
 
-      - name: Run tests
+      - name: 🧪 Run tests
         run: bun test --coverage
 
   setup-bun:
@@ -74,8 +74,7 @@ jobs:
 
       - name: ▶️ Run Bun
         id: run_bun
-        run: |
-          bun --version
+        run: bun --version
 
   setup-bun-from-file:
     name: setup-bun from (${{ matrix.os }}, ${{ matrix.file.name }})
