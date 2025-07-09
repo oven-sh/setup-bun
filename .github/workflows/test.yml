@@ -23,10 +23,26 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: ./
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run tests
+        run: bun test --coverage
+
   setup-bun:
     runs-on: ${{ matrix.os }}
     continue-on-error: true
-    needs: [remove-cache]
+    needs: [remove-cache, tests]
 
     strategy:
       matrix:
@@ -65,7 +81,7 @@ jobs:
     name: setup-bun from (${{ matrix.os }}, ${{ matrix.file.name }})
     runs-on: ${{ matrix.os }}
     continue-on-error: true
-    needs: [remove-cache]
+    needs: [remove-cache, tests]
     strategy:
       matrix:
         os:
@@ -130,7 +146,7 @@ jobs:
     name: setup-bun from (${{ matrix.os }}, download url)
     runs-on: ${{ matrix.os }}
     continue-on-error: true
-    needs: [remove-cache]
+    needs: [remove-cache, tests]
 
     strategy:
       matrix:
@@ -153,3 +169,47 @@ jobs:
         id: run_bun
         run: |
           bun --version
+
+  test-custom-registries:
+    name: test installing deps from custom registries (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    needs: [remove-cache, tests]
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup Bun
+        uses: ./
+        id: setup_bun
+        with:
+          registries: |
+            https://registry.npmjs.org
+            @types:https://registry.yarnpkg.com
+
+      - name: ▶️ Install from default registry
+        run: |
+          output=$(bun add is-odd --verbose --force 2>&1)
+
+          if echo "$output" | grep -q "HTTP/1.1 GET https://registry.npmjs.org/is-odd"; then
+            echo "Successfully installed from default registry"
+          else
+            echo "Failed to install from default registry"
+            exit 1
+          fi
+
+      - name: ▶️ Install from @types registry
+        run: |
+          output=$(bun add @types/bun --verbose --force 2>&1)
+
+          if echo "$output" | grep -q "HTTP/1.1 GET https://registry.yarnpkg.com/@types%2fbun"; then
+            echo "Successfully installed from @types registry"
+          else
+            echo "Failed to install from @types registry"
+            exit 1
+          fi

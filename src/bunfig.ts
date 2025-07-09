@@ -1,50 +1,81 @@
-import { EOL } from "node:os";
-import { appendFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { info } from "@actions/core";
+import { parse, stringify } from "@iarna/toml";
+import { Registry } from "./registry";
 
-type BunfigOptions = {
-  registryUrl?: string;
-  scope?: string;
+type BunfigConfig = {
+  install?: {
+    registry?: {
+      url: string;
+      token?: string;
+    };
+    scopes?: Record<string, { url: string; token?: string }>;
+  };
+  [key: string]: any;
 };
 
-export function createBunfig(options: BunfigOptions): string | null {
-  const { registryUrl, scope } = options;
-
-  let url: URL | undefined;
-  if (registryUrl) {
-    try {
-      url = new URL(registryUrl);
-    } catch {
-      throw new Error(`Invalid registry-url: ${registryUrl}`);
-    }
-  }
-
-  let owner: string | undefined;
-  if (scope) {
-    owner = scope.startsWith("@")
-      ? scope.toLocaleLowerCase()
-      : `@${scope.toLocaleLowerCase()}`;
-  }
-
-  if (url && owner) {
-    return `[install.scopes]${EOL}'${owner}' = { token = "$BUN_AUTH_TOKEN", url = "${url}"}${EOL}`;
-  }
-
-  if (url && !owner) {
-    return `[install]${EOL}registry = "${url}"${EOL}`;
-  }
-
-  return null;
-}
-
-export function writeBunfig(path: string, options: BunfigOptions): void {
-  const bunfig = createBunfig(options);
-  if (!bunfig) {
+export function writeBunfig(path: string, registries: Registry[]): void {
+  if (!registries.length) {
     return;
   }
 
-  info(`Writing bunfig.toml to '${path}'.`);
-  appendFileSync(path, bunfig, {
-    encoding: "utf8",
+  let globalRegistryCount = 0;
+  registries.forEach((registry) => {
+    try {
+      new URL(registry.url);
+    } catch {
+      throw new Error(`Invalid registry URL: ${registry.url}`);
+    }
+
+    if (!registry.scope) {
+      globalRegistryCount++;
+    }
   });
+
+  if (globalRegistryCount > 1) {
+    throw new Error("You can't have more than one global registry.");
+  }
+
+  info(`Writing bunfig.toml to '${path}'.`);
+
+  let config: BunfigConfig = {};
+  if (existsSync(path)) {
+    try {
+      const content = readFileSync(path, { encoding: "utf-8" });
+      config = parse(content) as BunfigConfig;
+    } catch (error) {
+      info(`Error reading existing bunfig: ${error.message}`);
+      config = {};
+    }
+  }
+
+  config.install = config?.install || {};
+  config.install.scopes = config?.install.scopes || {};
+
+  const globalRegistry = registries.find((r) => !r.scope);
+  if (globalRegistry) {
+    config.install.registry = {
+      url: globalRegistry.url,
+      ...(globalRegistry.token ? { token: globalRegistry.token } : {}),
+    };
+  }
+
+  for (const registry of registries) {
+    if (registry.scope) {
+      const scopeName = registry.scope.startsWith("@")
+        ? registry.scope.toLowerCase()
+        : `@${registry.scope.toLowerCase()}`;
+
+      config.install.scopes[scopeName] = {
+        url: registry.url,
+        ...(registry.token ? { token: registry.token } : {}),
+      };
+    }
+  }
+
+  if (Object.keys(config.install.scopes).length === 0) {
+    delete config.install.scopes;
+  }
+
+  writeFileSync(path, stringify(config), { encoding: "utf8" });
 }
