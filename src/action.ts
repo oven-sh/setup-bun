@@ -155,6 +155,33 @@ function isCacheEnabled(options: Input): boolean {
   return isFeatureAvailable();
 }
 
+function getEffectiveArch(os: string, arch: string): string {
+  // Temporary workaround for absence of arm64 builds on Windows (#130)
+  if (os === "win32" && arch === "arm64") {
+    warning(
+      [
+        "⚠️ Bun does not provide native arm64 builds for Windows.",
+        "Using x64-baseline build which will run through Microsoft's x64 emulation layer.",
+        "This may result in reduced performance and potential compatibility issues.",
+        "💡 For best performance, consider using x64 Windows runners or other platforms with native support.",
+      ].join("\n"),
+    );
+
+    return "x64";
+  }
+
+  return arch;
+}
+
+function getEffectiveAvx2(os: string, arch: string, avx2?: boolean): boolean {
+  // Temporary workaround for absence of arm64 builds on Windows (#130)
+  if (os === "win32" && arch === "arm64") {
+    return false;
+  }
+
+  return avx2 ?? true;
+}
+
 function getDownloadUrl(options: Input): string {
   const { customUrl } = options;
   if (customUrl) {
@@ -163,8 +190,12 @@ function getDownloadUrl(options: Input): string {
   const { version, os, arch, avx2, profile } = options;
   const eversion = encodeURIComponent(version ?? "latest");
   const eos = encodeURIComponent(os ?? process.platform);
-  const earch = encodeURIComponent(arch ?? process.arch);
-  const eavx2 = encodeURIComponent(avx2 ?? true);
+  const earch = encodeURIComponent(
+    getEffectiveArch(os ?? process.platform, arch ?? process.arch),
+  );
+  const eavx2 = encodeURIComponent(
+    getEffectiveAvx2(os ?? process.platform, arch ?? process.arch, avx2),
+  );
   const eprofile = encodeURIComponent(profile ?? false);
   const { href } = new URL(
     `${eversion}/${eos}/${earch}?avx2=${eavx2}&profile=${eprofile}`,
