@@ -95,11 +95,11 @@ jobs:
             run: |
               echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > package.json
 
-          - name: /foo/package.json (packageManager bun@1.1.0)
-            file: /foo/package.json
+          - name: foo/package.json (packageManager bun@1.1.0)
+            file: foo/package.json
             run: |
-              mkdir -p /foo
-              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > /foo/package.json
+              mkdir -p foo
+              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > foo/package.json
 
           - name: package.json (packageManager yarn@bun@1.1.0)
             file: package.json
