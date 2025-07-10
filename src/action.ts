@@ -158,6 +158,15 @@ function isCacheEnabled(options: Input): boolean {
 function getEffectiveArch(os: string, arch: string): string {
   // Temporary workaround for absence of arm64 builds on Windows (#130)
   if (os === "win32" && arch === "arm64") {
+    warning(
+      [
+        "⚠️ Bun does not provide native arm64 builds for Windows.",
+        "Using x64 build which will run through Microsoft's x64 emulation layer.",
+        "This may result in reduced performance and potential compatibility issues.",
+        "💡 For best performance, consider using x64 Windows runners or other platforms with native arm64 support.",
+      ].join("\n"),
+    );
+
     return "x64";
   }
 
