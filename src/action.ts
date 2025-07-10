@@ -217,6 +217,9 @@ async function getRevision(exe: string): Promise<string | undefined> {
   const revision = await getExecOutput(exe, ["--revision"], {
     ignoreReturnCode: true,
   });
+  console.log(revision.stdout);
+  console.log(revision.stderr);
+  console.log(revision.exitCode);
   if (revision.exitCode === 0 && /^\d+\.\d+\.\d+/.test(revision.stdout)) {
     return revision.stdout.trim();
   }
