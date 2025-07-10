@@ -155,6 +155,15 @@ function isCacheEnabled(options: Input): boolean {
   return isFeatureAvailable();
 }
 
+function getEffectiveArch(os: string, arch: string): string {
+  // Temporary workaround for absence of arm64 builds on Windows (#130)
+  if (os === "win32" && arch === "arm64") {
+    return "x64";
+  }
+
+  return arch;
+}
+
 function getDownloadUrl(options: Input): string {
   const { customUrl } = options;
   if (customUrl) {
@@ -164,10 +173,8 @@ function getDownloadUrl(options: Input): string {
   const eversion = encodeURIComponent(version ?? "latest");
   const eos = encodeURIComponent(os ?? process.platform);
   const earch = encodeURIComponent(
-    (os ?? process.platform) === "win32" && (arch ?? process.arch) === "arm64"
-      ? "x64"
-      : (arch ?? process.arch),
-  ); // Temporary workaround for absence of arm64 builds on Windows (#130)
+    getEffectiveArch(os ?? process.platform, arch ?? process.arch),
+  );
   const eavx2 = encodeURIComponent(avx2 ?? true);
   const eprofile = encodeURIComponent(profile ?? false);
   const { href } = new URL(
