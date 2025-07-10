@@ -163,7 +163,11 @@ function getDownloadUrl(options: Input): string {
   const { version, os, arch, avx2, profile } = options;
   const eversion = encodeURIComponent(version ?? "latest");
   const eos = encodeURIComponent(os ?? process.platform);
-  const earch = encodeURIComponent(arch ?? process.arch);
+  const earch = encodeURIComponent(
+    (os ?? process.platform) === "win32" && (arch ?? process.arch) === "arm64"
+      ? "x64"
+      : (arch ?? process.arch),
+  ); // Temporary workaround for absence of arm64 builds on Windows (#130)
   const eavx2 = encodeURIComponent(avx2 ?? true);
   const eprofile = encodeURIComponent(profile ?? false);
   const { href } = new URL(
