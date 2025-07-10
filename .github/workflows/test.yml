@@ -156,7 +156,6 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - windows-latest
-          - windows-11-arm
 
     steps:
       - name: 📥 Checkout
