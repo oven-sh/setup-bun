@@ -54,10 +54,11 @@ jobs:
           - latest
           - canary
           - "1.1.0"
-          - "1.x"
-          - "1"
-          - "> 1.0.0"
-          - "< 2"
+          # https://github.com/oven-sh/setup-bun/issues/37
+          # - "1.x"
+          # - "1"
+          # - "> 1.0.0"
+          # - "< 2"
           # Disable <sha> support for now. This is because Github Artifacts
           # expire after 90 days, and we don't have another source of truth yet.
           # - "822a00c4d508b54f650933a73ca5f4a3af9a7983" # 1.0.0 commit
