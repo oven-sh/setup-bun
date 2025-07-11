@@ -33,6 +33,7 @@
   "devDependencies": {
     "@types/bun": "^1.1.13",
     "@types/node": "^20.8.2",
+    "changelogen": "^0.5.7",
     "esbuild": "^0.19.2",
     "prettier": "^3.4.2",
     "typescript": "^4.9.5"

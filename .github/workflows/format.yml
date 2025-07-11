@@ -24,9 +24,7 @@ jobs:
         run: bun install
 
       - name: 🧹 Format
-        run: |
-          bun run format
-          bun run build
+        run: bun run format
 
       - name: 💾 Commit
         uses: autofix-ci/action@551dded8c6cc8a1054039c8bc0b8b48c51dfc6ef
