@@ -64,10 +64,6 @@ If you need to override the download URL, you can use the `bun-download-url` inp
     bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip"
 ```
 
-### Node.js not needed
-
-In most cases, you shouldn't need to use the [setup-node](https://github.com/actions/setup-node) GitHub Action.
-
 ## Inputs
 
 | Name               | Description                                           | Default     | Examples                                         |
