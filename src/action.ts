@@ -80,12 +80,15 @@ export default async (options: Input): Promise<Output> => {
   const cacheKeyBase = createHash("sha1").update(url).digest("base64")
   const cacheKey = `${cacheKeyBase}-${options.extraKey ?? "default"}`
   if (cacheEnabled) {
-    const cacheRestored = await restoreCache([bunPath], cacheKey, [cacheKeyBase]);
+    const cacheRestored = await restoreCache([bunPath, cachePath], cacheKey, [cacheKeyBase]);
     if (cacheRestored) {
       revision = await getRevision(bunPath);
       if (revision) {
-        cacheHit = true;
         info(`Using a cached version of Bun: ${revision}`);
+        if(cacheRestored === cacheKey){
+          info(`Cache hit with key: ${cacheRestored}`);
+          cacheHit = true;
+        }
       } else {
         warning(
           `Found a cached version of Bun: ${revision} (but it appears to be corrupted?)`,
