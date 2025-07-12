@@ -38,7 +38,10 @@ inputs:
     required: false
     type: boolean
     default: false
-    description: Disable caching of bun executable.
+    description: Disable caching of bun executable and packages.
+  extra-key:
+    required: false
+    description: Extra key to use for caching.
 
 outputs:
   bun-version:

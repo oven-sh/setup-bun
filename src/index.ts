@@ -30,6 +30,7 @@ runAction({
   customUrl: getInput("bun-download-url") || undefined,
   registries: registries,
   noCache: getBooleanInput("no-cache") || false,
+  extraKey: getInput("extra-key") || undefined,
 })
   .then(({ version, revision, bunPath, url, cacheHit }) => {
     setOutput("bun-version", version);

@@ -26,6 +26,7 @@ export type Input = {
   profile?: boolean;
   registries?: Registry[];
   noCache?: boolean;
+  extraKey?: string;
 };
 
 export type Output = {
@@ -41,6 +42,7 @@ export type CacheState = {
   cacheHit: boolean;
   bunPath: string;
   url: string;
+  cacheKey: string;
 };
 
 export default async (options: Input): Promise<Output> => {
@@ -51,6 +53,7 @@ export default async (options: Input): Promise<Output> => {
   const cacheEnabled = isCacheEnabled(options);
 
   const binPath = join(homedir(), ".bun", "bin");
+  const cachePath = join(homedir(), ".bun", "cache");
   try {
     mkdirSync(binPath, { recursive: true });
   } catch (error) {
@@ -73,10 +76,11 @@ export default async (options: Input): Promise<Output> => {
 
   let revision: string | undefined;
   let cacheHit = false;
-  if (cacheEnabled) {
-    const cacheKey = createHash("sha1").update(url).digest("base64");
 
-    const cacheRestored = await restoreCache([bunPath], cacheKey);
+  const cacheKeyBase = createHash("sha1").update(url).digest("base64")
+  const cacheKey = `${cacheKeyBase}-${options.extraKey ?? "default"}`
+  if (cacheEnabled) {
+    const cacheRestored = await restoreCache([bunPath], cacheKey, [cacheKeyBase]);
     if (cacheRestored) {
       revision = await getRevision(bunPath);
       if (revision) {
@@ -109,6 +113,7 @@ export default async (options: Input): Promise<Output> => {
     cacheHit,
     bunPath,
     url,
+    cacheKey,
   };
 
   saveState("cache", JSON.stringify(cacheState));
