@@ -53,7 +53,7 @@ export default async (options: Input): Promise<Output> => {
   const cacheEnabled = isCacheEnabled(options);
 
   const binPath = join(homedir(), ".bun", "bin");
-  const cachePath = join(homedir(), ".bun", "cache");
+  const cachePath = join(homedir(), ".bun", "install", "cache");
   try {
     mkdirSync(binPath, { recursive: true });
   } catch (error) {
@@ -75,6 +75,7 @@ export default async (options: Input): Promise<Output> => {
   }
 
   let revision: string | undefined;
+  let cacheBaseHit = false;
   let cacheHit = false;
 
   const cacheKeyBase = createHash("sha1").update(url).digest("base64")
@@ -84,6 +85,7 @@ export default async (options: Input): Promise<Output> => {
     if (cacheRestored) {
       revision = await getRevision(bunPath);
       if (revision) {
+        cacheBaseHit = true;
         info(`Using a cached version of Bun: ${revision}`);
         if(cacheRestored === cacheKey){
           info(`Cache hit with key: ${cacheRestored}`);
@@ -97,7 +99,7 @@ export default async (options: Input): Promise<Output> => {
     }
   }
 
-  if (!cacheHit) {
+  if (!cacheBaseHit) {
     info(`Downloading a new version of Bun: ${url}`);
     // TODO: remove this, temporary fix for https://github.com/oven-sh/setup-bun/issues/73
     revision = await retry(async () => await downloadBun(url, bunPath), 3);
