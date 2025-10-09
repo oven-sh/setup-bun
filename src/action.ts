@@ -154,7 +154,9 @@ function isVersionMatch(
 
   const normalizeVersion = (v: string) => v.replace(/^v/i, "");
 
-  return normalizeVersion(existingVersion) === normalizeVersion(requestedVersion);
+  return (
+    normalizeVersion(existingVersion) === normalizeVersion(requestedVersion)
+  );
 }
 
 async function downloadBun(
