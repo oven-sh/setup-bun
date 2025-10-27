@@ -157,7 +157,9 @@ function getAllVersions(): semver.SemVer[] {
     "0.0.2",
     "0.0.1",
   ];
-  const semverList = stableList.flatMap((v) => semver.coerce(v));
+  const semverList = stableList
+    .map((v) => semver.coerce(v))
+    .filter((v): v is semver.SemVer => v !== null);
   return semverList;
 }
 

@@ -249,7 +249,9 @@ async function fetchAllVersions(): Promise<semver.SemVer[]> {
   if (versions.exitCode == 0) {
     const jsonList = JSON.parse(versions.stdout.trim()) as string[];
     const stableList = jsonList.filter((v) => !v.includes("-"));
-    const semverList = stableList.flatMap((v) => semver.coerce(v));
+    const semverList = stableList
+      .map((v) => semver.coerce(v))
+      .filter((v): v is semver.SemVer => v !== null);
     const sortedList = semver.rsort(semverList);
     return sortedList;
   }
