@@ -16,6 +16,7 @@ import { writeBunfig, Registry } from "./bunfig";
 import { saveState } from "@actions/core";
 import { addExtension, retry } from "./utils";
 import { cwd } from "node:process";
+import * as semver from "semver";
 
 export type Input = {
   customUrl?: string;
@@ -43,11 +44,13 @@ export type CacheState = {
   url: string;
 };
 
+let cachedVersions: semver.SemVer[] | null = null;
+
 export default async (options: Input): Promise<Output> => {
   const bunfigPath = join(cwd(), "bunfig.toml");
   writeBunfig(bunfigPath, options.registries);
 
-  const url = getDownloadUrl(options);
+  const url = await getDownloadUrl(options);
   const cacheEnabled = isCacheEnabled(options);
 
   const binPath = join(homedir(), ".bun", "bin");
@@ -155,13 +158,27 @@ function isCacheEnabled(options: Input): boolean {
   return isFeatureAvailable();
 }
 
-function getDownloadUrl(options: Input): string {
+export async function getDownloadUrl(options: Input): Promise<string> {
   const { customUrl } = options;
   if (customUrl) {
     return customUrl;
   }
   const { version, os, arch, avx2, profile } = options;
-  const eversion = encodeURIComponent(version ?? "latest");
+  let resolvedVersion: string | null = null;
+  const range = semver.validRange(version);
+  if (version == "") {
+    resolvedVersion = null;
+  } else if (range !== null) {
+    const availableVersions = await getAllVersions();
+    const satisfiedVersion = semver.maxSatisfying(availableVersions, range);
+    if (satisfiedVersion === null) {
+      throw new Error(`Version "${version}" is not available`);
+    }
+    resolvedVersion = satisfiedVersion.toString();
+  } else {
+    resolvedVersion = version;
+  }
+  const eversion = encodeURIComponent(resolvedVersion ?? "latest");
   const eos = encodeURIComponent(os ?? process.platform);
   const earch = encodeURIComponent(arch ?? process.arch);
   const eavx2 = encodeURIComponent(avx2 ?? true);
@@ -207,4 +224,35 @@ async function getRevision(exe: string): Promise<string | undefined> {
     return version.stdout.trim();
   }
   return undefined;
+}
+
+export async function getAllVersions(): Promise<semver.SemVer[]> {
+  if (cachedVersions !== null) {
+    return cachedVersions;
+  }
+
+  const versions = await fetchAllVersions();
+  cachedVersions = versions;
+  return versions;
+}
+
+async function fetchAllVersions(): Promise<semver.SemVer[]> {
+  const versions = await getExecOutput(
+    "npm",
+    ["view", "bun", "versions", "--json"],
+    {
+      silent: true,
+      ignoreReturnCode: true,
+    },
+  );
+
+  if (versions.exitCode == 0) {
+    const jsonList = JSON.parse(versions.stdout.trim()) as string[];
+    const stableList = jsonList.filter((v) => !v.includes("-"));
+    const semverList = stableList.flatMap((v) => semver.coerce(v));
+    const sortedList = semver.rsort(semverList);
+    return sortedList;
+  }
+
+  return [];
 }
