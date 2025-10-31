@@ -33,7 +33,7 @@ const FILE_VERSION_READERS = {
     return pkg.packageManager?.split("bun@")?.[1] ?? pkg.engines?.bun;
   },
   ".tool-versions": (content: string) =>
-    content.match(/^bun\s+(?<version>.*?)$/m)?.groups?.version,
+    content.match(/^bun\s+(?<version>\S+)$/m)?.groups?.version,
   ".bumrc": (content: string) => content, // https://github.com/owenizedd/bum
   ".bun-version": (content: string) => content,
 };
