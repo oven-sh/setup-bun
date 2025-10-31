@@ -116,10 +116,6 @@ jobs:
             file: .tool-versions
             run: echo "bun 1.1.0" > .tool-versions
 
-          - name: .tool-versions (bun1.1.0)
-            file: .tool-versions
-            run: echo "bun1.1.0" > .tool-versions
-
           - name: .tool-versions (bun  1.1.0)
             file: .tool-versions
             run: echo "bun 1.1.0" > .tool-versions
