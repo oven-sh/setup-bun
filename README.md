@@ -73,6 +73,7 @@ If you need to override the download URL, you can use the `bun-download-url` inp
 | `bun-download-url` | URL to download .zip file for Bun release             |             |                                                  |
 | `registry-url`     | Registry URL where some private package is stored.    | `undefined` | `"https://npm.pkg.github.com/"`                  |
 | `scope`            | Scope for private packages.                           | `undefined` | `"@foo"`, `"@orgname"`                           |
+| `no-cache`         | Disable caching of the downloaded executable.         | `false`     | `true`, `false`                                  |
 
 ## Outputs
 
