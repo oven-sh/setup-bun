@@ -28,11 +28,13 @@
     "@actions/glob": "^0.4.0",
     "@actions/io": "^1.1.2",
     "@actions/tool-cache": "^2.0.1",
-    "@iarna/toml": "^2.2.5"
+    "@iarna/toml": "^2.2.5",
+    "semver": "6"
   },
   "devDependencies": {
     "@types/bun": "^1.1.13",
     "@types/node": "^20.8.2",
+    "@types/semver": "6",
     "esbuild": "^0.19.2",
     "prettier": "^3.4.2",
     "typescript": "^4.9.5"
