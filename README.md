@@ -27,7 +27,7 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
     scope: "@foo"
 ```
 
-If you need to authenticate with a private registry, you can set the `BUN_AUTH_TOKEN` environment variable.
+If you need to authenticate with a private registry, you can set the `BUN_AUTH_TOKEN` environment variable. Note that this only takes effect when `registry-url` is specified.
 
 ```yaml
 - name: Install Dependencies
