@@ -1,6 +1,6 @@
 import { compareVersions, satisfies, validate } from "compare-versions";
 import { Input } from "./action";
-import { getArchitecture, getPlatform, request } from "./utils";
+import { getArchitecture, getAvx2, getPlatform, request } from "./utils";
 
 export async function getDownloadUrl(options: Input): Promise<string> {
   const { customUrl } = options;
@@ -50,8 +50,14 @@ async function getSemverDownloadUrl(options: Input): Promise<string> {
 
   const eversion = encodeURIComponent(tag ?? version);
   const eos = encodeURIComponent(os ?? getPlatform());
-  const earch = encodeURIComponent(arch ?? getArchitecture());
-  const eavx2 = encodeURIComponent(avx2 === false ? "-baseline" : "");
+  const earch = encodeURIComponent(
+    arch ?? getArchitecture(os ?? process.platform, arch ?? process.arch),
+  );
+  const eavx2 = encodeURIComponent(
+    getAvx2(os ?? process.platform, arch ?? process.arch, avx2) === false
+      ? "-baseline"
+      : "",
+  );
   const eprofile = encodeURIComponent(profile === true ? "-profile" : "");
 
   const { href } = new URL(
