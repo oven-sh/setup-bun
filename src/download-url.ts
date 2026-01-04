@@ -97,6 +97,7 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
         : {},
     })
   ).json()) as { ref: string }[];
+
   let tags = res
     .filter(
       (tag) =>
@@ -104,14 +105,18 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
     )
     .map((item) => item.ref.replace(/refs\/tags\/(bun-v)?/g, ""));
 
+  console.log(tags);
+
   const { version, os, arch, avx2, profile } = options;
 
   let tag = tags.find((t) => t === version);
+  console.log(tag);
   if (!tag) {
     tags = tags.filter((t) => validate(t)).sort(compareVersions);
+    console.log(tags);
 
     const matchedTag =
-      version === "latest"
+      version === "latest" || !version
         ? tags.at(-1)
         : tags.filter((t) => satisfies(t, version)).at(-1);
 
