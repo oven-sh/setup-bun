@@ -16,6 +16,7 @@ import { getExecOutput } from "@actions/exec";
 import { writeBunfig, Registry } from "./bunfig";
 import { saveState } from "@actions/core";
 import { addExtension, retry } from "./utils";
+import { DownloadMeta, getDownloadMeta } from "./download-url";
 import { cwd } from "node:process";
 
 export type Input = {
@@ -109,7 +110,10 @@ export default async (options: Input): Promise<Output> => {
     if (!cacheHit) {
       info(`Downloading a new version of Bun: ${url}`);
       // TODO: remove this, temporary fix for https://github.com/oven-sh/setup-bun/issues/73
-      revision = await retry(async () => await downloadBun(url, bunPath), 3);
+      revision = await retry(
+        async () => await downloadBun(downloadMeta, bunPath),
+        3,
+      );
     }
   }
 
@@ -163,7 +167,7 @@ function isVersionMatch(
 }
 
 async function downloadBun(
-  url: string,
+  downloadMeta: DownloadMeta,
   bunPath: string,
 ): Promise<string | undefined> {
   // Workaround for https://github.com/oven-sh/setup-bun/issues/79 and https://github.com/actions/toolkit/issues/1179
@@ -171,9 +175,9 @@ async function downloadBun(
     await downloadTool(
       downloadMeta.url,
       undefined,
-      downloadMeta.auth ?? undefined
+      downloadMeta.auth ?? undefined,
     ),
-    ".zip"
+    ".zip",
   );
   const extractedZipPath = await extractZip(zipPath);
   const extractedBunPath = await extractBun(extractedZipPath);
@@ -200,24 +204,6 @@ function isCacheEnabled(options: Input): boolean {
     return false;
   }
   return isFeatureAvailable();
-}
-
-function getDownloadUrl(options: Input): string {
-  const { customUrl } = options;
-  if (customUrl) {
-    return customUrl;
-  }
-  const { version, os, arch, avx2, profile } = options;
-  const eversion = encodeURIComponent(version ?? "latest");
-  const eos = encodeURIComponent(os ?? process.platform);
-  const earch = encodeURIComponent(arch ?? process.arch);
-  const eavx2 = encodeURIComponent(avx2 ?? true);
-  const eprofile = encodeURIComponent(profile ?? false);
-  const { href } = new URL(
-    `${eversion}/${eos}/${earch}?avx2=${eavx2}&profile=${eprofile}`,
-    "https://bun.sh/download/",
-  );
-  return href;
 }
 
 async function extractBun(path: string): Promise<string> {

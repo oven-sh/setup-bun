@@ -43,7 +43,7 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
           headers: {
             "Authorization": `Bearer ${options.token}`,
           },
-        }
+        },
       )
     ).json()) as Runs)
   ) {
@@ -60,7 +60,7 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
         headers: {
           "Authorization": `Bearer ${options.token}`,
         },
-      }
+      },
     )
   ).json()) as { artifacts: { name: string; archive_download_url: string }[] };
 
@@ -92,7 +92,7 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
   let tags = res
     .filter(
       (tag) =>
-        tag.ref.startsWith("refs/tags/bun-v") || tag.ref === "refs/tags/canary"
+        tag.ref.startsWith("refs/tags/bun-v") || tag.ref === "refs/tags/canary",
     )
     .map((item) => item.ref.replace(/refs\/tags\/(bun-v)?/g, ""));
 
@@ -116,7 +116,7 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
 
   const { href } = new URL(
     `${eversion}/bun-${eos}-${earch}${eavx2}${eprofile}.zip`,
-    "https://github.com/oven-sh/bun/releases/download/"
+    "https://github.com/oven-sh/bun/releases/download/",
   );
 
   return {

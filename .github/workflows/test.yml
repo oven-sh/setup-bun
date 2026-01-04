@@ -54,6 +54,10 @@ jobs:
           - latest
           - canary
           - "1.1.0"
+          - "1.x"
+          - "1"
+          - "> 1.0.0"
+          - "< 2"
           # https://github.com/oven-sh/setup-bun/issues/37
           # - "1.x"
           # - "1"

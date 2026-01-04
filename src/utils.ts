@@ -15,6 +15,18 @@ export function retry<T>(
     return new Promise((resolve) => setTimeout(resolve, timeout)).then(() =>
       retry(fn, retries - 1, timeout),
     );
+  });
+}
+
+export async function request(
+  url: string,
+  init?: RequestInit,
+): Promise<Response> {
+  const res = await fetch(url, init);
+  if (!res.ok) {
+    throw new Error(
+      `Failed to fetch url ${url}. (status code: ${res.status}, status text: ${res.statusText})\n${res}`,
+    );
   }
 
   return res;
