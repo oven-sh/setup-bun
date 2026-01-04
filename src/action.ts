@@ -52,7 +52,6 @@ export default async (options: Input): Promise<Output> => {
   writeBunfig(bunfigPath, options.registries);
 
   const url = await getDownloadUrl(options);
-
   const cacheEnabled = isCacheEnabled(options);
 
   const binPath = join(homedir(), ".bun", "bin");
