@@ -43,7 +43,10 @@ export function getPlatform(): string {
 }
 
 export function getArchitecture(os: string, arch: string): string {
-  if (os === "windows" && (arch === "aarch64" || arch === "arm64")) {
+  if (
+    (os === "win32" || os === "windows") &&
+    (arch === "aarch64" || arch === "arm64")
+  ) {
     warning(
       [
         "⚠️ Bun does not provide native arm64 builds for Windows.",
@@ -62,7 +65,10 @@ export function getArchitecture(os: string, arch: string): string {
 
 export function getAvx2(os: string, arch: string, avx2?: boolean): boolean {
   // Temporary workaround for absence of arm64 builds on Windows (#130)
-  if (os === "win32" && (arch === "aarch64" || arch === "arm64")) {
+  if (
+    (os === "win32" || os === "windows") &&
+    (arch === "aarch64" || arch === "arm64")
+  ) {
     return false;
   }
 
