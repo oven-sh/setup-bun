@@ -14,15 +14,19 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-      - name: Install Dependencies
+      - name: 📥 Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+
+      - name: 🛠️ Setup Bun
+        uses: ./
+
+      - name: 📦 Install Dependencies
         run: bun install
-      - name: Format
+
+      - name: 🧹 Format
         run: |
           bun run format
           bun run build
-      - name: Commit
-        uses: autofix-ci/action@d3e591514b99d0fca6779455ff8338516663f7cc
+
+      - name: 💾 Commit
+        uses: autofix-ci/action@551dded8c6cc8a1054039c8bc0b8b48c51dfc6ef

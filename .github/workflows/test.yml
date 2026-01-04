@@ -1,4 +1,4 @@
-name: Test
+name: 🧪 Test
 
 on:
   workflow_dispatch:
@@ -15,28 +15,35 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: 📥 Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
 
-      - name: Install github cli
-        run: |
-          (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
-          && sudo mkdir -p -m 755 /etc/apt/keyrings \
-          && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-          && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-          && sudo apt update \
-          && sudo apt install gh -y
-
-      - run: |
-          gh cache delete --all || true
+      - name: 🗑️ Remove cache
+        run: gh cache delete --all || true
         env:
           GH_TOKEN: ${{ github.token }}
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+
+      - name: Setup Bun
+        uses: ./
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run tests
+        run: bun test --coverage
 
   setup-bun:
     runs-on: ${{ matrix.os }}
     continue-on-error: true
-    needs: [remove-cache]
+    needs: [remove-cache, tests]
+
     strategy:
       matrix:
         os:
@@ -47,25 +54,26 @@ jobs:
           - latest
           - canary
           - "1.1.0"
-          - "1.x"
-          - "1"
-          - "> 1.0.0"
-          - "< 2"
-          - "dbd320ccfa909053f95be9e1643d80d73286751f"
+          # https://github.com/oven-sh/setup-bun/issues/37
+          # - "1.x"
+          # - "1"
+          # - "> 1.0.0"
+          # - "< 2"
           # Disable <sha> support for now. This is because Github Artifacts
           # expire after 90 days, and we don't have another source of truth yet.
           # - "822a00c4d508b54f650933a73ca5f4a3af9a7983" # 1.0.0 commit
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Setup Bun
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+
+      - name: 🛠️ Setup Bun
         uses: ./
         id: setup_bun
         with:
           bun-version: ${{ matrix.bun-version }}
 
-      - name: Run Bun
+      - name: ▶️ Run Bun
         id: run_bun
         run: |
           bun --version
@@ -74,51 +82,141 @@ jobs:
     name: setup-bun from (${{ matrix.os }}, ${{ matrix.file.name }})
     runs-on: ${{ matrix.os }}
     continue-on-error: true
-    needs: [remove-cache]
+    needs: [remove-cache, tests]
     strategy:
       matrix:
         os:
           - ubuntu-latest
           - macos-latest
           - windows-latest
+
         file:
-          - name: package.json (bun@1.1.0)
+          - name: package.json (packageManager bun@1.1.0)
             file: package.json
             run: |
               echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > package.json
-          - name: package.json (yarn@bun@1.1.0)
+
+          - name: foo/package.json (packageManager bun@1.1.0)
+            file: foo/package.json
+            run: |
+              mkdir -p foo
+              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > foo/package.json
+
+          - name: package.json (packageManager yarn@bun@1.1.0)
             file: package.json
             run: |
               echo "$(jq '. += {"packageManager": "yarn@bun@1.1.0"}' package.json)" > package.json
+
+          - name: package.json (engines bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '.engines = {"bun": "1.1.0"}' package.json)" > package.json
+
           - name: .tool-versions (bun 1.1.0)
             file: .tool-versions
-            run: |
-              echo "bun 1.1.0" > .tool-versions
+            run: echo "bun 1.1.0" > .tool-versions
+
           - name: .tool-versions (bun1.1.0)
             file: .tool-versions
-            run: |
-              echo "bun1.1.0" > .tool-versions
+            run: echo "bun1.1.0" > .tool-versions
+
+          - name: .tool-versions (bun  1.1.0)
+            file: .tool-versions
+            run: echo "bun 1.1.0" > .tool-versions
+
           - name: .bumrc (1.1.0)
             file: .bumrc
-            run: |
-              echo "1.1.0" > .bumrc
+            run: echo "1.1.0" > .bumrc
+
           - name: .bun-version (1.1.0)
             file: .bun-version
-            run: |
-              echo "1.1.0" > .bun-version
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+            run: echo "1.1.0" > .bun-version
 
-      - name: Setup file
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+
+      - name: 📄 Setup file
         run: ${{ matrix.file.run }}
 
-      - name: Setup Bun
+      - name: 🛠️ Setup Bun
         uses: ./
         with:
           bun-version-file: ${{ matrix.file.file }}
 
-      - name: Compare versions
+      - name: ⚖️ Compare versions
         uses: ./.github/actions/compare-bun-version
         with:
           bun-version: "1.1.0"
+
+  setup-bun-download-url:
+    name: setup-bun from (${{ matrix.os }}, download url)
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    needs: [remove-cache, tests]
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+
+      - name: 🛠️ Setup Bun
+        uses: ./
+        id: setup_bun
+        with:
+          bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-${{runner.os == 'macOS' && 'darwin' || runner.os}}-${{ runner.arch == 'X64' && 'x64' || 'aarch64' }}.zip"
+
+      - name: ▶️ Run Bun
+        id: run_bun
+        run: |
+          bun --version
+
+  test-custom-registries:
+    name: test installing deps from custom registries (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    needs: [remove-cache, tests]
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+
+      - name: 🛠️ Setup Bun
+        uses: ./
+        id: setup_bun
+        with:
+          registries: |
+            https://registry.npmjs.org
+            @types:https://registry.yarnpkg.com
+
+      - name: ▶️ Install from default registry
+        run: |
+          output=$(bun add is-odd --verbose --force 2>&1)
+
+          if echo "$output" | grep -q "HTTP/1.1 GET https://registry.npmjs.org/is-odd"; then
+            echo "Successfully installed from default registry"
+          else
+            echo "Failed to install from default registry"
+            exit 1
+          fi
+
+      - name: ▶️ Install from @types registry
+        run: |
+          output=$(bun add @types/bun --verbose --force 2>&1)
+
+          if echo "$output" | grep -q "HTTP/1.1 GET https://registry.yarnpkg.com/@types%2fbun"; then
+            echo "Successfully installed from @types registry"
+          else
+            echo "Failed to install from @types registry"
+            exit 1
+          fi
