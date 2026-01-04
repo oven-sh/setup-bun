@@ -43,7 +43,7 @@ export function getPlatform(): string {
 }
 
 export function getArchitecture(os: string, arch: string): string {
-  if (os == "windows" && arch === "arm64") {
+  if (os == "windows" && (arch === "aarch64" || arch === "arm64")) {
     warning(
       [
         "⚠️ Bun does not provide native arm64 builds for Windows.",
