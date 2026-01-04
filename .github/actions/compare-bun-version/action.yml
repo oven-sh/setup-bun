@@ -55,7 +55,8 @@ runs:
 
         # Case 3: Semver ranges (e.g., >1.0.0, <2, 1.x, 1.1.0)
         op_part=$(echo "${REQUESTED_SPEC}" | sed -E 's/^([><=]*).*/\1/')
-        version_part=$(echo "${REQUESTED_SPEC}" | sed -E 's/^[><=]*//')
+        version_part=$(echo "${REQUESTED_SPEC}" | sed -E 's/^[><= ]*//')
+
         op="${op_part:-==}"
         version_base="${version_part//.x/}"
 
@@ -71,8 +72,7 @@ runs:
         fi
 
         # Perform comparison for >, <, >=, <=, ==
-        version_compare "${ACTUAL_VERSION}" "${version_part}"
-        result=$?
+        version_compare "${ACTUAL_VERSION}" "${version_part}" && result=0 || result=$?
 
         case "${op}" in
           '==') if [[ ${result} -ne 0 ]]; then echo "Error: Expected version ${version_part}, but got ${ACTUAL_VERSION}." && exit 1; fi ;;
