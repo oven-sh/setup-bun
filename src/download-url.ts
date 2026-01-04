@@ -37,7 +37,8 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
       (tag) =>
         tag.ref.startsWith("refs/tags/bun-v") || tag.ref === "refs/tags/canary",
     )
-    .map((item) => item.ref.replace(/refs\/tags\/(bun-v)?/g, ""));
+    .map((item) => item.ref.replace(/refs\/tags\/(bun-v)?/g, ""))
+    .filter(Boolean);
 
   const { version, os, arch, avx2, profile } = options;
 
