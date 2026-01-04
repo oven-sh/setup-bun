@@ -35,14 +35,12 @@ describe("getAvx2", () => {
   });
 
   it("should return true by default when avx2 is not specified and not on Windows ARM64", () => {
+    // x64 architecture on various platforms
     expect(getAvx2("linux", "x64")).toBe(true);
     expect(getAvx2("darwin", "x64")).toBe(true);
     expect(getAvx2("windows", "x64")).toBe(true);
-    expect(getAvx2("linux", "arm64")).toBe(true);
-    expect(getAvx2("darwin", "aarch64")).toBe(true);
-  });
-
-  it("should return true by default for non-Windows platforms with ARM architecture", () => {
+    
+    // ARM architecture on non-Windows platforms
     expect(getAvx2("linux", "arm64")).toBe(true);
     expect(getAvx2("linux", "aarch64")).toBe(true);
     expect(getAvx2("darwin", "arm64")).toBe(true);
