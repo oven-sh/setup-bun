@@ -54,6 +54,10 @@ jobs:
           - latest
           - canary
           - "1.1.0"
+          - "1.x"
+          - "1"
+          - "> 1.0.0"
+          - "< 2"
           # https://github.com/oven-sh/setup-bun/issues/37
           # - "1.x"
           # - "1"
@@ -77,6 +81,11 @@ jobs:
         id: run_bun
         run: |
           bun --version
+
+      - name: ⚖️ Verify Bun version
+        uses: ./.github/actions/compare-bun-version
+        with:
+          bun-version: ${{ matrix.bun-version }}
 
   setup-bun-from-file:
     name: setup-bun from (${{ matrix.os }}, ${{ matrix.file.name }})

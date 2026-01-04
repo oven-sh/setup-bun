@@ -66,14 +66,15 @@ If you need to override the download URL, you can use the `bun-download-url` inp
 
 ## Inputs
 
-| Name               | Description                                           | Default     | Examples                                         |
-| ------------------ | ----------------------------------------------------- | ----------- | ------------------------------------------------ |
-| `bun-version`      | The version of Bun to download and install.           | `latest`    | `canary`, `1.0.0`                                |
-| `bun-version-file` | The version of Bun to download and install from file. | `undefined` | `package.json`, `.bun-version`, `.tool-versions` |
-| `bun-download-url` | URL to download .zip file for Bun release             |             |                                                  |
-| `registry-url`     | Registry URL where some private package is stored.    | `undefined` | `"https://npm.pkg.github.com/"`                  |
-| `scope`            | Scope for private packages.                           | `undefined` | `"@foo"`, `"@orgname"`                           |
-| `no-cache`         | Disable caching of the downloaded executable.         | `false`     | `true`, `false`                                  |
+| Name               | Description                                                                       | Default               | Examples                                         |
+| ------------------ | --------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------ |
+| `bun-version`      | The version of Bun to download and install.                                       | `latest`              | `canary`, `1.0.0`, `1.0.x`                       |
+| `bun-version-file` | The version of Bun to download and install from file.                             | `undefined`           | `package.json`, `.bun-version`, `.tool-versions` |
+| `bun-download-url` | URL to download .zip file for Bun release                                         |                       |                                                  |
+| `registry-url`     | Registry URL where some private package is stored.                                | `undefined`           | `"https://npm.pkg.github.com/"`                  |
+| `scope`            | Scope for private packages.                                                       | `undefined`           | `"@foo"`, `"@orgname"`                           |
+| `no-cache`         | Disable caching of the downloaded executable.                                     | `false`               | `true`, `false`                                  |
+| `token`            | Personal access token (PAT) used to fetch tags from the `oven-sh/bun` repository. | `${{ github.token }}` | `${{ secrets.GITHUB_TOKEN }}`                    |
 
 ## Outputs
 

@@ -3,19 +3,27 @@ import { info } from "node:console";
 import { existsSync, readFileSync, renameSync } from "node:fs";
 import { resolve, basename } from "node:path";
 
-export function retry<T>(
-  fn: () => Promise<T>,
-  retries: number,
-  timeout = 10000,
-): Promise<T> {
-  return fn().catch((err) => {
-    if (retries <= 0) {
-      throw err;
-    }
-    return new Promise((resolve) => setTimeout(resolve, timeout)).then(() =>
-      retry(fn, retries - 1, timeout),
-    );
+export async function request(
+  url: string,
+  init?: RequestInit,
+): Promise<Response> {
+  const headers = new Headers(init?.headers);
+  if (!headers.has("User-Agent")) {
+    headers.set("User-Agent", "@oven-sh/setup-bun");
+  }
+
+  const res = await fetch(url, {
+    ...init,
+    headers,
   });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(
+      `Failed to fetch url ${url}. (status code: ${res.status}, status text: ${res.statusText})${body ? `\n${body}` : ""}`,
+    );
+  }
+
+  return res;
 }
 
 export function addExtension(path: string, ext: string): string {
@@ -25,6 +33,20 @@ export function addExtension(path: string, ext: string): string {
   }
 
   return path;
+}
+
+export function getPlatform(): string {
+  const platform = process.platform;
+  if (platform === "win32") return "windows";
+
+  return platform;
+}
+
+export function getArchitecture(): string {
+  const arch = process.arch;
+  if (arch === "arm64") return "aarch64";
+
+  return arch;
 }
 
 const FILE_VERSION_READERS = {

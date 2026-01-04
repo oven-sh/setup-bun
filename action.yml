@@ -39,6 +39,10 @@ inputs:
     type: boolean
     default: false
     description: Disable caching of bun executable.
+  token:
+    required: false
+    default: ${{ github.token }}
+    description: Personal access token (PAT) used to fetch tags from oven-sh/bun repository. Recommended for resolving wildcard/range versions to avoid GitHub API rate limiting.
 
 outputs:
   bun-version:
