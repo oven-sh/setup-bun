@@ -61,7 +61,7 @@ runs:
         version_base="${version_part//.x/}"
 
         # Handle wildcards like '1.x' or '1'
-        if [[ "${version_part}" == *.x* ]] || [[ ! "${version_part}" == *.* ]]; then
+        if [[ "${version_part}" == *.x* ]] || { [[ ! "${version_part}" == *.* ]] && [[ "${op}" == "==" ]]; }; then
            if [[ "${ACTUAL_VERSION}" == "${version_base}" || "${ACTUAL_VERSION}" == "${version_base}".* ]]; then
               echo "OK: Version ${ACTUAL_VERSION} matches wildcard spec '${REQUESTED_SPEC}'."
               exit 0
