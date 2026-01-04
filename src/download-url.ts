@@ -34,7 +34,7 @@ interface Runs {
 async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
   let res: Runs;
   let page = 1;
-  let run: Run;
+  let run: Run | undefined;
   while (
     (res = (await (
       await request(
@@ -47,10 +47,18 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
       )
     ).json()) as Runs)
   ) {
+    if (res.workflow_runs.length === 0) {
+      break;
+    }
+
     run = res.workflow_runs.find((item) => item.head_sha === options.version);
     if (run) break;
 
     page++;
+  }
+
+  if (!run) {
+    throw new Error(`Failed to find workflow run for SHA '${options.version}'`);
   }
 
   const artifacts = (await (
@@ -67,7 +75,7 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
   const { os, arch, avx2, profile, token } = options;
 
   const name = `bun-${os ?? getPlatform()}-${arch ?? getArchitecture()}${
-    avx2 ? "-baseline" : ""
+    avx2 ? "" : "-baseline"
   }${profile ? "-profile" : ""}`;
 
   const artifact = artifacts.artifacts.find((item) => item.name === name);
@@ -102,8 +110,16 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
   if (!tag) {
     tags = tags.filter((t) => validate(t)).sort(compareVersions);
 
-    if (version === "latest") tag = `bun-v${tags.at(-1)}`;
-    else tag = `bun-v${tags.filter((t) => satisfies(t, version)).at(-1)}`;
+    const matchedTag =
+      version === "latest"
+        ? tags.at(-1)
+        : tags.filter((t) => satisfies(t, version)).at(-1);
+
+    if (!matchedTag) {
+      throw new Error(`No Bun release found matching version '${version}'`);
+    }
+
+    tag = `bun-v${matchedTag}`;
   } else if (validate(tag)) {
     tag = `bun-v${tag}`;
   }
@@ -111,7 +127,7 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
   const eversion = encodeURIComponent(tag ?? version);
   const eos = encodeURIComponent(os ?? getPlatform());
   const earch = encodeURIComponent(arch ?? getArchitecture());
-  const eavx2 = encodeURIComponent(avx2 ? "-baseline" : "");
+  const eavx2 = encodeURIComponent(avx2 ? "" : "-baseline");
   const eprofile = encodeURIComponent(profile ? "-profile" : "");
 
   const { href } = new URL(
