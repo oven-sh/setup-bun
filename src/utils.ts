@@ -60,7 +60,10 @@ const FILE_VERSION_READERS = {
   ".bun-version": (content: string) => content,
 };
 
-export function readVersionFromFile(file: string, silent = false): string | undefined {
+export function readVersionFromFile(
+  file: string,
+  silent = false,
+): string | undefined {
   const cwd = process.env.GITHUB_WORKSPACE;
   if (!cwd) {
     return;
