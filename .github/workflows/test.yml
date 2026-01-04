@@ -16,7 +16,7 @@ jobs:
     permissions: write-all
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
 
       - name: 🗑️ Remove cache
         run: gh cache delete --all || true
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
 
       - name: Setup Bun
         uses: ./
@@ -59,13 +59,18 @@ jobs:
           - "1"
           - "> 1.0.0"
           - "< 2"
+          # https://github.com/oven-sh/setup-bun/issues/37
+          # - "1.x"
+          # - "1"
+          # - "> 1.0.0"
+          # - "< 2"
           # Disable <sha> support for now. This is because Github Artifacts
           # expire after 90 days, and we don't have another source of truth yet.
           # - "822a00c4d508b54f650933a73ca5f4a3af9a7983" # 1.0.0 commit
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
 
       - name: 🛠️ Setup Bun
         uses: ./
@@ -77,6 +82,11 @@ jobs:
         id: run_bun
         run: |
           bun --version
+
+      - name: ⚖️ Verify Bun version
+        uses: ./.github/actions/compare-bun-version
+        with:
+          bun-version: ${{ matrix.bun-version }}
 
   setup-bun-from-file:
     name: setup-bun from (${{ matrix.os }}, ${{ matrix.file.name }})
@@ -92,20 +102,26 @@ jobs:
           - windows-11-arm
 
         file:
-          - name: package.json (bun@1.1.0)
+          - name: package.json (packageManager bun@1.1.0)
             file: package.json
             run: |
               echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > package.json
 
-          - name: /foo/package.json (bun@1.1.0)
-            file: /foo/package.json
+          - name: foo/package.json (packageManager bun@1.1.0)
+            file: foo/package.json
             run: |
-              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > /foo/package.json
+              mkdir -p foo
+              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > foo/package.json
 
-          - name: package.json (yarn@bun@1.1.0)
+          - name: package.json (packageManager yarn@bun@1.1.0)
             file: package.json
             run: |
               echo "$(jq '. += {"packageManager": "yarn@bun@1.1.0"}' package.json)" > package.json
+
+          - name: package.json (engines bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '.engines = {"bun": "1.1.0"}' package.json)" > package.json
 
           - name: .tool-versions (bun 1.1.0)
             file: .tool-versions
@@ -129,7 +145,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
 
       - name: 📄 Setup file
         run: ${{ matrix.file.run }}
@@ -159,7 +175,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
 
       - name: 🛠️ Setup Bun
         uses: ./
@@ -184,7 +200,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
 
       - name: 🛠️ Setup Bun
         uses: ./

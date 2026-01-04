@@ -7,14 +7,17 @@ import {
   symlinkSync,
   renameSync,
   copyFileSync,
+  existsSync,
 } from "node:fs";
 import { addPath, info, warning } from "@actions/core";
 import { isFeatureAvailable, restoreCache } from "@actions/cache";
 import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
-import { writeBunfig, Registry } from "./bunfig";
+import { Registry } from "./registry";
+import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { addExtension, retry } from "./utils";
+import { addExtension } from "./utils";
+import { getDownloadUrl } from "./download-url";
 import { cwd } from "node:process";
 
 export type Input = {
@@ -26,6 +29,7 @@ export type Input = {
   profile?: boolean;
   registries?: Registry[];
   noCache?: boolean;
+  token?: string;
 };
 
 export type Output = {
@@ -47,7 +51,7 @@ export default async (options: Input): Promise<Output> => {
   const bunfigPath = join(cwd(), "bunfig.toml");
   writeBunfig(bunfigPath, options.registries);
 
-  const url = getDownloadUrl(options);
+  const url = await getDownloadUrl(options);
   const cacheEnabled = isCacheEnabled(options);
 
   const binPath = join(homedir(), ".bun", "bin");
@@ -73,27 +77,39 @@ export default async (options: Input): Promise<Output> => {
 
   let revision: string | undefined;
   let cacheHit = false;
-  if (cacheEnabled) {
-    const cacheKey = createHash("sha1").update(url).digest("base64");
 
-    const cacheRestored = await restoreCache([bunPath], cacheKey);
-    if (cacheRestored) {
-      revision = await getRevision(bunPath);
-      if (revision) {
-        cacheHit = true;
-        info(`Using a cached version of Bun: ${revision}`);
-      } else {
-        warning(
-          `Found a cached version of Bun: ${revision} (but it appears to be corrupted?)`,
-        );
-      }
+  // Check if Bun executable already exists and matches requested version
+  if (!options.customUrl && existsSync(bunPath)) {
+    const existingRevision = await getRevision(bunPath);
+    if (existingRevision && isVersionMatch(existingRevision, options.version)) {
+      revision = existingRevision;
+      cacheHit = true; // Treat as cache hit to avoid unnecessary network requests
+      info(`Using existing Bun installation: ${revision}`);
     }
   }
 
-  if (!cacheHit) {
-    info(`Downloading a new version of Bun: ${url}`);
-    // TODO: remove this, temporary fix for https://github.com/oven-sh/setup-bun/issues/73
-    revision = await retry(async () => await downloadBun(url, bunPath), 3);
+  if (!revision) {
+    if (cacheEnabled) {
+      const cacheKey = createHash("sha1").update(url).digest("base64");
+
+      const cacheRestored = await restoreCache([bunPath], cacheKey);
+      if (cacheRestored) {
+        revision = await getRevision(bunPath);
+        if (revision) {
+          cacheHit = true;
+          info(`Using a cached version of Bun: ${revision}`);
+        } else {
+          warning(
+            `Found a cached version of Bun: ${revision} (but it appears to be corrupted?)`,
+          );
+        }
+      }
+    }
+
+    if (!cacheHit) {
+      info(`Downloading a new version of Bun: ${url}`);
+      revision = await downloadBun(url, bunPath);
+    }
   }
 
   if (!revision) {
@@ -121,6 +137,29 @@ export default async (options: Input): Promise<Output> => {
     cacheHit,
   };
 };
+
+function isVersionMatch(
+  existingRevision: string,
+  requestedVersion?: string,
+): boolean {
+  // If no version specified, default is "latest" - don't match existing
+  if (!requestedVersion) {
+    return false;
+  }
+
+  // Non-pinned versions should never match existing installations
+  if (/^(latest|canary|action)$/i.test(requestedVersion)) {
+    return false;
+  }
+
+  const [existingVersion] = existingRevision.split("+");
+
+  const normalizeVersion = (v: string) => v.replace(/^v/i, "");
+
+  return (
+    normalizeVersion(existingVersion) === normalizeVersion(requestedVersion)
+  );
+}
 
 async function downloadBun(
   url: string,
@@ -153,55 +192,6 @@ function isCacheEnabled(options: Input): boolean {
     return false;
   }
   return isFeatureAvailable();
-}
-
-function getEffectiveArch(os: string, arch: string): string {
-  // Temporary workaround for absence of arm64 builds on Windows (#130)
-  if (os === "win32" && arch === "arm64") {
-    warning(
-      [
-        "⚠️ Bun does not provide native arm64 builds for Windows.",
-        "Using x64-baseline build which will run through Microsoft's x64 emulation layer.",
-        "This may result in reduced performance and potential compatibility issues.",
-        "💡 For best performance, consider using x64 Windows runners or other platforms with native support.",
-      ].join("\n"),
-    );
-
-    return "x64";
-  }
-
-  return arch;
-}
-
-function getEffectiveAvx2(os: string, arch: string, avx2?: boolean): boolean {
-  // Temporary workaround for absence of arm64 builds on Windows (#130)
-  if (os === "win32" && arch === "arm64") {
-    return false;
-  }
-
-  return avx2 ?? true;
-}
-
-function getDownloadUrl(options: Input): string {
-  const { customUrl } = options;
-  if (customUrl) {
-    return customUrl;
-  }
-  const { version, os, arch, avx2, profile } = options;
-  const eversion = encodeURIComponent(version ?? "latest");
-  const eos = encodeURIComponent(os ?? process.platform);
-  const earch = encodeURIComponent(
-    getEffectiveArch(os ?? process.platform, arch ?? process.arch),
-  );
-  const eavx2 = encodeURIComponent(
-    getEffectiveAvx2(os ?? process.platform, arch ?? process.arch, avx2),
-  );
-  const eprofile = encodeURIComponent(profile ?? false);
-  const { href } = new URL(
-    `${eversion}/${eos}/${earch}?avx2=${eavx2}&profile=${eprofile}`,
-    "https://bun.sh/download/",
-  );
-  return href;
 }
 
 async function extractBun(path: string): Promise<string> {

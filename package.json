@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "setup-bun",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Setup Bun on GitHub Actions.",
   "keywords": [
     "bun",
@@ -28,7 +28,8 @@
     "@actions/glob": "^0.4.0",
     "@actions/io": "^1.1.2",
     "@actions/tool-cache": "^2.0.1",
-    "@iarna/toml": "^2.2.5"
+    "@iarna/toml": "^2.2.5",
+    "compare-versions": "^6.1.1"
   },
   "devDependencies": {
     "@types/bun": "^1.1.13",
@@ -36,5 +37,8 @@
     "esbuild": "^0.19.2",
     "prettier": "^3.4.2",
     "typescript": "^4.9.5"
+  },
+  "patchedDependencies": {
+    "compare-versions@6.1.1": "patches/compare-versions@6.1.1.patch"
   }
 }
