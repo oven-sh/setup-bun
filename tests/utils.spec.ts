@@ -1,10 +1,11 @@
 import { describe, expect, it, beforeEach, afterEach } from "bun:test";
-import { existsSync, mkdirSync, writeFileSync, unlinkSync, rmdirSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { readVersionFromFile } from "../src/utils";
 import { resolve } from "node:path";
+import { tmpdir } from "node:os";
 
 describe("readVersionFromFile", () => {
-  const testDir = "/tmp/setup-bun-tests";
+  const testDir = resolve(tmpdir(), "setup-bun-tests");
   const originalWorkspace = process.env.GITHUB_WORKSPACE;
 
   beforeEach(() => {
@@ -18,13 +19,9 @@ describe("readVersionFromFile", () => {
   afterEach(() => {
     // Clean up test directory
     try {
-      const files = ["package.json", ".bun-version", ".tool-versions", ".bumrc"];
-      files.forEach((file) => {
-        const path = resolve(testDir, file);
-        if (existsSync(path)) {
-          unlinkSync(path);
-        }
-      });
+      if (existsSync(testDir)) {
+        rmSync(testDir, { recursive: true, force: true });
+      }
     } catch (error) {
       console.error("Error cleaning up test files:", error);
     }
