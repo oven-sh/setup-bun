@@ -39,7 +39,7 @@ describe("getAvx2", () => {
     expect(getAvx2("linux", "x64")).toBe(true);
     expect(getAvx2("darwin", "x64")).toBe(true);
     expect(getAvx2("windows", "x64")).toBe(true);
-    
+
     // ARM architecture on non-Windows platforms
     expect(getAvx2("linux", "arm64")).toBe(true);
     expect(getAvx2("linux", "aarch64")).toBe(true);
