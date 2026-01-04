@@ -47,7 +47,7 @@ export function getArchitecture(os: string, arch: string): string {
     warning(
       [
         "⚠️ Bun does not provide native arm64 builds for Windows.",
-        "Using x64-baseline build which will run through Microsoft's x64 emulation layer.",
+        "Using x64 baseline build which will run through Microsoft's x64 emulation layer.",
         "This may result in reduced performance and potential compatibility issues.",
         "💡 For best performance, consider using x64 Windows runners or other platforms with native support.",
       ].join("\n"),
