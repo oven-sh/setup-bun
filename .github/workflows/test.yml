@@ -82,6 +82,11 @@ jobs:
         run: |
           bun --version
 
+      - name: ⚖️ Verify Bun version
+        uses: ./.github/actions/compare-bun-version
+        with:
+          bun-version: ${{ matrix.bun-version }}
+
   setup-bun-from-file:
     name: setup-bun from (${{ matrix.os }}, ${{ matrix.file.name }})
     runs-on: ${{ matrix.os }}

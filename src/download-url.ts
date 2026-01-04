@@ -75,7 +75,7 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
   const { os, arch, avx2, profile, token } = options;
 
   const name = `bun-${os ?? getPlatform()}-${arch ?? getArchitecture()}${
-    avx2 ? "" : "-baseline"
+    avx2 == false ? "-baseline" : ""
   }${profile ? "-profile" : ""}`;
 
   const artifact = artifacts.artifacts.find((item) => item.name === name);
@@ -128,7 +128,7 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
   const eversion = encodeURIComponent(tag ?? version);
   const eos = encodeURIComponent(os ?? getPlatform());
   const earch = encodeURIComponent(arch ?? getArchitecture());
-  const eavx2 = encodeURIComponent(avx2 == true ? "-baseline" : "");
+  const eavx2 = encodeURIComponent(avx2 == false ? "-baseline" : "");
   const eprofile = encodeURIComponent(profile == true ? "-profile" : "");
 
   const { href } = new URL(
