@@ -13,7 +13,8 @@ import { addPath, info, warning } from "@actions/core";
 import { isFeatureAvailable, restoreCache } from "@actions/cache";
 import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
-import { writeBunfig, Registry } from "./bunfig";
+import { Registry } from "./registry";
+import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
 import { addExtension, retry } from "./utils";
 import { DownloadMeta, getDownloadMeta } from "./download-url";
@@ -172,11 +173,7 @@ async function downloadBun(
 ): Promise<string | undefined> {
   // Workaround for https://github.com/oven-sh/setup-bun/issues/79 and https://github.com/actions/toolkit/issues/1179
   const zipPath = addExtension(
-    await downloadTool(
-      downloadMeta.url,
-      undefined,
-      downloadMeta.auth ?? undefined,
-    ),
+    await downloadTool(downloadMeta.url, undefined, downloadMeta.auth),
     ".zip",
   );
   const extractedZipPath = await extractZip(zipPath);

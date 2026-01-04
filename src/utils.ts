@@ -24,8 +24,9 @@ export async function request(
 ): Promise<Response> {
   const res = await fetch(url, init);
   if (!res.ok) {
+    const body = await res.text().catch(() => "");
     throw new Error(
-      `Failed to fetch url ${url}. (status code: ${res.status}, status text: ${res.statusText})\n${res}`,
+      `Failed to fetch url ${url}. (status code: ${res.status}, status text: ${res.statusText})${body ? `\n${body}` : ""}`,
     );
   }
 

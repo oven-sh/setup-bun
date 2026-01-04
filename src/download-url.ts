@@ -40,9 +40,9 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
       await request(
         `https://api.github.com/repos/oven-sh/bun/actions/workflows/ci.yml/runs?per_page=100&page=${page}`,
         {
-          headers: {
-            "Authorization": `Bearer ${options.token}`,
-          },
+          headers: options.token
+            ? { "Authorization": `Bearer ${options.token}` }
+            : {},
         },
       )
     ).json()) as Runs)
@@ -57,9 +57,9 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
     await request(
       `https://api.github.com/repos/oven-sh/bun/actions/runs/${run.id}/artifacts`,
       {
-        headers: {
-          "Authorization": `Bearer ${options.token}`,
-        },
+        headers: options.token
+          ? { "Authorization": `Bearer ${options.token}` }
+          : {},
       },
     )
   ).json()) as { artifacts: { name: string; archive_download_url: string }[] };
@@ -84,9 +84,9 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
 async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
   const res = (await (
     await request("https://api.github.com/repos/oven-sh/bun/git/refs/tags", {
-      headers: {
-        "Authorization": `Bearer ${options.token}`,
-      },
+      headers: options.token
+        ? { "Authorization": `Bearer ${options.token}` }
+        : {},
     })
   ).json()) as { ref: string }[];
   let tags = res
