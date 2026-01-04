@@ -105,15 +105,11 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
     )
     .map((item) => item.ref.replace(/refs\/tags\/(bun-v)?/g, ""));
 
-  console.log(tags);
-
   const { version, os, arch, avx2, profile } = options;
 
   let tag = tags.find((t) => t === version);
-  console.log(tag);
   if (!tag) {
     tags = tags.filter((t) => validate(t)).sort(compareVersions);
-    console.log(tags);
 
     const matchedTag =
       version === "latest" || !version
@@ -132,8 +128,8 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
   const eversion = encodeURIComponent(tag ?? version);
   const eos = encodeURIComponent(os ?? getPlatform());
   const earch = encodeURIComponent(arch ?? getArchitecture());
-  const eavx2 = encodeURIComponent(avx2 ? "" : "-baseline");
-  const eprofile = encodeURIComponent(profile ? "-profile" : "");
+  const eavx2 = encodeURIComponent(avx2 == true ? "-baseline" : "");
+  const eprofile = encodeURIComponent(profile == true ? "-profile" : "");
 
   const { href } = new URL(
     `${eversion}/bun-${eos}-${earch}${eavx2}${eprofile}.zip`,
