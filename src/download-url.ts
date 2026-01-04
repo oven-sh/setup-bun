@@ -2,28 +2,16 @@ import { compareVersions, satisfies, validate } from "compare-versions";
 import { Input } from "./action";
 import { getArchitecture, getPlatform, request } from "./utils";
 
-export interface DownloadMeta {
-  url: string;
-  auth?: string;
-}
-
-export async function getDownloadMeta(options: Input): Promise<DownloadMeta> {
+export async function getDownloadUrl(options: Input): Promise<string> {
   const { customUrl } = options;
   if (customUrl) {
-    return {
-      url: customUrl,
-    };
+    return customUrl;
   }
 
-  return await getSemverDownloadMeta(options);
+  return await getSemverDownloadUrl(options);
 }
 
-interface Run {
-  id: string;
-  head_sha: string;
-}
-
-async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
+async function getSemverDownloadUrl(options: Input): Promise<string> {
   const res = (await (
     await request("https://api.github.com/repos/oven-sh/bun/git/refs/tags", {
       headers: options.token
@@ -71,7 +59,5 @@ async function getSemverDownloadMeta(options: Input): Promise<DownloadMeta> {
     "https://github.com/oven-sh/bun/releases/download/",
   );
 
-  return {
-    url: href,
-  };
+  return href;
 }

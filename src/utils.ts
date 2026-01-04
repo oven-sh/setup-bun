@@ -7,7 +7,15 @@ export async function request(
   url: string,
   init?: RequestInit,
 ): Promise<Response> {
-  const res = await fetch(url, init);
+  const headers = new Headers(init?.headers);
+  if (!headers.has("User-Agent")) {
+    headers.set("User-Agent", "@oven-sh/setup-bun");
+  }
+
+  const res = await fetch(url, {
+    ...init,
+    headers,
+  });
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     throw new Error(

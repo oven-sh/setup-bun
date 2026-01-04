@@ -17,7 +17,7 @@ import { Registry } from "./registry";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
 import { addExtension } from "./utils";
-import { DownloadMeta, getDownloadMeta } from "./download-url";
+import { getDownloadUrl } from "./download-url";
 import { cwd } from "node:process";
 
 export type Input = {
@@ -29,7 +29,7 @@ export type Input = {
   profile?: boolean;
   registries?: Registry[];
   noCache?: boolean;
-  token: string;
+  token?: string;
 };
 
 export type Output = {
@@ -51,8 +51,7 @@ export default async (options: Input): Promise<Output> => {
   const bunfigPath = join(cwd(), "bunfig.toml");
   writeBunfig(bunfigPath, options.registries);
 
-  const downloadMeta = await getDownloadMeta(options);
-  const url = downloadMeta.url;
+  const url = await getDownloadUrl(options);
 
   const cacheEnabled = isCacheEnabled(options);
 
@@ -110,7 +109,7 @@ export default async (options: Input): Promise<Output> => {
 
     if (!cacheHit) {
       info(`Downloading a new version of Bun: ${url}`);
-      revision = await downloadBun(downloadMeta, bunPath);
+      revision = await downloadBun(url, bunPath);
     }
   }
 
@@ -164,11 +163,11 @@ function isVersionMatch(
 }
 
 async function downloadBun(
-  downloadMeta: DownloadMeta,
+  url: string,
   bunPath: string,
 ): Promise<string | undefined> {
   // Workaround for https://github.com/oven-sh/setup-bun/issues/79 and https://github.com/actions/toolkit/issues/1179
-  const zipPath = addExtension(await downloadTool(downloadMeta.url), ".zip");
+  const zipPath = addExtension(await downloadTool(url), ".zip");
   const extractedZipPath = await extractZip(zipPath);
   const extractedBunPath = await extractBun(extractedZipPath);
   try {
