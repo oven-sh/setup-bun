@@ -16,7 +16,7 @@ import { getExecOutput } from "@actions/exec";
 import { Registry } from "./registry";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { addExtension, retry } from "./utils";
+import { addExtension } from "./utils";
 import { DownloadMeta, getDownloadMeta } from "./download-url";
 import { cwd } from "node:process";
 
@@ -110,11 +110,7 @@ export default async (options: Input): Promise<Output> => {
 
     if (!cacheHit) {
       info(`Downloading a new version of Bun: ${url}`);
-      // TODO: remove this, temporary fix for https://github.com/oven-sh/setup-bun/issues/73
-      revision = await retry(
-        async () => await downloadBun(downloadMeta, bunPath),
-        3,
-      );
+      revision = await downloadBun(downloadMeta, bunPath);
     }
   }
 
