@@ -51,7 +51,7 @@ async function getSemverDownloadUrl(options: Input): Promise<string> {
   const eversion = encodeURIComponent(tag ?? version);
   const eos = encodeURIComponent(os ?? getPlatform());
   const earch = encodeURIComponent(
-    arch ?? getArchitecture(os ?? getPlatform(), arch ?? process.arch),
+    getArchitecture(os ?? getPlatform(), arch ?? process.arch),
   );
   const eavx2 = encodeURIComponent(
     getAvx2(os ?? getPlatform(), arch ?? process.arch, avx2) === false
