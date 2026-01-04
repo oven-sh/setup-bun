@@ -85,7 +85,7 @@ async function getShaDownloadMeta(options: Input): Promise<DownloadMeta> {
 
   return {
     url: artifact.archive_download_url,
-    auth: `Bearer ${token}`,
+    auth: token ? `Bearer ${token}` : undefined,
   };
 }
 
