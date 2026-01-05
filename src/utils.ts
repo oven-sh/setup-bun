@@ -42,11 +42,31 @@ export function getPlatform(): string {
   return platform;
 }
 
-export function getArchitecture(): string {
-  const arch = process.arch;
-  if (arch === "arm64") return "aarch64";
+export function getArchitecture(os: string, arch: string): string {
+  if (os === "windows" && (arch === "aarch64" || arch === "arm64")) {
+    warning(
+      [
+        "⚠️ Bun does not provide native arm64 builds for Windows.",
+        "Using x64 baseline build which will run through Microsoft's x64 emulation layer.",
+        "This may result in reduced performance and potential compatibility issues.",
+        "💡 For best performance, consider using x64 Windows runners or other platforms with native support.",
+      ].join("\n"),
+    );
 
+    return "x64";
+  }
+
+  if (arch === "arm64") return "aarch64";
   return arch;
+}
+
+export function getAvx2(os: string, arch: string, avx2?: boolean): boolean {
+  // Temporary workaround for absence of arm64 builds on Windows (#130)
+  if (os === "windows" && (arch === "aarch64" || arch === "arm64")) {
+    return false;
+  }
+
+  return avx2 ?? true;
 }
 
 const FILE_VERSION_READERS = {
