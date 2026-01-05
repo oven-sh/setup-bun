@@ -80,7 +80,10 @@ const FILE_VERSION_READERS = {
   ".bun-version": (content: string) => content,
 };
 
-export function readVersionFromFile(file: string): string | undefined {
+export function readVersionFromFile(
+  file: string,
+  silent = false,
+): string | undefined {
   const cwd = process.env.GITHUB_WORKSPACE;
   if (!cwd) {
     return;
@@ -96,7 +99,9 @@ export function readVersionFromFile(file: string): string | undefined {
   const base = basename(file);
 
   if (!existsSync(path)) {
-    warning(`File ${path} not found`);
+    if (!silent) {
+      warning(`File ${path} not found`);
+    }
     return;
   }
 
@@ -107,12 +112,16 @@ export function readVersionFromFile(file: string): string | undefined {
     output = reader(readFileSync(path, "utf8"))?.trim();
 
     if (!output) {
-      warning(`Failed to read version from ${file}`);
+      if (!silent) {
+        warning(`Failed to read version from ${file}`);
+      }
       return;
     }
   } catch (error) {
     const { message } = error as Error;
-    warning(`Failed to read ${file}: ${message}`);
+    if (!silent) {
+      warning(`Failed to read ${file}: ${message}`);
+    }
   } finally {
     if (output) {
       info(`Obtained version ${output} from ${file}`);
