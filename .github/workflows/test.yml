@@ -160,6 +160,56 @@ jobs:
         with:
           bun-version: "1.1.0"
 
+  setup-bun-from-package-json-without-specified-field:
+    name: setup-bun from (${{ matrix.os }}, ${{ matrix.file.name }}) without specified field
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    needs: [remove-cache, tests]
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+          - windows-11-arm
+
+        file:
+          - name: package.json (packageManager bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > package.json
+
+          - name: foo/package.json (packageManager bun@1.1.0)
+            file: foo/package.json
+            run: |
+              mkdir -p foo
+              echo "$(jq '. += {"packageManager": "bun@1.1.0"}' package.json)" > foo/package.json
+
+          - name: package.json (packageManager yarn@bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '. += {"packageManager": "yarn@bun@1.1.0"}' package.json)" > package.json
+
+          - name: package.json (engines bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '.engines = {"bun": "1.1.0"}' package.json)" > package.json
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+
+      - name: 📄 Setup file
+        run: ${{ matrix.file.run }}
+
+      - name: 🛠️ Setup Bun
+        uses: ./
+
+      - name: ⚖️ Compare versions
+        uses: ./.github/actions/compare-bun-version
+        with:
+          bun-version: "1.1.0"
+
   setup-bun-download-url:
     name: setup-bun from (${{ matrix.os }}, download url)
     runs-on: ${{ matrix.os }}
