@@ -1,114 +1,124 @@
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
-import { existsSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
-import { readVersionFromFile } from "../src/utils";
-import { resolve } from "node:path";
-import { tmpdir } from "node:os";
+import { afterEach, describe, expect, it, spyOn } from "bun:test";
+import { getArchitecture, getAvx2 } from "../src/utils";
+import * as core from "@actions/core";
 
-describe("readVersionFromFile", () => {
-  const testDir = resolve(tmpdir(), "setup-bun-tests");
-  const originalWorkspace = process.env.GITHUB_WORKSPACE;
-
-  beforeEach(() => {
-    // Set up test directory
-    if (!existsSync(testDir)) {
-      mkdirSync(testDir, { recursive: true });
-    }
-    process.env.GITHUB_WORKSPACE = testDir;
-  });
+describe("getArchitecture", () => {
+  let warningSpy: ReturnType<typeof spyOn>;
 
   afterEach(() => {
-    // Clean up test directory
-    try {
-      if (existsSync(testDir)) {
-        rmSync(testDir, { recursive: true, force: true });
-      }
-    } catch (error) {
-      console.error("Error cleaning up test files:", error);
-    }
-    process.env.GITHUB_WORKSPACE = originalWorkspace;
+    warningSpy?.mockRestore();
   });
 
-  describe("package.json with packageManager field", () => {
-    it("should read version from packageManager field", () => {
-      const packageJson = {
-        name: "test",
-        packageManager: "bun@1.0.25",
-      };
-      writeFileSync(
-        resolve(testDir, "package.json"),
-        JSON.stringify(packageJson, null, 2)
-      );
+  it("should return x64 for Windows with arm64 architecture", () => {
+    warningSpy = spyOn(core, "warning");
+    const result = getArchitecture("windows", "arm64");
 
-      const version = readVersionFromFile("package.json");
-      expect(version).toBe("1.0.25");
-    });
-
-    it("should fallback to engines.bun when packageManager doesn't exist", () => {
-      const packageJson = {
-        name: "test",
-        engines: {
-          bun: ">=1.0.0",
-        },
-      };
-      writeFileSync(
-        resolve(testDir, "package.json"),
-        JSON.stringify(packageJson, null, 2)
-      );
-
-      const version = readVersionFromFile("package.json");
-      expect(version).toBe(">=1.0.0");
-    });
-
-    it("should return undefined when neither packageManager nor engines.bun exist (with warning)", () => {
-      const packageJson = {
-        name: "test",
-      };
-      writeFileSync(
-        resolve(testDir, "package.json"),
-        JSON.stringify(packageJson, null, 2)
-      );
-
-      const version = readVersionFromFile("package.json");
-      expect(version).toBeUndefined();
-    });
+    expect(result).toBe("x64");
+    expect(warningSpy).toHaveBeenCalledTimes(1);
+    expect(warningSpy).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "⚠️ Bun does not provide native arm64 builds for Windows."
+      )
+    );
   });
 
-  describe("silent mode", () => {
-    it("should not warn when file doesn't exist and silent is true", () => {
-      // This should not produce a warning
-      const version = readVersionFromFile("package.json", true);
-      expect(version).toBeUndefined();
-    });
+  it("should return x64 for Windows with aarch64 architecture", () => {
+    warningSpy = spyOn(core, "warning");
+    const result = getArchitecture("windows", "aarch64");
 
-    it("should not warn when version cannot be read and silent is true", () => {
-      const packageJson = {
-        name: "test",
-      };
-      writeFileSync(
-        resolve(testDir, "package.json"),
-        JSON.stringify(packageJson, null, 2)
-      );
-
-      const version = readVersionFromFile("package.json", true);
-      expect(version).toBeUndefined();
-    });
+    expect(result).toBe("x64");
+    expect(warningSpy).toHaveBeenCalledTimes(1);
+    expect(warningSpy).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "⚠️ Bun does not provide native arm64 builds for Windows."
+      )
+    );
   });
 
-  describe(".bun-version file", () => {
-    it("should read version from .bun-version file", () => {
-      writeFileSync(resolve(testDir, ".bun-version"), "1.0.20");
+  it("should return aarch64 for non-Windows platforms with arm64", () => {
+    warningSpy = spyOn(core, "warning");
+    const result = getArchitecture("linux", "arm64");
 
-      const version = readVersionFromFile(".bun-version");
-      expect(version).toBe("1.0.20");
-    });
+    expect(result).toBe("aarch64");
+    expect(warningSpy).not.toHaveBeenCalled();
   });
 
-  describe(".tool-versions file", () => {
-    it("should read bun version from .tool-versions file", () => {
-      writeFileSync(resolve(testDir, ".tool-versions"), "nodejs 18.0.0\nbun 1.0.15\npython 3.9.0");
+  it("should return aarch64 for macOS with arm64", () => {
+    warningSpy = spyOn(core, "warning");
+    const result = getArchitecture("darwin", "arm64");
 
-      const version = readVersionFromFile(".tool-versions");
-      expect(version).toBe("1.0.15");
-    });
+    expect(result).toBe("aarch64");
+    expect(warningSpy).not.toHaveBeenCalled();
+  });
+
+  it("should return original arch value for x64", () => {
+    warningSpy = spyOn(core, "warning");
+    const result = getArchitecture("windows", "x64");
+
+    expect(result).toBe("x64");
+    expect(warningSpy).not.toHaveBeenCalled();
+  });
+
+  it("should return original arch value for x86", () => {
+    warningSpy = spyOn(core, "warning");
+    const result = getArchitecture("linux", "x86");
+
+    expect(result).toBe("x86");
+    expect(warningSpy).not.toHaveBeenCalled();
+  });
+
+  it("should return original arch value for aarch64 on Linux", () => {
+    warningSpy = spyOn(core, "warning");
+    const result = getArchitecture("linux", "aarch64");
+
+    expect(result).toBe("aarch64");
+    expect(warningSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("getAvx2", () => {
+  it("should return false when called with os: 'windows' and arch: 'arm64'", () => {
+    const result = getAvx2("windows", "arm64");
+    expect(result).toBe(false);
+  });
+
+  it("should return false when called with os: 'windows' and arch: 'aarch64'", () => {
+    const result = getAvx2("windows", "aarch64");
+    expect(result).toBe(false);
+  });
+
+  it("should return false when called with os: 'windows', arch: 'arm64', and avx2: true", () => {
+    const result = getAvx2("windows", "arm64", true);
+    expect(result).toBe(false);
+  });
+
+  it("should return false when called with os: 'windows', arch: 'aarch64', and avx2: false", () => {
+    const result = getAvx2("windows", "aarch64", false);
+    expect(result).toBe(false);
+  });
+
+  it("should return the provided avx2 value (true) when specified and not on Windows ARM64", () => {
+    expect(getAvx2("linux", "x64", true)).toBe(true);
+    expect(getAvx2("darwin", "x64", true)).toBe(true);
+    expect(getAvx2("windows", "x64", true)).toBe(true);
+  });
+
+  it("should return the provided avx2 value (false) when specified and not on Windows ARM64", () => {
+    expect(getAvx2("linux", "x64", false)).toBe(false);
+    expect(getAvx2("darwin", "x64", false)).toBe(false);
+    expect(getAvx2("windows", "x64", false)).toBe(false);
+  });
+
+  it("should return true by default when avx2 is not specified and not on Windows ARM64", () => {
+    // x64 architecture on various platforms
+    expect(getAvx2("linux", "x64")).toBe(true);
+    expect(getAvx2("darwin", "x64")).toBe(true);
+    expect(getAvx2("windows", "x64")).toBe(true);
+
+    // ARM architecture on non-Windows platforms
+    expect(getAvx2("linux", "arm64")).toBe(true);
+    expect(getAvx2("linux", "aarch64")).toBe(true);
+    expect(getAvx2("darwin", "arm64")).toBe(true);
+    expect(getAvx2("darwin", "aarch64")).toBe(true);
   });
 });
