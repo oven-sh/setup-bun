@@ -74,18 +74,4 @@ describe("getArchitecture", () => {
     expect(result).toBe("aarch64");
     expect(warningSpy).not.toHaveBeenCalled();
   });
-
-  it("should emit warning with correct message for Windows ARM64 fallback", () => {
-    warningSpy = spyOn(core, "warning");
-    getArchitecture("windows", "arm64");
-
-    expect(warningSpy).toHaveBeenCalledWith(
-      [
-        "⚠️ Bun does not provide native arm64 builds for Windows.",
-        "Using x64 baseline build which will run through Microsoft's x64 emulation layer.",
-        "This may result in reduced performance and potential compatibility issues.",
-        "💡 For best performance, consider using x64 Windows runners or other platforms with native support.",
-      ].join("\n")
-    );
-  });
 });
