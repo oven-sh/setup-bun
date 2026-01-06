@@ -26,10 +26,12 @@ runAction({
   version:
     getInput("bun-version") ||
     readVersionFromFile(getInput("bun-version-file")) ||
+    readVersionFromFile("package.json", true) ||
     undefined,
   customUrl: getInput("bun-download-url") || undefined,
   registries: registries,
   noCache: getBooleanInput("no-cache") || false,
+  token: getInput("token"),
 })
   .then(({ version, revision, bunPath, url, cacheHit }) => {
     setOutput("bun-version", version);

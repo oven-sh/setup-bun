@@ -6,6 +6,18 @@ Download, install, and setup [Bun](https://bun.sh) in GitHub Actions.
 
 ```yaml
 - uses: oven-sh/setup-bun@v2
+```
+
+By default, if no version is specified, the action will:
+
+1. Check `package.json` for the `packageManager` field (e.g., `"packageManager": "bun@1.0.25"`)
+2. If `packageManager` doesn't exist, check `package.json` for `engines.bun`
+3. If neither exists or `package.json` is not found, use `latest`
+
+You can also explicitly specify a version:
+
+```yaml
+- uses: oven-sh/setup-bun@v2
   with:
     bun-version: latest
 ```
@@ -66,13 +78,15 @@ If you need to override the download URL, you can use the `bun-download-url` inp
 
 ## Inputs
 
-| Name               | Description                                           | Default     | Examples                                         |
-| ------------------ | ----------------------------------------------------- | ----------- | ------------------------------------------------ |
-| `bun-version`      | The version of Bun to download and install.           | `latest`    | `canary`, `1.0.0`                                |
-| `bun-version-file` | The version of Bun to download and install from file. | `undefined` | `package.json`, `.bun-version`, `.tool-versions` |
-| `bun-download-url` | URL to download .zip file for Bun release             |             |                                                  |
-| `registry-url`     | Registry URL where some private package is stored.    | `undefined` | `"https://npm.pkg.github.com/"`                  |
-| `scope`            | Scope for private packages.                           | `undefined` | `"@foo"`, `"@orgname"`                           |
+| Name               | Description                                                                       | Default                                  | Examples                                         |
+| ------------------ | --------------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------ |
+| `bun-version`      | The version of Bun to download and install.                                       | Version from `package.json`, or `latest` | `canary`, `1.0.0`, `1.0.x`                       |
+| `bun-version-file` | The version of Bun to download and install from file.                             | `undefined`                              | `package.json`, `.bun-version`, `.tool-versions` |
+| `bun-download-url` | URL to download .zip file for Bun release                                         |                                          |                                                  |
+| `registry-url`     | Registry URL where some private package is stored.                                | `undefined`                              | `"https://npm.pkg.github.com/"`                  |
+| `scope`            | Scope for private packages.                                                       | `undefined`                              | `"@foo"`, `"@orgname"`                           |
+| `no-cache`         | Disable caching of the downloaded executable.                                     | `false`                                  | `true`, `false`                                  |
+| `token`            | Personal access token (PAT) used to fetch tags from the `oven-sh/bun` repository. | `${{ github.token }}`                    | `${{ secrets.GITHUB_TOKEN }}`                    |
 
 ## Outputs
 
