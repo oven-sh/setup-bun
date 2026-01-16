@@ -40,5 +40,8 @@
   },
   "patchedDependencies": {
     "compare-versions@6.1.1": "patches/compare-versions@6.1.1.patch"
+  },
+  "overrides": {
+    "form-data": "^4.0.4"
   }
 }
