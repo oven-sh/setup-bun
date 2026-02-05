@@ -1,4 +1,9 @@
-import { compareVersions, satisfies, validate } from "compare-versions";
+import {
+  compareVersions,
+  satisfies,
+  validate,
+  validateStrict,
+} from "compare-versions";
 import { Input } from "./action";
 import { getArchitecture, getAvx2, getPlatform, request } from "./utils";
 
@@ -12,40 +17,48 @@ export async function getDownloadUrl(options: Input): Promise<string> {
 }
 
 async function getSemverDownloadUrl(options: Input): Promise<string> {
-  const res = (await (
-    await request("https://api.github.com/repos/oven-sh/bun/git/refs/tags", {
-      headers: options.token
-        ? { "Authorization": `Bearer ${options.token}` }
-        : {},
-    })
-  ).json()) as { ref: string }[];
-
-  let tags = res
-    .filter(
-      (tag) =>
-        tag.ref.startsWith("refs/tags/bun-v") || tag.ref === "refs/tags/canary",
-    )
-    .map((item) => item.ref.replace(/refs\/tags\/(bun-v)?/g, ""))
-    .filter(Boolean);
-
   const { version, os, arch, avx2, profile } = options;
+  let tag: string | undefined;
 
-  let tag = tags.find((t) => t === version);
+  if (validateStrict(version)) {
+    tag = `bun-v${version}`;
+  }
+
   if (!tag) {
-    tags = tags.filter((t) => validate(t)).sort(compareVersions);
+    const res = (await (
+      await request("https://api.github.com/repos/oven-sh/bun/git/refs/tags", {
+        headers: options.token
+          ? { "Authorization": `Bearer ${options.token}` }
+          : {},
+      })
+    ).json()) as { ref: string }[];
 
-    const matchedTag =
-      version === "latest" || !version
-        ? tags.at(-1)
-        : tags.filter((t) => satisfies(t, version)).at(-1);
+    let tags = res
+      .filter(
+        (tag) =>
+          tag.ref.startsWith("refs/tags/bun-v") ||
+          tag.ref === "refs/tags/canary",
+      )
+      .map((item) => item.ref.replace(/refs\/tags\/(bun-v)?/g, ""))
+      .filter(Boolean);
 
-    if (!matchedTag) {
-      throw new Error(`No Bun release found matching version '${version}'`);
+    tag = tags.find((t) => t === version);
+    if (!tag) {
+      tags = tags.filter((t) => validate(t)).sort(compareVersions);
+
+      const matchedTag =
+        version === "latest" || !version
+          ? tags.at(-1)
+          : tags.filter((t) => satisfies(t, version)).at(-1);
+
+      if (!matchedTag) {
+        throw new Error(`No Bun release found matching version '${version}'`);
+      }
+
+      tag = `bun-v${matchedTag}`;
+    } else if (validate(tag)) {
+      tag = `bun-v${tag}`;
     }
-
-    tag = `bun-v${matchedTag}`;
-  } else if (validate(tag)) {
-    tag = `bun-v${tag}`;
   }
 
   const eversion = encodeURIComponent(tag ?? version);
