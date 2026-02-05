@@ -1,11 +1,11 @@
 import { saveCache } from "@actions/cache";
 import { getState, warning } from "@actions/core";
 import { CacheState } from "./action";
-import { createHash } from "node:crypto";
+import { getCacheKey } from "./utils";
 (async () => {
   const state: CacheState = JSON.parse(getState("cache"));
   if (state.cacheEnabled && !state.cacheHit) {
-    const cacheKey = createHash("sha1").update(state.url).digest("base64");
+    const cacheKey = getCacheKey(state.url);
 
     try {
       await saveCache([state.bunPath], cacheKey);

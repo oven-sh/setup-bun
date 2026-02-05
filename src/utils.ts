@@ -1,7 +1,12 @@
 import { debug, warning } from "@actions/core";
 import { info } from "node:console";
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, renameSync } from "node:fs";
 import { resolve, basename } from "node:path";
+
+export function getCacheKey(url: string): string {
+  return `bun-${createHash("sha1").update(url).digest("base64")}`;
+}
 
 export async function request(
   url: string,
