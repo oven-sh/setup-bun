@@ -7,7 +7,6 @@ import { resolve, basename } from "node:path";
 
 export const MIN_WINDOWS_ARM64_VERSION = "1.3.10";
 
-
 export function getCacheKey(url: string): string {
   return `bun-${createHash("sha1").update(url).digest("base64")}`;
 }

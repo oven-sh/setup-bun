@@ -27,12 +27,6 @@ describe("isWindowsArm64Supported", () => {
 });
 
 describe("getArchitecture", () => {
-  let warningSpy: ReturnType<typeof spyOn>;
-
-  afterEach(() => {
-    warningSpy?.mockRestore();
-  });
-
   it("should return aarch64 for arm64 architecture on all platforms", () => {
     expect(getArchitecture("arm64")).toBe("aarch64");
   });

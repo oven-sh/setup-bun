@@ -8,6 +8,7 @@ const MOCK_TAGS = [
   { ref: "refs/tags/bun-v1.0.0" },
   { ref: "refs/tags/bun-v1.0.1" },
   { ref: "refs/tags/bun-v1.1.0" },
+  { ref: "refs/tags/bun-v1.3.10" },
   { ref: "refs/tags/canary" },
 ];
 
@@ -99,7 +100,7 @@ describe("getDownloadUrl", () => {
       });
 
       expect(url).toBe(
-        "https://github.com/oven-sh/bun/releases/download/bun-v1.1.0/bun-linux-x64.zip",
+        "https://github.com/oven-sh/bun/releases/download/bun-v1.3.10/bun-linux-x64.zip",
       );
       expect(requestSpy).toHaveBeenCalledTimes(1);
     });
@@ -112,7 +113,7 @@ describe("getDownloadUrl", () => {
       });
 
       expect(url).toBe(
-        "https://github.com/oven-sh/bun/releases/download/bun-v1.1.0/bun-linux-x64.zip",
+        "https://github.com/oven-sh/bun/releases/download/bun-v1.3.10/bun-linux-x64.zip",
       );
       expect(requestSpy).toHaveBeenCalledTimes(1);
     });
@@ -201,6 +202,21 @@ describe("getDownloadUrl", () => {
       expect(url).toBe(
         "https://github.com/oven-sh/bun/releases/download/canary/bun-windows-aarch64.zip",
       );
+    });
+
+    it("should use aarch64 for latest", async () => {
+      const warningSpy = spyOn(core, "warning");
+      const url = await getDownloadUrl({
+        version: "latest",
+        os: "windows",
+        arch: "arm64",
+      });
+
+      expect(url).toBe(
+        "https://github.com/oven-sh/bun/releases/download/bun-v1.3.10/bun-windows-aarch64.zip",
+      );
+      expect(warningSpy).not.toHaveBeenCalled();
+      warningSpy.mockRestore();
     });
   });
 });
