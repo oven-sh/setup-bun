@@ -3,6 +3,10 @@ import { info } from "node:console";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, renameSync } from "node:fs";
 import { resolve, basename } from "node:path";
+import { compareVersions, validate } from "compare-versions";
+
+// First Bun version that ships native Windows ARM64 binaries.
+const WINDOWS_ARM64_MIN_VERSION = "1.3.10";
 
 export function getCacheKey(url: string): string {
   return `bun-${createHash("sha1").update(url).digest("base64")}`;
@@ -47,28 +51,51 @@ export function getPlatform(): string {
   return platform;
 }
 
-export function getArchitecture(os: string, arch: string): string {
-  if (os === "windows" && (arch === "aarch64" || arch === "arm64")) {
-    warning(
-      [
-        "⚠️ Bun does not provide native arm64 builds for Windows.",
-        "Using x64 baseline build which will run through Microsoft's x64 emulation layer.",
-        "This may result in reduced performance and potential compatibility issues.",
-        "💡 For best performance, consider using x64 Windows runners or other platforms with native support.",
-      ].join("\n"),
-    );
+export function hasNativeWindowsArm64(version?: string): boolean {
+  if (!version) return false;
+  const cleaned = version.replace(/^bun-v/, "");
+  // Non-semver versions like "canary" represent latest builds which ship ARM64.
+  if (!validate(cleaned)) return true;
+  return compareVersions(cleaned, WINDOWS_ARM64_MIN_VERSION) >= 0;
+}
 
-    return "x64";
+export function getArchitecture(
+  os: string,
+  arch: string,
+  version?: string,
+): string {
+  if (os === "windows" && (arch === "aarch64" || arch === "arm64")) {
+    if (!hasNativeWindowsArm64(version)) {
+      warning(
+        [
+          "⚠️ This version of Bun does not provide native arm64 builds for Windows.",
+          "Using x64 baseline build which will run through Microsoft's x64 emulation layer.",
+          "This may result in reduced performance and potential compatibility issues.",
+          "💡 For best performance, consider using Bun >= 1.3.10, x64 Windows runners, or other platforms with native support.",
+        ].join("\n"),
+      );
+
+      return "x64";
+    }
   }
 
   if (arch === "arm64") return "aarch64";
   return arch;
 }
 
-export function getAvx2(os: string, arch: string, avx2?: boolean): boolean {
-  // Temporary workaround for absence of arm64 builds on Windows (#130)
+export function getAvx2(
+  os: string,
+  arch: string,
+  avx2?: boolean,
+  version?: string,
+): boolean {
+  // Workaround for absence of arm64 builds on Windows before 1.3.10 (#130)
   if (os === "windows" && (arch === "aarch64" || arch === "arm64")) {
-    return false;
+    if (!hasNativeWindowsArm64(version)) {
+      return false;
+    }
+    // Native ARM64 builds don't use AVX2 suffix
+    return true;
   }
 
   return avx2 ?? true;

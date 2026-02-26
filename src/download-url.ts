@@ -61,13 +61,15 @@ async function getSemverDownloadUrl(options: Input): Promise<string> {
     }
   }
 
-  const eversion = encodeURIComponent(tag ?? version);
+  const resolvedTag = tag ?? version;
+  const eversion = encodeURIComponent(resolvedTag);
   const eos = encodeURIComponent(os ?? getPlatform());
   const earch = encodeURIComponent(
-    getArchitecture(os ?? getPlatform(), arch ?? process.arch),
+    getArchitecture(os ?? getPlatform(), arch ?? process.arch, resolvedTag),
   );
   const eavx2 = encodeURIComponent(
-    getAvx2(os ?? getPlatform(), arch ?? process.arch, avx2) === false
+    getAvx2(os ?? getPlatform(), arch ?? process.arch, avx2, resolvedTag) ===
+      false
       ? "-baseline"
       : "",
   );
