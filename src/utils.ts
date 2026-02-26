@@ -1,3 +1,4 @@
+import { compareVersions, validate } from "compare-versions";
 import { debug, warning } from "@actions/core";
 import { info } from "node:console";
 import { createHash } from "node:crypto";
@@ -59,6 +60,25 @@ export function getAvx2(arch: string, avx2?: boolean): boolean {
   }
 
   return avx2 ?? true;
+}
+
+export function isWindowsArm64Supported(tag: string): boolean {
+  if (tag === "canary" || tag === "latest") return true;
+
+  const version = tag.startsWith("bun-v") ? tag.slice(5) : tag;
+
+  return validate(version) && compareVersions(version, "1.3.10") >= 0;
+}
+
+export function warnWindowsArm64(): void {
+  warning(
+    [
+      "⚠️ Bun does not provide native arm64 builds for Windows.",
+      "Using x64 baseline build which will run through Microsoft's x64 emulation layer.",
+      "This may result in reduced performance and potential compatibility issues.",
+      "💡 For best performance, consider using x64 Windows runners or other platforms with native support.",
+    ].join("\n"),
+  );
 }
 
 const FILE_VERSION_READERS = {

@@ -5,7 +5,14 @@ import {
   validateStrict,
 } from "compare-versions";
 import { Input } from "./action";
-import { getArchitecture, getAvx2, getPlatform, request } from "./utils";
+import {
+  getArchitecture,
+  getAvx2,
+  getPlatform,
+  isWindowsArm64Supported,
+  request,
+  warnWindowsArm64,
+} from "./utils";
 
 export async function getDownloadUrl(options: Input): Promise<string> {
   const { customUrl } = options;
@@ -63,13 +70,21 @@ async function getSemverDownloadUrl(options: Input): Promise<string> {
 
   const eversion = encodeURIComponent(tag ?? version);
   const eos = encodeURIComponent(os ?? getPlatform());
-  const earch = encodeURIComponent(
-    getArchitecture(arch ?? process.arch),
-  );
+
+  let archValue = arch ?? process.arch;
+  let avx2Value = avx2;
+
+  if (eos === "windows" && getArchitecture(archValue) === "aarch64") {
+    if (!isWindowsArm64Supported(tag ?? version)) {
+      warnWindowsArm64();
+      archValue = "x64";
+      avx2Value = false;
+    }
+  }
+
+  const earch = encodeURIComponent(getArchitecture(archValue));
   const eavx2 = encodeURIComponent(
-    getAvx2(arch ?? process.arch, avx2) === false
-      ? "-baseline"
-      : "",
+    getAvx2(archValue, avx2Value) === false ? "-baseline" : "",
   );
   const eprofile = encodeURIComponent(profile === true ? "-profile" : "");
 

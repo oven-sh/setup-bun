@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, spyOn } from "bun:test";
 import { getDownloadUrl } from "../src/download-url";
 import * as utils from "../src/utils";
+import * as core from "@actions/core";
 
 const MOCK_TAGS = [
   { ref: "refs/tags/bun-v0.5.0" },
@@ -158,4 +159,49 @@ describe("getDownloadUrl", () => {
       );
     });
   });
+
+  describe("Windows ARM64 Fallback", () => {
+    it("should fallback to x64-baseline for versions older than 1.3.10 and log a warning", async () => {
+      const warningSpy = spyOn(core, "warning");
+      const url = await getDownloadUrl({
+        version: "1.1.0",
+        os: "windows",
+        arch: "arm64",
+      });
+
+      expect(url).toBe(
+        "https://github.com/oven-sh/bun/releases/download/bun-v1.1.0/bun-windows-x64-baseline.zip",
+      );
+      expect(warningSpy).toHaveBeenCalled();
+      expect(warningSpy.mock.calls[0][0]).toContain(
+        "Bun does not provide native arm64 builds for Windows",
+      );
+      warningSpy.mockRestore();
+    });
+
+    it("should use aarch64 for version 1.3.10", async () => {
+      const url = await getDownloadUrl({
+        version: "1.3.10",
+        os: "windows",
+        arch: "arm64",
+      });
+
+      expect(url).toBe(
+        "https://github.com/oven-sh/bun/releases/download/bun-v1.3.10/bun-windows-aarch64.zip",
+      );
+    });
+
+    it("should use aarch64 for canary", async () => {
+      const url = await getDownloadUrl({
+        version: "canary",
+        os: "windows",
+        arch: "arm64",
+      });
+
+      expect(url).toBe(
+        "https://github.com/oven-sh/bun/releases/download/canary/bun-windows-aarch64.zip",
+      );
+    });
+  });
 });
+
