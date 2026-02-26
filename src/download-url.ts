@@ -69,12 +69,13 @@ async function getSemverDownloadUrl(options: Input): Promise<string> {
   }
 
   const eversion = encodeURIComponent(tag ?? version);
-  const eos = encodeURIComponent(os ?? getPlatform());
+  const osValue = os ?? getPlatform();
+  const eos = encodeURIComponent(osValue);
 
   let archValue = arch ?? process.arch;
   let avx2Value = avx2;
 
-  if (eos === "windows" && getArchitecture(archValue) === "aarch64") {
+  if (osValue === "windows" && getArchitecture(archValue) === "aarch64") {
     if (!isWindowsArm64Supported(tag ?? version)) {
       warnWindowsArm64();
       archValue = "x64";

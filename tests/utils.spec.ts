@@ -1,6 +1,30 @@
 import { afterEach, describe, expect, it, spyOn } from "bun:test";
-import { getArchitecture, getAvx2 } from "../src/utils";
-import * as core from "@actions/core";
+import {
+  getArchitecture,
+  getAvx2,
+  isWindowsArm64Supported,
+  MIN_WINDOWS_ARM64_VERSION,
+} from "../src/utils";
+
+describe("isWindowsArm64Supported", () => {
+  it("should return true for 'canary' and 'latest'", () => {
+    expect(isWindowsArm64Supported("canary")).toBe(true);
+    expect(isWindowsArm64Supported("latest")).toBe(true);
+  });
+
+  it("should return true for versions >= MIN_WINDOWS_ARM64_VERSION", () => {
+    expect(isWindowsArm64Supported(MIN_WINDOWS_ARM64_VERSION)).toBe(true);
+    expect(isWindowsArm64Supported("bun-v" + MIN_WINDOWS_ARM64_VERSION)).toBe(
+      true,
+    );
+    expect(isWindowsArm64Supported("1.4.0")).toBe(true);
+  });
+
+  it("should return false for versions < MIN_WINDOWS_ARM64_VERSION", () => {
+    expect(isWindowsArm64Supported("1.0.0")).toBe(false);
+    expect(isWindowsArm64Supported("bun-v1.3.9")).toBe(false);
+  });
+});
 
 describe("getArchitecture", () => {
   let warningSpy: ReturnType<typeof spyOn>;

@@ -161,7 +161,7 @@ describe("getDownloadUrl", () => {
   });
 
   describe("Windows ARM64 Fallback", () => {
-    it("should fallback to x64-baseline for versions older than 1.3.10 and log a warning", async () => {
+    it("should fallback to x64-baseline for versions older than MIN_WINDOWS_ARM64_VERSION and log a warning", async () => {
       const warningSpy = spyOn(core, "warning");
       const url = await getDownloadUrl({
         version: "1.1.0",
@@ -174,20 +174,20 @@ describe("getDownloadUrl", () => {
       );
       expect(warningSpy).toHaveBeenCalled();
       expect(warningSpy.mock.calls[0][0]).toContain(
-        "Bun does not provide native arm64 builds for Windows",
+        "On this OS/version, Bun does not provide native arm64 builds for Windows",
       );
       warningSpy.mockRestore();
     });
 
-    it("should use aarch64 for version 1.3.10", async () => {
+    it(`should use aarch64 for version ${utils.MIN_WINDOWS_ARM64_VERSION}`, async () => {
       const url = await getDownloadUrl({
-        version: "1.3.10",
+        version: utils.MIN_WINDOWS_ARM64_VERSION,
         os: "windows",
         arch: "arm64",
       });
 
       expect(url).toBe(
-        "https://github.com/oven-sh/bun/releases/download/bun-v1.3.10/bun-windows-aarch64.zip",
+        `https://github.com/oven-sh/bun/releases/download/bun-v${utils.MIN_WINDOWS_ARM64_VERSION}/bun-windows-aarch64.zip`,
       );
     });
 

@@ -5,6 +5,9 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, renameSync } from "node:fs";
 import { resolve, basename } from "node:path";
 
+export const MIN_WINDOWS_ARM64_VERSION = "1.3.10";
+
+
 export function getCacheKey(url: string): string {
   return `bun-${createHash("sha1").update(url).digest("base64")}`;
 }
@@ -67,15 +70,18 @@ export function isWindowsArm64Supported(tag: string): boolean {
 
   const version = tag.startsWith("bun-v") ? tag.slice(5) : tag;
 
-  return validate(version) && compareVersions(version, "1.3.10") >= 0;
+  return (
+    validate(version) &&
+    compareVersions(version, MIN_WINDOWS_ARM64_VERSION) >= 0
+  );
 }
 
 export function warnWindowsArm64(): void {
   warning(
     [
-      "⚠️ Bun does not provide native arm64 builds for Windows.",
-      "Using x64 baseline build which will run through Microsoft's x64 emulation layer.",
-      "This may result in reduced performance and potential compatibility issues.",
+      "⚠️ On this OS/version, Bun does not provide native arm64 builds for Windows.",
+      "Using x64 baseline build on this runner/version which will run through Microsoft's x64 emulation layer.",
+      "This may result in reduced performance and potential compatibility issues on affected versions.",
       "💡 For best performance, consider using x64 Windows runners or other platforms with native support.",
     ].join("\n"),
   );
