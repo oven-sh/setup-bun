@@ -98,6 +98,18 @@ export function getAvx2(
     return true;
   }
 
+  // Check AVX2 support on x64 Linux
+  if (os === "linux" && arch === "x64" && avx2 === undefined) {
+    try {
+      const cpuInfo = readFileSync("/proc/cpuinfo", "utf8");
+      const hasAvx2 = cpuInfo.includes("avx2");
+      return hasAvx2;
+    } catch (error) {
+      warning(`Failed to detect AVX2 support.`);
+      return false;
+    }
+  }
+
   return avx2 ?? true;
 }
 
