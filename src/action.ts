@@ -97,7 +97,12 @@ export default async (options: Input): Promise<Output> => {
         if (revision) {
           const expectedVersion = extractVersionFromUrl(url);
           const [actualVersion] = revision.split("+");
-          if (expectedVersion && actualVersion !== expectedVersion) {
+          if (!expectedVersion) {
+            warning(
+              `Could not parse expected version from URL: ${url}. Ignoring cache.`,
+            );
+            revision = undefined;
+          } else if (actualVersion !== expectedVersion) {
             warning(
               `Cached Bun version ${revision} does not match expected version ${expectedVersion}. Re-downloading.`,
             );
