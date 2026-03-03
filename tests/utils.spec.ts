@@ -1,6 +1,26 @@
 import { afterEach, describe, expect, it, spyOn } from "bun:test";
-import { getArchitecture, getAvx2, hasNativeWindowsArm64 } from "../src/utils";
+import { extractVersionFromUrl, getArchitecture, getAvx2, hasNativeWindowsArm64 } from "../src/utils";
 import * as core from "@actions/core";
+
+describe("extractVersionFromUrl", () => {
+  it("should extract version from standard download URL", () => {
+    expect(extractVersionFromUrl("https://github.com/oven-sh/bun/releases/download/bun-v1.3.1/bun-linux-x64.zip")).toBe("1.3.1");
+    expect(extractVersionFromUrl("https://github.com/oven-sh/bun/releases/download/bun-v1.0.0/bun-darwin-aarch64.zip")).toBe("1.0.0");
+    expect(extractVersionFromUrl("https://github.com/oven-sh/bun/releases/download/bun-v0.5.0/bun-linux-x64-baseline.zip")).toBe("0.5.0");
+  });
+
+  it("should extract version from URL with profile suffix", () => {
+    expect(extractVersionFromUrl("https://github.com/oven-sh/bun/releases/download/bun-v1.1.0/bun-linux-x64-profile.zip")).toBe("1.1.0");
+  });
+
+  it("should return undefined for canary URL", () => {
+    expect(extractVersionFromUrl("https://github.com/oven-sh/bun/releases/download/canary/bun-linux-x64.zip")).toBeUndefined();
+  });
+
+  it("should return undefined for custom/non-standard URL", () => {
+    expect(extractVersionFromUrl("https://example.com/bun.zip")).toBeUndefined();
+  });
+});
 
 describe("hasNativeWindowsArm64", () => {
   it("should return true for version >= 1.3.10", () => {

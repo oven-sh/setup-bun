@@ -15,7 +15,7 @@ import { getExecOutput } from "@actions/exec";
 import { Registry } from "./registry";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { addExtension, getCacheKey } from "./utils";
+import { addExtension, extractVersionFromUrl, getCacheKey } from "./utils";
 import { getDownloadUrl } from "./download-url";
 import { cwd } from "node:process";
 
@@ -95,8 +95,17 @@ export default async (options: Input): Promise<Output> => {
       if (cacheRestored) {
         revision = await getRevision(bunPath);
         if (revision) {
-          cacheHit = true;
-          info(`Using a cached version of Bun: ${revision}`);
+          const expectedVersion = extractVersionFromUrl(url);
+          const [actualVersion] = revision.split("+");
+          if (expectedVersion && actualVersion !== expectedVersion) {
+            warning(
+              `Cached Bun version ${revision} does not match expected version ${expectedVersion}. Re-downloading.`,
+            );
+            revision = undefined;
+          } else {
+            cacheHit = true;
+            info(`Using a cached version of Bun: ${revision}`);
+          }
         } else {
           warning(
             `Found a cached version of Bun: ${revision} (but it appears to be corrupted?)`,
