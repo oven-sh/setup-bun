@@ -12,6 +12,11 @@ export function getCacheKey(url: string): string {
   return `bun-${createHash("sha1").update(url).digest("base64")}`;
 }
 
+export function extractVersionFromUrl(url: string): string | undefined {
+  const match = url.match(/\/bun-v([^/]+)\//);
+  return match?.[1];
+}
+
 export async function request(
   url: string,
   init?: RequestInit,
