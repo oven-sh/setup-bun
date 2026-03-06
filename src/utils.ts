@@ -5,6 +5,8 @@ import { existsSync, readFileSync, renameSync } from "node:fs";
 import { resolve, basename } from "node:path";
 import { compareVersions, validate } from "compare-versions";
 
+import { getStoredResponse, setStoredResponse } from "./response-storage";
+
 // First Bun version that ships native Windows ARM64 binaries.
 const WINDOWS_ARM64_MIN_VERSION = "1.3.10";
 
@@ -26,6 +28,14 @@ export async function request(
     headers.set("User-Agent", "@oven-sh/setup-bun");
   }
 
+  const canUseResponseCache = "GET" === (init?.method ?? "GET").toUpperCase();
+  if (canUseResponseCache) {
+    const stored = getStoredResponse(url);
+    if (stored) {
+      return stored;
+    }
+  }
+
   const res = await fetch(url, {
     ...init,
     headers,
@@ -35,6 +45,10 @@ export async function request(
     throw new Error(
       `Failed to fetch url ${url}. (status code: ${res.status}, status text: ${res.statusText})${body ? `\n${body}` : ""}`,
     );
+  }
+
+  if (canUseResponseCache) {
+    await setStoredResponse(url, res);
   }
 
   return res;
