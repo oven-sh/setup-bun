@@ -5,6 +5,7 @@ import {
   validateStrict,
 } from "compare-versions";
 import { Input } from "./action";
+import { addGitHubApiHeaders } from "./github-api";
 import { getArchitecture, getAvx2, getPlatform, request } from "./utils";
 
 export async function getDownloadUrl(options: Input): Promise<string> {
@@ -25,12 +26,10 @@ async function getSemverDownloadUrl(options: Input): Promise<string> {
   }
 
   if (!tag) {
+    const apiUrl = "https://api.github.com/repos/oven-sh/bun/git/refs/tags";
+    const headers = addGitHubApiHeaders(apiUrl, {}, options.token);
     const res = (await (
-      await request("https://api.github.com/repos/oven-sh/bun/git/refs/tags", {
-        headers: options.token
-          ? { "Authorization": `Bearer ${options.token}` }
-          : {},
-      })
+      await request(apiUrl, { headers: headers })
     ).json()) as { ref: string }[];
 
     let tags = res
