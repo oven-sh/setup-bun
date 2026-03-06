@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync, unlinkSync } from "node:fs";
-import { info, warning } from "@actions/core";
+import { info, warning, setOutput } from "@actions/core";
 import { GITHUB_DIGEST_THRESHOLD } from "./github-api";
 import { fetchAssetMetadata, getHexFromDigest } from "./github-asset";
 import { getVerifiedManifest } from "./manifest";
@@ -80,7 +80,6 @@ export async function verifyAsset(
    * for custom/mirror URLs where parseAssetUrl() cannot resolve metadata.
    * Real security mismatches are always re-thrown.
    */
-  let digest_matched = false;
   let manifestBaseUrl = "";
   try {
     const metadata = await fetchAssetMetadata(downloadUrl, token);
@@ -114,8 +113,8 @@ export async function verifyAsset(
             `Security Mismatch: GitHub API digest (${githubHash}) differs from local hash (${actualHash})!`,
           );
         }
-        digest_matched = true;
         info(`GitHub API digest matched! (${metadata.digest})`);
+        setOutput("bun-download-checksum", `${metadata.digest}`);
       } else {
         warning(
           `GitHub digest missing for asset updated on ${updatedAt.toISOString()}`,
@@ -195,7 +194,8 @@ export async function verifyAsset(
     );
   }
 
-  info(`Successfully verified ${assetName} (PGP + SHA256)`);
+  info(`Successfully verified ${assetName} (PGP + ${manifestFile})`);
+  setOutput("bun-download-checksum", `${algorithm}:${manifestHash}`);
 }
 
 function silentUnlink(filePath: string): void {

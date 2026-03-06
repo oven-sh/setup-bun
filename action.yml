@@ -51,6 +51,8 @@ outputs:
     description: The revision of Bun that was installed.
   bun-path:
     description: The path to the Bun executable.
+  bun-download-checksum:
+    description: The verified checksum of the archive from which Bun was extracted.
   bun-download-url:
     description: The URL from which Bun was downloaded.
   cache-hit:
