@@ -1,0 +1,359 @@
+diff --git a/node_modules/compare-versions/lib/esm/compare.d.ts b/node_modules/compare-versions/lib/esm/compare.d.ts
+index 9d1ec98..5d57039 100644
+--- a/node_modules/compare-versions/lib/esm/compare.d.ts
++++ b/node_modules/compare-versions/lib/esm/compare.d.ts
+@@ -1,4 +1,4 @@
+-import { CompareOperator } from './utils.js';
++import { type CompareOperator } from './utils.js';
+ /**
+  * Compare [semver](https://semver.org/) version strings using the specified operator.
+  *
+@@ -17,3 +17,4 @@ import { CompareOperator } from './utils.js';
+  * ```
+  */
+ export declare const compare: (v1: string, v2: string, operator: CompareOperator) => boolean;
++//# sourceMappingURL=compare.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/compare.d.ts.map b/node_modules/compare-versions/lib/esm/compare.d.ts.map
+new file mode 100644
+index 0000000..8da340c
+--- /dev/null
++++ b/node_modules/compare-versions/lib/esm/compare.d.ts.map
+@@ -0,0 +1 @@
++{"version":3,"file":"compare.d.ts","sourceRoot":"","sources":["../../src/compare.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,KAAK,eAAe,EAAE,MAAM,YAAY,CAAC;AAElD;;;;;;;;;;;;;;;;GAgBG;AACH,eAAO,MAAM,OAAO,GAAI,IAAI,MAAM,EAAE,IAAI,MAAM,EAAE,UAAU,eAAe,YASxE,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/compare.js b/node_modules/compare-versions/lib/esm/compare.js
+index c8e769b..bb7306b 100644
+--- a/node_modules/compare-versions/lib/esm/compare.js
++++ b/node_modules/compare-versions/lib/esm/compare.js
+@@ -1,4 +1,5 @@
+ import { compareVersions } from './compareVersions.js';
++import {} from './utils.js';
+ /**
+  * Compare [semver](https://semver.org/) version strings using the specified operator.
+  *
+diff --git a/node_modules/compare-versions/lib/esm/compare.js.map b/node_modules/compare-versions/lib/esm/compare.js.map
+index d0501e1..5923d8e 100644
+--- a/node_modules/compare-versions/lib/esm/compare.js.map
++++ b/node_modules/compare-versions/lib/esm/compare.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"compare.js","sourceRoot":"","sources":["../../src/compare.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,MAAM,sBAAsB,CAAC;AAGvD;;;;;;;;;;;;;;;;GAgBG;AACH,MAAM,CAAC,MAAM,OAAO,GAAG,CAAC,EAAU,EAAE,EAAU,EAAE,QAAyB,EAAE,EAAE;IAC3E,0BAA0B;IAC1B,mBAAmB,CAAC,QAAQ,CAAC,CAAC;IAE9B,2DAA2D;IAC3D,6CAA6C;IAC7C,MAAM,GAAG,GAAG,eAAe,CAAC,EAAE,EAAE,EAAE,CAAC,CAAC;IAEpC,OAAO,cAAc,CAAC,QAAQ,CAAC,CAAC,QAAQ,CAAC,GAAG,CAAC,CAAC;AAChD,CAAC,CAAC;AAEF,MAAM,cAAc,GAAG;IACrB,GAAG,EAAE,CAAC,CAAC,CAAC;IACR,IAAI,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC;IACZ,GAAG,EAAE,CAAC,CAAC,CAAC;IACR,IAAI,EAAE,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC;IACb,GAAG,EAAE,CAAC,CAAC,CAAC,CAAC;IACT,IAAI,EAAE,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC;CACd,CAAC;AAEF,MAAM,gBAAgB,GAAG,MAAM,CAAC,IAAI,CAAC,cAAc,CAAC,CAAC;AAErD,MAAM,mBAAmB,GAAG,CAAC,EAAU,EAAE,EAAE;IACzC,IAAI,OAAO,EAAE,KAAK,QAAQ,EAAE,CAAC;QAC3B,MAAM,IAAI,SAAS,CACjB,kDAAkD,OAAO,EAAE,EAAE,CAC9D,CAAC;IACJ,CAAC;IACD,IAAI,gBAAgB,CAAC,OAAO,CAAC,EAAE,CAAC,KAAK,CAAC,CAAC,EAAE,CAAC;QACxC,MAAM,IAAI,KAAK,CACb,qCAAqC,gBAAgB,CAAC,IAAI,CAAC,GAAG,CAAC,EAAE,CAClE,CAAC;IACJ,CAAC;AACH,CAAC,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"compare.js","sourceRoot":"","sources":["../../src/compare.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,MAAM,sBAAsB,CAAC;AACvD,OAAO,EAAwB,MAAM,YAAY,CAAC;AAElD;;;;;;;;;;;;;;;;GAgBG;AACH,MAAM,CAAC,MAAM,OAAO,GAAG,CAAC,EAAU,EAAE,EAAU,EAAE,QAAyB,EAAE,EAAE;IAC3E,0BAA0B;IAC1B,mBAAmB,CAAC,QAAQ,CAAC,CAAC;IAE9B,2DAA2D;IAC3D,6CAA6C;IAC7C,MAAM,GAAG,GAAG,eAAe,CAAC,EAAE,EAAE,EAAE,CAAC,CAAC;IAEpC,OAAO,cAAc,CAAC,QAAQ,CAAC,CAAC,QAAQ,CAAC,GAAG,CAAC,CAAC;AAChD,CAAC,CAAC;AAEF,MAAM,cAAc,GAAG;IACrB,GAAG,EAAE,CAAC,CAAC,CAAC;IACR,IAAI,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC;IACZ,GAAG,EAAE,CAAC,CAAC,CAAC;IACR,IAAI,EAAE,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC;IACb,GAAG,EAAE,CAAC,CAAC,CAAC,CAAC;IACT,IAAI,EAAE,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC;CACd,CAAC;AAEF,MAAM,gBAAgB,GAAG,MAAM,CAAC,IAAI,CAAC,cAAc,CAAC,CAAC;AAErD,MAAM,mBAAmB,GAAG,CAAC,EAAU,EAAE,EAAE;IACzC,IAAI,OAAO,EAAE,KAAK,QAAQ,EAAE,CAAC;QAC3B,MAAM,IAAI,SAAS,CACjB,kDAAkD,OAAO,EAAE,EAAE,CAC9D,CAAC;IACJ,CAAC;IACD,IAAI,gBAAgB,CAAC,OAAO,CAAC,EAAE,CAAC,KAAK,CAAC,CAAC,EAAE,CAAC;QACxC,MAAM,IAAI,KAAK,CACb,qCAAqC,gBAAgB,CAAC,IAAI,CAAC,GAAG,CAAC,EAAE,CAClE,CAAC;IACJ,CAAC;AACH,CAAC,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/compareVersions.d.ts b/node_modules/compare-versions/lib/esm/compareVersions.d.ts
+index 5af3761..2a14e01 100644
+--- a/node_modules/compare-versions/lib/esm/compareVersions.d.ts
++++ b/node_modules/compare-versions/lib/esm/compareVersions.d.ts
+@@ -6,3 +6,4 @@
+  * @returns Numeric value compatible with the [Array.sort(fn) interface](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#Parameters).
+  */
+ export declare const compareVersions: (v1: string, v2: string) => 0 | 1 | -1;
++//# sourceMappingURL=compareVersions.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/compareVersions.d.ts.map b/node_modules/compare-versions/lib/esm/compareVersions.d.ts.map
+new file mode 100644
+index 0000000..c8dec99
+--- /dev/null
++++ b/node_modules/compare-versions/lib/esm/compareVersions.d.ts.map
+@@ -0,0 +1 @@
++{"version":3,"file":"compareVersions.d.ts","sourceRoot":"","sources":["../../src/compareVersions.ts"],"names":[],"mappings":"AAEA;;;;;;GAMG;AACH,eAAO,MAAM,eAAe,GAAI,IAAI,MAAM,EAAE,IAAI,MAAM,eAqBrD,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/index.d.ts b/node_modules/compare-versions/lib/esm/index.d.ts
+index b2f8aab..9eea193 100644
+--- a/node_modules/compare-versions/lib/esm/index.d.ts
++++ b/node_modules/compare-versions/lib/esm/index.d.ts
+@@ -1,5 +1,6 @@
+ export { compare } from './compare.js';
+ export { compareVersions } from './compareVersions.js';
+ export { satisfies } from './satisfies.js';
+-export { CompareOperator } from './utils.js';
++export type { CompareOperator } from './utils.js';
+ export { validate, validateStrict } from './validate.js';
++//# sourceMappingURL=index.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/index.d.ts.map b/node_modules/compare-versions/lib/esm/index.d.ts.map
+new file mode 100644
+index 0000000..cfe9372
+--- /dev/null
++++ b/node_modules/compare-versions/lib/esm/index.d.ts.map
+@@ -0,0 +1 @@
++{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../src/index.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,cAAc,CAAC;AACvC,OAAO,EAAE,eAAe,EAAE,MAAM,sBAAsB,CAAC;AACvD,OAAO,EAAE,SAAS,EAAE,MAAM,gBAAgB,CAAC;AAC3C,YAAY,EAAE,eAAe,EAAE,MAAM,YAAY,CAAC;AAClD,OAAO,EAAE,QAAQ,EAAE,cAAc,EAAE,MAAM,eAAe,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/satisfies.d.ts b/node_modules/compare-versions/lib/esm/satisfies.d.ts
+index ef5fe98..dbc01d5 100644
+--- a/node_modules/compare-versions/lib/esm/satisfies.d.ts
++++ b/node_modules/compare-versions/lib/esm/satisfies.d.ts
+@@ -12,3 +12,4 @@
+  * ```
+  */
+ export declare const satisfies: (version: string, range: string) => boolean;
++//# sourceMappingURL=satisfies.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/satisfies.d.ts.map b/node_modules/compare-versions/lib/esm/satisfies.d.ts.map
+new file mode 100644
+index 0000000..96f030b
+--- /dev/null
++++ b/node_modules/compare-versions/lib/esm/satisfies.d.ts.map
+@@ -0,0 +1 @@
++{"version":3,"file":"satisfies.d.ts","sourceRoot":"","sources":["../../src/satisfies.ts"],"names":[],"mappings":"AAGA;;;;;;;;;;;;GAYG;AACH,eAAO,MAAM,SAAS,GAAI,SAAS,MAAM,EAAE,OAAO,MAAM,KAAG,OAoD1D,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/satisfies.js b/node_modules/compare-versions/lib/esm/satisfies.js
+index 7586b71..8b38a9b 100644
+--- a/node_modules/compare-versions/lib/esm/satisfies.js
++++ b/node_modules/compare-versions/lib/esm/satisfies.js
+@@ -40,7 +40,7 @@ export const satisfies = (version, range) => {
+     // else range of either "~" or "^" is assumed
+     const [v1, v2, v3, , vp] = validateAndParse(version);
+     const [r1, r2, r3, , rp] = validateAndParse(range);
+-    const v = [v1, v2, v3];
++    const v = [v1, v2 !== null && v2 !== void 0 ? v2 : 'x', v3 !== null && v3 !== void 0 ? v3 : 'x'];
+     const r = [r1, r2 !== null && r2 !== void 0 ? r2 : 'x', r3 !== null && r3 !== void 0 ? r3 : 'x'];
+     // validate pre-release
+     if (rp) {
+diff --git a/node_modules/compare-versions/lib/esm/satisfies.js.map b/node_modules/compare-versions/lib/esm/satisfies.js.map
+index d97d380..9bc0729 100644
+--- a/node_modules/compare-versions/lib/esm/satisfies.js.map
++++ b/node_modules/compare-versions/lib/esm/satisfies.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"satisfies.js","sourceRoot":"","sources":["../../src/satisfies.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"satisfies.js","sourceRoot":"","sources":["../../src/satisfies.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,cAAc,CAAC;AACvC,OAAO,EAAwB,eAAe,EAAE,gBAAgB,EAAE,MAAM,YAAY,CAAC;AAErF;;;;;;;;;;;;GAYG;AACH,MAAM,CAAC,MAAM,SAAS,GAAG,CAAC,OAAe,EAAE,KAAa,EAAW,EAAE;IACnE,cAAc;IACd,KAAK,GAAG,KAAK,CAAC,OAAO,CAAC,cAAc,EAAE,IAAI,CAAC,CAAC;IAE5C,8BAA8B;IAC9B,IAAI,KAAK,CAAC,QAAQ,CAAC,IAAI,CAAC,EAAE,CAAC;QACzB,OAAO,KAAK,CAAC,KAAK,CAAC,IAAI,CAAC,CAAC,IAAI,CAAC,CAAC,CAAC,EAAE,EAAE,CAAC,SAAS,CAAC,OAAO,EAAE,CAAC,CAAC,CAAC,CAAC;IAC9D,CAAC;SAAM,IAAI,KAAK,CAAC,QAAQ,CAAC,KAAK,CAAC,EAAE,CAAC;QACjC,MAAM,CAAC,CAAC,EAAE,CAAC,CAAC,GAAG,KAAK,CAAC,KAAK,CAAC,KAAK,EAAE,CAAC,CAAC,CAAC;QACrC,OAAO,SAAS,CAAC,OAAO,EAAE,KAAK,CAAC,MAAM,CAAC,EAAE,CAAC,CAAC;IAC7C,CAAC;SAAM,IAAI,KAAK,CAAC,QAAQ,CAAC,GAAG,CAAC,EAAE,CAAC;QAC/B,OAAO,KAAK;aACT,IAAI,EAAE;aACN,OAAO,CAAC,SAAS,EAAE,GAAG,CAAC;aACvB,KAAK,CAAC,GAAG,CAAC;aACV,KAAK,CAAC,CAAC,CAAC,EAAE,EAAE,CAAC,SAAS,CAAC,OAAO,EAAE,CAAC,CAAC,CAAC,CAAC;IACzC,CAAC;IAED,gCAAgC;IAChC,MAAM,CAAC,GAAG,KAAK,CAAC,KAAK,CAAC,aAAa,CAAC,CAAC;IACrC,MAAM,EAAE,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,GAAG,CAAC;IAE1B,oCAAoC;IACpC,IAAI,EAAE,KAAK,GAAG,IAAI,EAAE,KAAK,GAAG;QAC1B,OAAO,OAAO,CAAC,OAAO,EAAE,KAAK,EAAE,EAAqB,CAAC,CAAC;IAExD,6CAA6C;IAC7C,MAAM,CAAC,EAAE,EAAE,EAAE,EAAE,EAAE,EAAE,AAAD,EAAG,EAAE,CAAC,GAAG,gBAAgB,CAAC,OAAO,CAAC,CAAC;IACrD,MAAM,CAAC,EAAE,EAAE,EAAE,EAAE,EAAE,EAAE,AAAD,EAAG,EAAE,CAAC,GAAG,gBAAgB,CAAC,KAAK,CAAC,CAAC;IACnD,MAAM,CAAC,GAAG,CAAC,EAAE,EAAE,EAAE,aAAF,EAAE,cAAF,EAAE,GAAI,GAAG,EAAE,EAAE,aAAF,EAAE,cAAF,EAAE,GAAI,GAAG,CAAC,CAAC;IACrC,MAAM,CAAC,GAAG,CAAC,EAAE,EAAE,EAAE,aAAF,EAAE,cAAF,EAAE,GAAI,GAAG,EAAE,EAAE,aAAF,EAAE,cAAF,EAAE,GAAI,GAAG,CAAC,CAAC;IAErC,uBAAuB;IACvB,IAAI,EAAE,EAAE,CAAC;QACP,IAAI,CAAC,EAAE;YAAE,OAAO,KAAK,CAAC;QACtB,IAAI,eAAe,CAAC,CAAC,EAAE,CAAC,CAAC,KAAK,CAAC;YAAE,OAAO,KAAK,CAAC;QAC9C,IAAI,eAAe,CAAC,EAAE,CAAC,KAAK,CAAC,GAAG,CAAC,EAAE,EAAE,CAAC,KAAK,CAAC,GAAG,CAAC,CAAC,KAAK,CAAC,CAAC;YAAE,OAAO,KAAK,CAAC;IACzE,CAAC;IAED,wBAAwB;IACxB,MAAM,OAAO,GAAG,CAAC,CAAC,SAAS,CAAC,CAAC,CAAC,EAAE,EAAE,CAAC,CAAC,KAAK,GAAG,CAAC,GAAG,CAAC,CAAC;IAElD,sCAAsC;IACtC,MAAM,CAAC,GAAG,EAAE,KAAK,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,OAAO,GAAG,CAAC,CAAC,CAAC,CAAC,OAAO,CAAC,CAAC,CAAC,CAAC,CAAC;IAErD,+BAA+B;IAC/B,IAAI,eAAe,CAAC,CAAC,CAAC,KAAK,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,KAAK,CAAC,CAAC,EAAE,CAAC,CAAC,CAAC,KAAK,CAAC;QAAE,OAAO,KAAK,CAAC;IAEtE,2BAA2B;IAC3B,IAAI,eAAe,CAAC,CAAC,CAAC,KAAK,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC,KAAK,CAAC,CAAC,CAAC,CAAC,KAAK,CAAC,CAAC;QAAE,OAAO,KAAK,CAAC;IAEjE,OAAO,IAAI,CAAC;AACd,CAAC,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/utils.d.ts b/node_modules/compare-versions/lib/esm/utils.d.ts
+index 4f809dc..30a780b 100644
+--- a/node_modules/compare-versions/lib/esm/utils.d.ts
++++ b/node_modules/compare-versions/lib/esm/utils.d.ts
+@@ -5,3 +5,4 @@ export type CompareOperator = '>' | '>=' | '=' | '<' | '<=' | '!=';
+ export declare const semver: RegExp;
+ export declare const validateAndParse: (version: string) => RegExpMatchArray;
+ export declare const compareSegments: (a: string | string[] | RegExpMatchArray, b: string | string[] | RegExpMatchArray) => 0 | 1 | -1;
++//# sourceMappingURL=utils.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/utils.d.ts.map b/node_modules/compare-versions/lib/esm/utils.d.ts.map
+new file mode 100644
+index 0000000..06191db
+--- /dev/null
++++ b/node_modules/compare-versions/lib/esm/utils.d.ts.map
+@@ -0,0 +1 @@
++{"version":3,"file":"utils.d.ts","sourceRoot":"","sources":["../../src/utils.ts"],"names":[],"mappings":"AAAA;;GAEG;AACH,MAAM,MAAM,eAAe,GAAG,GAAG,GAAG,IAAI,GAAG,GAAG,GAAG,GAAG,GAAG,IAAI,GAAG,IAAI,CAAC;AAEnE,eAAO,MAAM,MAAM,QAC2H,CAAC;AAE/I,eAAO,MAAM,gBAAgB,GAAI,SAAS,MAAM,qBAY/C,CAAC;AAsBF,eAAO,MAAM,eAAe,GAC1B,GAAG,MAAM,GAAG,MAAM,EAAE,GAAG,gBAAgB,EACvC,GAAG,MAAM,GAAG,MAAM,EAAE,GAAG,gBAAgB,eAOxC,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/utils.js b/node_modules/compare-versions/lib/esm/utils.js
+index b5cc8b9..ab568f3 100644
+--- a/node_modules/compare-versions/lib/esm/utils.js
++++ b/node_modules/compare-versions/lib/esm/utils.js
+@@ -20,15 +20,17 @@ const compareStrings = (a, b) => {
+     if (isWildcard(a) || isWildcard(b))
+         return 0;
+     const [ap, bp] = forceType(tryParse(a), tryParse(b));
+-    if (ap > bp)
+-        return 1;
+-    if (ap < bp)
+-        return -1;
++    if (ap !== undefined && bp !== undefined) {
++        if (ap > bp)
++            return 1;
++        if (ap < bp)
++            return -1;
++    }
+     return 0;
+ };
+ export const compareSegments = (a, b) => {
+     for (let i = 0; i < Math.max(a.length, b.length); i++) {
+-        const r = compareStrings(a[i] || '0', b[i] || '0');
++        const r = compareStrings(a[i] || 'x', b[i] || 'x');
+         if (r !== 0)
+             return r;
+     }
+diff --git a/node_modules/compare-versions/lib/esm/utils.js.map b/node_modules/compare-versions/lib/esm/utils.js.map
+index 207b40a..3f57e96 100644
+--- a/node_modules/compare-versions/lib/esm/utils.js.map
++++ b/node_modules/compare-versions/lib/esm/utils.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"utils.js","sourceRoot":"","sources":["../../src/utils.ts"],"names":[],"mappings":"AAKA,MAAM,CAAC,MAAM,MAAM,GACjB,4IAA4I,CAAC;AAE/I,MAAM,CAAC,MAAM,gBAAgB,GAAG,CAAC,OAAe,EAAE,EAAE;IAClD,IAAI,OAAO,OAAO,KAAK,QAAQ,EAAE,CAAC;QAChC,MAAM,IAAI,SAAS,CAAC,kCAAkC,CAAC,CAAC;IAC1D,CAAC;IACD,MAAM,KAAK,GAAG,OAAO,CAAC,KAAK,CAAC,MAAM,CAAC,CAAC;IACpC,IAAI,CAAC,KAAK,EAAE,CAAC;QACX,MAAM,IAAI,KAAK,CACb,uCAAuC,OAAO,aAAa,CAC5D,CAAC;IACJ,CAAC;IACD,KAAK,CAAC,KAAK,EAAE,CAAC;IACd,OAAO,KAAK,CAAC;AACf,CAAC,CAAC;AAEF,MAAM,UAAU,GAAG,CAAC,CAAS,EAAE,EAAE,CAAC,CAAC,KAAK,GAAG,IAAI,CAAC,KAAK,GAAG,IAAI,CAAC,KAAK,GAAG,CAAC;AAEtE,MAAM,QAAQ,GAAG,CAAC,CAAS,EAAE,EAAE;IAC7B,MAAM,CAAC,GAAG,QAAQ,CAAC,CAAC,EAAE,EAAE,CAAC,CAAC;IAC1B,OAAO,KAAK,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC;AAC1B,CAAC,CAAC;AAEF,MAAM,SAAS,GAAG,CAAC,CAAkB,EAAE,CAAkB,EAAE,EAAE,CAC3D,OAAO,CAAC,KAAK,OAAO,CAAC,CAAC,CAAC,CAAC,CAAC,MAAM,CAAC,CAAC,CAAC,EAAE,MAAM,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC,CAAC;AAE1D,MAAM,cAAc,GAAG,CAAC,CAAS,EAAE,CAAS,EAAE,EAAE;IAC9C,IAAI,UAAU,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CAAC;QAAE,OAAO,CAAC,CAAC;IAC7C,MAAM,CAAC,EAAE,EAAE,EAAE,CAAC,GAAG,SAAS,CAAC,QAAQ,CAAC,CAAC,CAAC,EAAE,QAAQ,CAAC,CAAC,CAAC,CAAC,CAAC;IACrD,IAAI,EAAE,GAAG,EAAE;QAAE,OAAO,CAAC,CAAC;IACtB,IAAI,EAAE,GAAG,EAAE;QAAE,OAAO,CAAC,CAAC,CAAC;IACvB,OAAO,CAAC,CAAC;AACX,CAAC,CAAC;AAEF,MAAM,CAAC,MAAM,eAAe,GAAG,CAC7B,CAAuC,EACvC,CAAuC,EACvC,EAAE;IACF,KAAK,IAAI,CAAC,GAAG,CAAC,EAAE,CAAC,GAAG,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,MAAM,EAAE,CAAC,CAAC,MAAM,CAAC,EAAE,CAAC,EAAE,EAAE,CAAC;QACtD,MAAM,CAAC,GAAG,cAAc,CAAC,CAAC,CAAC,CAAC,CAAC,IAAI,GAAG,EAAE,CAAC,CAAC,CAAC,CAAC,IAAI,GAAG,CAAC,CAAC;QACnD,IAAI,CAAC,KAAK,CAAC;YAAE,OAAO,CAAC,CAAC;IACxB,CAAC;IACD,OAAO,CAAC,CAAC;AACX,CAAC,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"utils.js","sourceRoot":"","sources":["../../src/utils.ts"],"names":[],"mappings":"AAKA,MAAM,CAAC,MAAM,MAAM,GACjB,4IAA4I,CAAC;AAE/I,MAAM,CAAC,MAAM,gBAAgB,GAAG,CAAC,OAAe,EAAE,EAAE;IAClD,IAAI,OAAO,OAAO,KAAK,QAAQ,EAAE,CAAC;QAChC,MAAM,IAAI,SAAS,CAAC,kCAAkC,CAAC,CAAC;IAC1D,CAAC;IACD,MAAM,KAAK,GAAG,OAAO,CAAC,KAAK,CAAC,MAAM,CAAC,CAAC;IACpC,IAAI,CAAC,KAAK,EAAE,CAAC;QACX,MAAM,IAAI,KAAK,CACb,uCAAuC,OAAO,aAAa,CAC5D,CAAC;IACJ,CAAC;IACD,KAAK,CAAC,KAAK,EAAE,CAAC;IACd,OAAO,KAAK,CAAC;AACf,CAAC,CAAC;AAEF,MAAM,UAAU,GAAG,CAAC,CAAS,EAAE,EAAE,CAAC,CAAC,KAAK,GAAG,IAAI,CAAC,KAAK,GAAG,IAAI,CAAC,KAAK,GAAG,CAAC;AAEtE,MAAM,QAAQ,GAAG,CAAC,CAAS,EAAE,EAAE;IAC7B,MAAM,CAAC,GAAG,QAAQ,CAAC,CAAC,EAAE,EAAE,CAAC,CAAC;IAC1B,OAAO,KAAK,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC;AAC1B,CAAC,CAAC;AAEF,MAAM,SAAS,GAAG,CAAC,CAAkB,EAAE,CAAkB,EAAE,EAAE,CAC3D,OAAO,CAAC,KAAK,OAAO,CAAC,CAAC,CAAC,CAAC,CAAC,MAAM,CAAC,CAAC,CAAC,EAAE,MAAM,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC,CAAC;AAE1D,MAAM,cAAc,GAAG,CAAC,CAAS,EAAE,CAAS,EAAE,EAAE;IAC9C,IAAI,UAAU,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CAAC;QAAE,OAAO,CAAC,CAAC;IAC7C,MAAM,CAAC,EAAE,EAAE,EAAE,CAAC,GAAG,SAAS,CAAC,QAAQ,CAAC,CAAC,CAAC,EAAE,QAAQ,CAAC,CAAC,CAAC,CAAC,CAAC;IACrD,IAAI,EAAE,KAAK,SAAS,IAAI,EAAE,KAAK,SAAS,EAAE,CAAC;QACzC,IAAI,EAAE,GAAG,EAAE;YAAE,OAAO,CAAC,CAAC;QACtB,IAAI,EAAE,GAAG,EAAE;YAAE,OAAO,CAAC,CAAC,CAAC;IACzB,CAAC;IACD,OAAO,CAAC,CAAC;AACX,CAAC,CAAC;AAEF,MAAM,CAAC,MAAM,eAAe,GAAG,CAC7B,CAAuC,EACvC,CAAuC,EACvC,EAAE;IACF,KAAK,IAAI,CAAC,GAAG,CAAC,EAAE,CAAC,GAAG,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,MAAM,EAAE,CAAC,CAAC,MAAM,CAAC,EAAE,CAAC,EAAE,EAAE,CAAC;QACtD,MAAM,CAAC,GAAG,cAAc,CAAC,CAAC,CAAC,CAAC,CAAC,IAAI,GAAG,EAAE,CAAC,CAAC,CAAC,CAAC,IAAI,GAAG,CAAC,CAAC;QACnD,IAAI,CAAC,KAAK,CAAC;YAAE,OAAO,CAAC,CAAC;IACxB,CAAC;IACD,OAAO,CAAC,CAAC;AACX,CAAC,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/validate.d.ts b/node_modules/compare-versions/lib/esm/validate.d.ts
+index 1479cee..ea2afe0 100644
+--- a/node_modules/compare-versions/lib/esm/validate.d.ts
++++ b/node_modules/compare-versions/lib/esm/validate.d.ts
+@@ -26,3 +26,4 @@ export declare const validate: (version: string) => boolean;
+  * ```
+  */
+ export declare const validateStrict: (version: string) => boolean;
++//# sourceMappingURL=validate.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/esm/validate.d.ts.map b/node_modules/compare-versions/lib/esm/validate.d.ts.map
+new file mode 100644
+index 0000000..dba2667
+--- /dev/null
++++ b/node_modules/compare-versions/lib/esm/validate.d.ts.map
+@@ -0,0 +1 @@
++{"version":3,"file":"validate.d.ts","sourceRoot":"","sources":["../../src/validate.ts"],"names":[],"mappings":"AAEA;;;;;;;;;;;;GAYG;AACH,eAAO,MAAM,QAAQ,GAAI,SAAS,MAAM,YACuC,CAAC;AAEhF;;;;;;;;;;;;GAYG;AACH,eAAO,MAAM,cAAc,GAAI,SAAS,MAAM,YAI3C,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/lib/umd/index.js b/node_modules/compare-versions/lib/umd/index.js
+index 2cfef26..e3bbc58 100644
+--- a/node_modules/compare-versions/lib/umd/index.js
++++ b/node_modules/compare-versions/lib/umd/index.js
+@@ -26,15 +26,17 @@
+         if (isWildcard(a) || isWildcard(b))
+             return 0;
+         const [ap, bp] = forceType(tryParse(a), tryParse(b));
+-        if (ap > bp)
+-            return 1;
+-        if (ap < bp)
+-            return -1;
++        if (ap !== undefined && bp !== undefined) {
++            if (ap > bp)
++                return 1;
++            if (ap < bp)
++                return -1;
++        }
+         return 0;
+     };
+     const compareSegments = (a, b) => {
+         for (let i = 0; i < Math.max(a.length, b.length); i++) {
+-            const r = compareStrings(a[i] || '0', b[i] || '0');
++            const r = compareStrings(a[i] || 'x', b[i] || 'x');
+             if (r !== 0)
+                 return r;
+         }
+@@ -152,7 +154,7 @@
+         // else range of either "~" or "^" is assumed
+         const [v1, v2, v3, , vp] = validateAndParse(version);
+         const [r1, r2, r3, , rp] = validateAndParse(range);
+-        const v = [v1, v2, v3];
++        const v = [v1, v2 !== null && v2 !== void 0 ? v2 : 'x', v3 !== null && v3 !== void 0 ? v3 : 'x'];
+         const r = [r1, r2 !== null && r2 !== void 0 ? r2 : 'x', r3 !== null && r3 !== void 0 ? r3 : 'x'];
+         // validate pre-release
+         if (rp) {
+diff --git a/node_modules/compare-versions/lib/umd/index.js.map b/node_modules/compare-versions/lib/umd/index.js.map
+index ab9acc9..746de4d 100644
+--- a/node_modules/compare-versions/lib/umd/index.js.map
++++ b/node_modules/compare-versions/lib/umd/index.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"index.js","sources":["../esm/utils.js","../esm/compareVersions.js","../esm/compare.js","../esm/satisfies.js","../esm/validate.js"],"sourcesContent":["export const semver = /^[v^~<>=]*?(\\d+)(?:\\.([x*]|\\d+)(?:\\.([x*]|\\d+)(?:\\.([x*]|\\d+))?(?:-([\\da-z\\-]+(?:\\.[\\da-z\\-]+)*))?(?:\\+[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?)?)?$/i;\nexport const validateAndParse = (version) => {\n    if (typeof version !== 'string') {\n        throw new TypeError('Invalid argument expected string');\n    }\n    const match = version.match(semver);\n    if (!match) {\n        throw new Error(`Invalid argument not valid semver ('${version}' received)`);\n    }\n    match.shift();\n    return match;\n};\nconst isWildcard = (s) => s === '*' || s === 'x' || s === 'X';\nconst tryParse = (v) => {\n    const n = parseInt(v, 10);\n    return isNaN(n) ? v : n;\n};\nconst forceType = (a, b) => typeof a !== typeof b ? [String(a), String(b)] : [a, b];\nconst compareStrings = (a, b) => {\n    if (isWildcard(a) || isWildcard(b))\n        return 0;\n    const [ap, bp] = forceType(tryParse(a), tryParse(b));\n    if (ap > bp)\n        return 1;\n    if (ap < bp)\n        return -1;\n    return 0;\n};\nexport const compareSegments = (a, b) => {\n    for (let i = 0; i < Math.max(a.length, b.length); i++) {\n        const r = compareStrings(a[i] || '0', b[i] || '0');\n        if (r !== 0)\n            return r;\n    }\n    return 0;\n};\n//# sourceMappingURL=utils.js.map","import { compareSegments, validateAndParse } from './utils.js';\n/**\n * Compare [semver](https://semver.org/) version strings to find greater, equal or lesser.\n * This library supports the full semver specification, including comparing versions with different number of digits like `1.0.0`, `1.0`, `1`, and pre-release versions like `1.0.0-alpha`.\n * @param v1 - First version to compare\n * @param v2 - Second version to compare\n * @returns Numeric value compatible with the [Array.sort(fn) interface](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#Parameters).\n */\nexport const compareVersions = (v1, v2) => {\n    // validate input and split into segments\n    const n1 = validateAndParse(v1);\n    const n2 = validateAndParse(v2);\n    // pop off the patch\n    const p1 = n1.pop();\n    const p2 = n2.pop();\n    // validate numbers\n    const r = compareSegments(n1, n2);\n    if (r !== 0)\n        return r;\n    // validate pre-release\n    if (p1 && p2) {\n        return compareSegments(p1.split('.'), p2.split('.'));\n    }\n    else if (p1 || p2) {\n        return p1 ? -1 : 1;\n    }\n    return 0;\n};\n//# sourceMappingURL=compareVersions.js.map","import { compareVersions } from './compareVersions.js';\n/**\n * Compare [semver](https://semver.org/) version strings using the specified operator.\n *\n * @param v1 First version to compare\n * @param v2 Second version to compare\n * @param operator Allowed arithmetic operator to use\n * @returns `true` if the comparison between the firstVersion and the secondVersion satisfies the operator, `false` otherwise.\n *\n * @example\n * ```\n * compare('10.1.8', '10.0.4', '>'); // return true\n * compare('10.0.1', '10.0.1', '='); // return true\n * compare('10.1.1', '10.2.2', '<'); // return true\n * compare('10.1.1', '10.2.2', '<='); // return true\n * compare('10.1.1', '10.2.2', '>='); // return false\n * ```\n */\nexport const compare = (v1, v2, operator) => {\n    // validate input operator\n    assertValidOperator(operator);\n    // since result of compareVersions can only be -1 or 0 or 1\n    // a simple map can be used to replace switch\n    const res = compareVersions(v1, v2);\n    return operatorResMap[operator].includes(res);\n};\nconst operatorResMap = {\n    '>': [1],\n    '>=': [0, 1],\n    '=': [0],\n    '<=': [-1, 0],\n    '<': [-1],\n    '!=': [-1, 1],\n};\nconst allowedOperators = Object.keys(operatorResMap);\nconst assertValidOperator = (op) => {\n    if (typeof op !== 'string') {\n        throw new TypeError(`Invalid operator type, expected string but got ${typeof op}`);\n    }\n    if (allowedOperators.indexOf(op) === -1) {\n        throw new Error(`Invalid operator, expected one of ${allowedOperators.join('|')}`);\n    }\n};\n//# sourceMappingURL=compare.js.map","import { compare } from './compare.js';\nimport { compareSegments, validateAndParse } from './utils.js';\n/**\n * Match [npm semver](https://docs.npmjs.com/cli/v6/using-npm/semver) version range.\n *\n * @param version Version number to match\n * @param range Range pattern for version\n * @returns `true` if the version number is within the range, `false` otherwise.\n *\n * @example\n * ```\n * satisfies('1.1.0', '^1.0.0'); // return true\n * satisfies('1.1.0', '~1.0.0'); // return false\n * ```\n */\nexport const satisfies = (version, range) => {\n    // clean input\n    range = range.replace(/([><=]+)\\s+/g, '$1');\n    // handle multiple comparators\n    if (range.includes('||')) {\n        return range.split('||').some((r) => satisfies(version, r));\n    }\n    else if (range.includes(' - ')) {\n        const [a, b] = range.split(' - ', 2);\n        return satisfies(version, `>=${a} <=${b}`);\n    }\n    else if (range.includes(' ')) {\n        return range\n            .trim()\n            .replace(/\\s{2,}/g, ' ')\n            .split(' ')\n            .every((r) => satisfies(version, r));\n    }\n    // if no range operator then \"=\"\n    const m = range.match(/^([<>=~^]+)/);\n    const op = m ? m[1] : '=';\n    // if gt/lt/eq then operator compare\n    if (op !== '^' && op !== '~')\n        return compare(version, range, op);\n    // else range of either \"~\" or \"^\" is assumed\n    const [v1, v2, v3, , vp] = validateAndParse(version);\n    const [r1, r2, r3, , rp] = validateAndParse(range);\n    const v = [v1, v2, v3];\n    const r = [r1, r2 !== null && r2 !== void 0 ? r2 : 'x', r3 !== null && r3 !== void 0 ? r3 : 'x'];\n    // validate pre-release\n    if (rp) {\n        if (!vp)\n            return false;\n        if (compareSegments(v, r) !== 0)\n            return false;\n        if (compareSegments(vp.split('.'), rp.split('.')) === -1)\n            return false;\n    }\n    // first non-zero number\n    const nonZero = r.findIndex((v) => v !== '0') + 1;\n    // pointer to where segments can be >=\n    const i = op === '~' ? 2 : nonZero > 1 ? nonZero : 1;\n    // before pointer must be equal\n    if (compareSegments(v.slice(0, i), r.slice(0, i)) !== 0)\n        return false;\n    // after pointer must be >=\n    if (compareSegments(v.slice(i), r.slice(i)) === -1)\n        return false;\n    return true;\n};\n//# sourceMappingURL=satisfies.js.map","import { semver } from './utils.js';\n/**\n * Validate [semver](https://semver.org/) version strings.\n *\n * @param version Version number to validate\n * @returns `true` if the version number is a valid semver version number, `false` otherwise.\n *\n * @example\n * ```\n * validate('1.0.0-rc.1'); // return true\n * validate('1.0-rc.1'); // return false\n * validate('foo'); // return false\n * ```\n */\nexport const validate = (version) => typeof version === 'string' && /^[v\\d]/.test(version) && semver.test(version);\n/**\n * Validate [semver](https://semver.org/) version strings strictly. Will not accept wildcards and version ranges.\n *\n * @param version Version number to validate\n * @returns `true` if the version number is a valid semver version number `false` otherwise\n *\n * @example\n * ```\n * validate('1.0.0-rc.1'); // return true\n * validate('1.0-rc.1'); // return false\n * validate('foo'); // return false\n * ```\n */\nexport const validateStrict = (version) => typeof version === 'string' &&\n    /^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$/.test(version);\n//# sourceMappingURL=validate.js.map"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"index.js","sources":["../esm/utils.js","../esm/compareVersions.js","../esm/compare.js","../esm/satisfies.js","../esm/validate.js"],"sourcesContent":["export const semver = /^[v^~<>=]*?(\\d+)(?:\\.([x*]|\\d+)(?:\\.([x*]|\\d+)(?:\\.([x*]|\\d+))?(?:-([\\da-z\\-]+(?:\\.[\\da-z\\-]+)*))?(?:\\+[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?)?)?$/i;\nexport const validateAndParse = (version) => {\n    if (typeof version !== 'string') {\n        throw new TypeError('Invalid argument expected string');\n    }\n    const match = version.match(semver);\n    if (!match) {\n        throw new Error(`Invalid argument not valid semver ('${version}' received)`);\n    }\n    match.shift();\n    return match;\n};\nconst isWildcard = (s) => s === '*' || s === 'x' || s === 'X';\nconst tryParse = (v) => {\n    const n = parseInt(v, 10);\n    return isNaN(n) ? v : n;\n};\nconst forceType = (a, b) => typeof a !== typeof b ? [String(a), String(b)] : [a, b];\nconst compareStrings = (a, b) => {\n    if (isWildcard(a) || isWildcard(b))\n        return 0;\n    const [ap, bp] = forceType(tryParse(a), tryParse(b));\n    if (ap !== undefined && bp !== undefined) {\n        if (ap > bp)\n            return 1;\n        if (ap < bp)\n            return -1;\n    }\n    return 0;\n};\nexport const compareSegments = (a, b) => {\n    for (let i = 0; i < Math.max(a.length, b.length); i++) {\n        const r = compareStrings(a[i] || 'x', b[i] || 'x');\n        if (r !== 0)\n            return r;\n    }\n    return 0;\n};\n//# sourceMappingURL=utils.js.map","import { compareSegments, validateAndParse } from './utils.js';\n/**\n * Compare [semver](https://semver.org/) version strings to find greater, equal or lesser.\n * This library supports the full semver specification, including comparing versions with different number of digits like `1.0.0`, `1.0`, `1`, and pre-release versions like `1.0.0-alpha`.\n * @param v1 - First version to compare\n * @param v2 - Second version to compare\n * @returns Numeric value compatible with the [Array.sort(fn) interface](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#Parameters).\n */\nexport const compareVersions = (v1, v2) => {\n    // validate input and split into segments\n    const n1 = validateAndParse(v1);\n    const n2 = validateAndParse(v2);\n    // pop off the patch\n    const p1 = n1.pop();\n    const p2 = n2.pop();\n    // validate numbers\n    const r = compareSegments(n1, n2);\n    if (r !== 0)\n        return r;\n    // validate pre-release\n    if (p1 && p2) {\n        return compareSegments(p1.split('.'), p2.split('.'));\n    }\n    else if (p1 || p2) {\n        return p1 ? -1 : 1;\n    }\n    return 0;\n};\n//# sourceMappingURL=compareVersions.js.map","import { compareVersions } from './compareVersions.js';\nimport {} from './utils.js';\n/**\n * Compare [semver](https://semver.org/) version strings using the specified operator.\n *\n * @param v1 First version to compare\n * @param v2 Second version to compare\n * @param operator Allowed arithmetic operator to use\n * @returns `true` if the comparison between the firstVersion and the secondVersion satisfies the operator, `false` otherwise.\n *\n * @example\n * ```\n * compare('10.1.8', '10.0.4', '>'); // return true\n * compare('10.0.1', '10.0.1', '='); // return true\n * compare('10.1.1', '10.2.2', '<'); // return true\n * compare('10.1.1', '10.2.2', '<='); // return true\n * compare('10.1.1', '10.2.2', '>='); // return false\n * ```\n */\nexport const compare = (v1, v2, operator) => {\n    // validate input operator\n    assertValidOperator(operator);\n    // since result of compareVersions can only be -1 or 0 or 1\n    // a simple map can be used to replace switch\n    const res = compareVersions(v1, v2);\n    return operatorResMap[operator].includes(res);\n};\nconst operatorResMap = {\n    '>': [1],\n    '>=': [0, 1],\n    '=': [0],\n    '<=': [-1, 0],\n    '<': [-1],\n    '!=': [-1, 1],\n};\nconst allowedOperators = Object.keys(operatorResMap);\nconst assertValidOperator = (op) => {\n    if (typeof op !== 'string') {\n        throw new TypeError(`Invalid operator type, expected string but got ${typeof op}`);\n    }\n    if (allowedOperators.indexOf(op) === -1) {\n        throw new Error(`Invalid operator, expected one of ${allowedOperators.join('|')}`);\n    }\n};\n//# sourceMappingURL=compare.js.map","import { compare } from './compare.js';\nimport { compareSegments, validateAndParse } from './utils.js';\n/**\n * Match [npm semver](https://docs.npmjs.com/cli/v6/using-npm/semver) version range.\n *\n * @param version Version number to match\n * @param range Range pattern for version\n * @returns `true` if the version number is within the range, `false` otherwise.\n *\n * @example\n * ```\n * satisfies('1.1.0', '^1.0.0'); // return true\n * satisfies('1.1.0', '~1.0.0'); // return false\n * ```\n */\nexport const satisfies = (version, range) => {\n    // clean input\n    range = range.replace(/([><=]+)\\s+/g, '$1');\n    // handle multiple comparators\n    if (range.includes('||')) {\n        return range.split('||').some((r) => satisfies(version, r));\n    }\n    else if (range.includes(' - ')) {\n        const [a, b] = range.split(' - ', 2);\n        return satisfies(version, `>=${a} <=${b}`);\n    }\n    else if (range.includes(' ')) {\n        return range\n            .trim()\n            .replace(/\\s{2,}/g, ' ')\n            .split(' ')\n            .every((r) => satisfies(version, r));\n    }\n    // if no range operator then \"=\"\n    const m = range.match(/^([<>=~^]+)/);\n    const op = m ? m[1] : '=';\n    // if gt/lt/eq then operator compare\n    if (op !== '^' && op !== '~')\n        return compare(version, range, op);\n    // else range of either \"~\" or \"^\" is assumed\n    const [v1, v2, v3, , vp] = validateAndParse(version);\n    const [r1, r2, r3, , rp] = validateAndParse(range);\n    const v = [v1, v2 !== null && v2 !== void 0 ? v2 : 'x', v3 !== null && v3 !== void 0 ? v3 : 'x'];\n    const r = [r1, r2 !== null && r2 !== void 0 ? r2 : 'x', r3 !== null && r3 !== void 0 ? r3 : 'x'];\n    // validate pre-release\n    if (rp) {\n        if (!vp)\n            return false;\n        if (compareSegments(v, r) !== 0)\n            return false;\n        if (compareSegments(vp.split('.'), rp.split('.')) === -1)\n            return false;\n    }\n    // first non-zero number\n    const nonZero = r.findIndex((v) => v !== '0') + 1;\n    // pointer to where segments can be >=\n    const i = op === '~' ? 2 : nonZero > 1 ? nonZero : 1;\n    // before pointer must be equal\n    if (compareSegments(v.slice(0, i), r.slice(0, i)) !== 0)\n        return false;\n    // after pointer must be >=\n    if (compareSegments(v.slice(i), r.slice(i)) === -1)\n        return false;\n    return true;\n};\n//# sourceMappingURL=satisfies.js.map","import { semver } from './utils.js';\n/**\n * Validate [semver](https://semver.org/) version strings.\n *\n * @param version Version number to validate\n * @returns `true` if the version number is a valid semver version number, `false` otherwise.\n *\n * @example\n * ```\n * validate('1.0.0-rc.1'); // return true\n * validate('1.0-rc.1'); // return false\n * validate('foo'); // return false\n * ```\n */\nexport const validate = (version) => typeof version === 'string' && /^[v\\d]/.test(version) && semver.test(version);\n/**\n * Validate [semver](https://semver.org/) version strings strictly. Will not accept wildcards and version ranges.\n *\n * @param version Version number to validate\n * @returns `true` if the version number is a valid semver version number `false` otherwise\n *\n * @example\n * ```\n * validate('1.0.0-rc.1'); // return true\n * validate('1.0-rc.1'); // return false\n * validate('foo'); // return false\n * ```\n */\nexport const validateStrict = (version) => typeof version === 'string' &&\n    /^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$/.test(version);\n//# sourceMappingURL=validate.js.map"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/node_modules/compare-versions/src/compare.ts b/node_modules/compare-versions/src/compare.ts
+index 0b63734..a6a9af5 100644
+--- a/node_modules/compare-versions/src/compare.ts
++++ b/node_modules/compare-versions/src/compare.ts
+@@ -1,5 +1,5 @@
+ import { compareVersions } from './compareVersions.js';
+-import { CompareOperator } from './utils.js';
++import { type CompareOperator } from './utils.js';
+ 
+ /**
+  * Compare [semver](https://semver.org/) version strings using the specified operator.
+diff --git a/node_modules/compare-versions/src/index.ts b/node_modules/compare-versions/src/index.ts
+index b2f8aab..8e30b2d 100644
+--- a/node_modules/compare-versions/src/index.ts
++++ b/node_modules/compare-versions/src/index.ts
+@@ -1,5 +1,5 @@
+ export { compare } from './compare.js';
+ export { compareVersions } from './compareVersions.js';
+ export { satisfies } from './satisfies.js';
+-export { CompareOperator } from './utils.js';
++export type { CompareOperator } from './utils.js';
+ export { validate, validateStrict } from './validate.js';
+diff --git a/node_modules/compare-versions/src/satisfies.ts b/node_modules/compare-versions/src/satisfies.ts
+index 66cb171..0828ae3 100644
+--- a/node_modules/compare-versions/src/satisfies.ts
++++ b/node_modules/compare-versions/src/satisfies.ts
+@@ -1,5 +1,5 @@
+ import { compare } from './compare.js';
+-import { CompareOperator, compareSegments, validateAndParse } from './utils.js';
++import { type CompareOperator, compareSegments, validateAndParse } from './utils.js';
+ 
+ /**
+  * Match [npm semver](https://docs.npmjs.com/cli/v6/using-npm/semver) version range.
+@@ -43,7 +43,7 @@ export const satisfies = (version: string, range: string): boolean => {
+   // else range of either "~" or "^" is assumed
+   const [v1, v2, v3, , vp] = validateAndParse(version);
+   const [r1, r2, r3, , rp] = validateAndParse(range);
+-  const v = [v1, v2, v3];
++  const v = [v1, v2 ?? 'x', v3 ?? 'x'];
+   const r = [r1, r2 ?? 'x', r3 ?? 'x'];
+ 
+   // validate pre-release
+diff --git a/node_modules/compare-versions/src/utils.ts b/node_modules/compare-versions/src/utils.ts
+index c7ae849..0261a9c 100644
+--- a/node_modules/compare-versions/src/utils.ts
++++ b/node_modules/compare-versions/src/utils.ts
+@@ -33,8 +33,10 @@ const forceType = (a: string | number, b: string | number) =>
+ const compareStrings = (a: string, b: string) => {
+   if (isWildcard(a) || isWildcard(b)) return 0;
+   const [ap, bp] = forceType(tryParse(a), tryParse(b));
+-  if (ap > bp) return 1;
+-  if (ap < bp) return -1;
++  if (ap !== undefined && bp !== undefined) {
++    if (ap > bp) return 1;
++    if (ap < bp) return -1;
++  }
+   return 0;
+ };
+ 
+@@ -43,7 +45,7 @@ export const compareSegments = (
+   b: string | string[] | RegExpMatchArray
+ ) => {
+   for (let i = 0; i < Math.max(a.length, b.length); i++) {
+-    const r = compareStrings(a[i] || '0', b[i] || '0');
++    const r = compareStrings(a[i] || 'x', b[i] || 'x');
+     if (r !== 0) return r;
+   }
+   return 0;
+diff --git a/node_modules/compare-versions/tsconfig.json b/node_modules/compare-versions/tsconfig.json
+new file mode 100644
+index 0000000..d9037da
+--- /dev/null
++++ b/node_modules/compare-versions/tsconfig.json
+@@ -0,0 +1,46 @@
++{
++  // Visit https://aka.ms/tsconfig to read more about this file
++  "compilerOptions": {
++    // File Layout
++    // "rootDir": "./src",
++    "outDir": "lib/esm",
++
++    // Environment Settings
++    // See also https://aka.ms/tsconfig/module
++    "module": "esnext",
++    "target": "es2017",
++    "types": [],
++    // For nodejs:
++    // "lib": ["esnext"],
++    // "types": ["node"],
++    // and npm install -D @types/node
++
++    // Other Outputs
++    "sourceMap": true,
++    "declaration": true,
++    "declarationMap": true,
++
++    // Stricter Typechecking Options
++    "noUncheckedIndexedAccess": true,
++    "exactOptionalPropertyTypes": true,
++
++    // Style Options
++    // "noImplicitReturns": true,
++    // "noImplicitOverride": true,
++    // "noUnusedLocals": true,
++    // "noUnusedParameters": true,
++    // "noFallthroughCasesInSwitch": true,
++    // "noPropertyAccessFromIndexSignature": true,
++
++    // Recommended Options
++    "strict": true,
++    "jsx": "react-jsx",
++    "verbatimModuleSyntax": true,
++    "isolatedModules": true,
++    "noUncheckedSideEffectImports": true,
++    "moduleDetection": "force",
++    "skipLibCheck": true,
++
++    "project": ".",
++  }
++}
