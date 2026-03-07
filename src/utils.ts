@@ -48,7 +48,7 @@ export async function request(
   }
 
   if (canUseResponseCache) {
-    await setStoredResponse(url, res);
+    await setStoredResponse(url, res, (init?.method ?? "GET").toUpperCase());
   }
 
   return res;
