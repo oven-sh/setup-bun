@@ -234,9 +234,13 @@ describe("getDownloadUrl", () => {
       });
 
       expect(requestSpy).toHaveBeenCalledWith(
-        expect.stringContaining("api.github.com"),
+        expect.stringContaining("https://api.github.com/"),
         expect.objectContaining({
-          headers: { Authorization: "Bearer my-secret-token" },
+          headers: {
+            Authorization: "Bearer my-secret-token",
+            Accept: "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+          },
         }),
       );
     });

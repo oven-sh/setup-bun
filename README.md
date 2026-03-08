@@ -90,10 +90,11 @@ If you need to override the download URL, you can use the `bun-download-url` inp
 
 ## Outputs
 
-| Name               | Description                                | Example                                                            |
-| ------------------ | ------------------------------------------ | ------------------------------------------------------------------ |
-| `bun-version`      | The output from `bun --version`.           | `1.0.0`                                                            |
-| `bun-revision`     | The output from `bun --revision`.          | `1.0.0+822a00c4`                                                   |
-| `bun-path`         | The path to the Bun executable.            | `/path/to/bun`                                                     |
-| `bun-download-url` | The URL from which Bun was downloaded.     | `https://bun.sh/download/latest/linux/x64?avx2=true&profile=false` |
-| `cache-hit`        | If the Bun executable was read from cache. | `true`                                                             |
+| Name                    | Description                                                        | Example                                                                                   |
+| ----------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `bun-version`           | The output from `bun --version`.                                   | `1.0.0`                                                                                   |
+| `bun-revision`          | The output from `bun --revision`.                                  | `1.0.0+822a00c4`                                                                          |
+| `bun-path`              | The path to the Bun executable.                                    | `/path/to/bun`                                                                            |
+| `bun-download-checksum` | The verified checksum of the archive from which Bun was extracted. | `sha256:a7bc4cdea1ef255a83adbf39c7aafcd30e09f2b8f74deec4b10ee318bc024d1f`                 |
+| `bun-download-url`      | The URL from which Bun was downloaded.                             | `https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64-musl-baseline.zip` |
+| `cache-hit`             | If the Bun executable was read from cache.                         | `true`                                                                                    |
