@@ -50,7 +50,7 @@ export async function verifyAsset(
   downloadUrl: string,
   token?: string,
   algorithm: SupportedAlgorithmNames = "sha256",
-): Promise<void> {
+): Promise<string> {
   const manifestFile = getManifest(algorithm);
   const urlObj = new URL(downloadUrl);
 
@@ -80,9 +80,15 @@ export async function verifyAsset(
    * for custom/mirror URLs where parseAssetUrl() cannot resolve metadata.
    * Real security mismatches are always re-thrown.
    */
-  let manifestBaseUrl = "";
+  let metadata: Awaited<ReturnType<typeof fetchAssetMetadata>> | undefined;
   try {
-    const metadata = await fetchAssetMetadata(downloadUrl, token);
+    metadata = await fetchAssetMetadata(downloadUrl, token);
+  } catch {
+    warning(`Skipping GitHub API digest check for: ${downloadUrl}`);
+  }
+
+  let manifestBaseUrl = "";
+  if (metadata) {
     assetName = metadata.name;
     manifestBaseUrl = getGitHubManifestUrl(
       metadata.owner,
@@ -90,8 +96,7 @@ export async function verifyAsset(
       metadata.tag,
       manifestFile,
     );
-    const updatedAt = new Date(metadata.updated_at);
-    if (Number.isNaN(updatedAt.getTime())) {
+    if (Number.isNaN(metadata.updated_at.getTime())) {
       silentUnlink(zipPath);
       throw new DigestVerificationError(
         `Invalid updated_at for asset ${assetName}`,
@@ -103,7 +108,7 @@ export async function verifyAsset(
      * For assets updated after our threshold, we cross-reference our local hash
      * with GitHub's infrastructure hash.
      */
-    if (updatedAt >= GITHUB_DIGEST_THRESHOLD) {
+    if (metadata.updated_at >= GITHUB_DIGEST_THRESHOLD) {
       info(`Verifying via asset metadata: ${assetName}`);
       if (metadata.digest) {
         const githubHash = getHexFromDigest(metadata.digest);
@@ -117,15 +122,10 @@ export async function verifyAsset(
         setOutput("bun-download-checksum", `${metadata.digest}`);
       } else {
         warning(
-          `GitHub digest missing for asset updated on ${updatedAt.toISOString()}`,
+          `GitHub digest missing for asset updated on ${metadata.updated_at.toISOString()}`,
         );
       }
     }
-  } catch (err) {
-    if (err instanceof DigestVerificationError) {
-      throw err; // always propagate real mismatches
-    }
-    warning(`Skipping GitHub API digest check for: ${downloadUrl}`);
   }
 
   /**
@@ -195,7 +195,7 @@ export async function verifyAsset(
   }
 
   info(`Successfully verified ${assetName} (PGP + ${manifestFile})`);
-  setOutput("bun-download-checksum", `${algorithm}:${manifestHash}`);
+  return `${algorithm}:${manifestHash}`;
 }
 
 function silentUnlink(filePath: string): void {

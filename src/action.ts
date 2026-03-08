@@ -7,6 +7,9 @@ import {
   renameSync,
   copyFileSync,
   existsSync,
+  readFileSync,
+  writeFileSync,
+  rmSync,
 } from "node:fs";
 import { addPath, info, warning } from "@actions/core";
 import { isFeatureAvailable, restoreCache } from "@actions/cache";
@@ -37,6 +40,7 @@ export type Output = {
   revision: string;
   bunPath: string;
   url: string;
+  checksum?: string;
   cacheHit: boolean;
 };
 
@@ -45,6 +49,8 @@ export type CacheState = {
   cacheHit: boolean;
   bunPath: string;
   url: string;
+  checksum?: string;
+  revision?: string;
 };
 
 export default async (options: Input): Promise<Output> => {
@@ -75,26 +81,73 @@ export default async (options: Input): Promise<Output> => {
     }
   }
 
+  let checksum: string | undefined;
   let revision: string | undefined;
   let cacheHit = false;
 
+  const cacheState: CacheState = {
+    cacheEnabled,
+    cacheHit,
+    bunPath,
+    url,
+    checksum,
+    revision,
+  };
+
+  const cacheKey = getCacheKey(url);
+  const statePath = `${bunPath}.json`;
+  const cachePaths = [bunPath, statePath];
+  if (cacheEnabled) {
+    if (existsSync(statePath)) {
+      try {
+        const state = JSON.parse(readFileSync(statePath, "utf8")) as CacheState;
+        if (state.url === url && "string" === typeof state.checksum) {
+          checksum = state.checksum;
+        }
+        if (state.url === url && "string" === typeof state.revision) {
+          cacheState.revision = state.revision;
+        }
+      } catch {
+        warning(`Ignoring cached checksum metadata from ${statePath}`);
+      }
+      if (checksum) {
+        cacheState.cacheHit = true;
+        cacheState.checksum = checksum;
+      }
+    }
+  }
+
   // Check if Bun executable already exists and matches requested version
-  if (!options.customUrl && existsSync(bunPath)) {
-    const existingRevision = await getRevision(bunPath);
-    if (existingRevision && isVersionMatch(existingRevision, options.version)) {
-      revision = existingRevision;
-      cacheHit = true; // Treat as cache hit to avoid unnecessary network requests
+  if (!options.customUrl && cacheState.revision && existsSync(bunPath)) {
+    if (isVersionMatch(cacheState.revision, options.version)) {
+      revision = cacheState.revision;
+      cacheHit = cacheState.cacheHit; // Treat as cache hit to avoid unnecessary network requests
       info(`Using existing Bun installation: ${revision}`);
     }
   }
 
   if (!revision) {
     if (cacheEnabled) {
-      const cacheKey = getCacheKey(url);
-
-      const cacheRestored = await restoreCache([bunPath], cacheKey);
+      const cacheRestored = await restoreCache(cachePaths, cacheKey);
       if (cacheRestored) {
-        revision = await getRevision(bunPath);
+        if (existsSync(statePath)) {
+          try {
+            const state = JSON.parse(
+              readFileSync(statePath, "utf8"),
+            ) as CacheState;
+            if (state.url === url && "string" === typeof state.checksum) {
+              checksum = state.checksum;
+              cacheState.checksum = checksum;
+            }
+            if (state.url === url && "string" === typeof state.revision) {
+              revision = state.revision;
+              cacheState.revision = revision;
+            }
+          } catch {
+            warning(`Ignoring cached checksum metadata from ${statePath}`);
+          }
+        }
+
         if (revision) {
           const expectedVersion = extractVersionFromUrl(url);
           const [actualVersion] = revision.split("+");
@@ -108,22 +161,28 @@ export default async (options: Input): Promise<Output> => {
               `Cached Bun version ${revision} does not match expected version ${expectedVersion}. Re-downloading.`,
             );
             revision = undefined;
-          } else {
+          } else if (cacheState.checksum) {
             cacheHit = true;
+            cacheState.cacheHit = cacheHit;
             info(`Using a cached version of Bun: ${revision}`);
           }
         } else {
           warning(
-            `Found a cached version of Bun: ${revision} (but it appears to be corrupted?)`,
+            `Found a Bun binary (with an unknown version) at: ${bunPath}`,
           );
         }
       }
     }
+  }
 
-    if (!cacheHit) {
-      info(`Downloading a new version of Bun: ${url}`);
-      revision = await downloadBun(url, bunPath, options.token);
-    }
+  if (!cacheHit) {
+    info(`Downloading a new version of Bun: ${url}`);
+    const result = await downloadBun(url, bunPath, options.token);
+    checksum = result.checksum;
+    cacheState.cacheHit = false;
+    cacheState.checksum = checksum;
+    revision = result.revision;
+    cacheState.revision = revision;
   }
 
   if (!revision) {
@@ -134,20 +193,21 @@ export default async (options: Input): Promise<Output> => {
 
   const [version] = revision.split("+");
 
-  const cacheState: CacheState = {
-    cacheEnabled,
-    cacheHit,
-    bunPath,
-    url,
-  };
-
-  saveState("cache", JSON.stringify(cacheState));
+  cacheState.cacheHit = cacheHit;
+  cacheState.checksum = checksum;
+  cacheState.revision = revision;
+  const stateValue = JSON.stringify(cacheState);
+  if (cacheEnabled && !cacheHit) {
+    writeFileSync(statePath, stateValue, "utf8");
+  }
+  saveState("cache", stateValue);
 
   return {
     version,
     revision,
     bunPath,
     url,
+    checksum,
     cacheHit,
   };
 };
@@ -179,13 +239,13 @@ async function downloadBun(
   url: string,
   bunPath: string,
   token?: string,
-): Promise<string | undefined> {
+): Promise<{ revision: string | undefined; checksum: string }> {
   // Workaround for https://github.com/oven-sh/setup-bun/issues/79 and https://github.com/actions/toolkit/issues/1179
   const zipPath = addExtension(await downloadTool(url), ".zip");
 
   // INTEGRITY CHECK: Verify the download before extraction.
   // This checks the Local Hash, GitHub Asset Digest, and the robobun PGP Signature.
-  await verifyAsset(zipPath, url, token);
+  const checksum = await verifyAsset(zipPath, url, token);
 
   const extractedZipPath = await extractZip(zipPath);
   const extractedBunPath = await extractBun(extractedZipPath);
@@ -197,7 +257,7 @@ async function downloadBun(
     copyFileSync(extractedBunPath, bunPath);
   }
 
-  return await getRevision(bunPath);
+  return { checksum, revision: await getRevision(bunPath) };
 }
 
 function isCacheEnabled(options: Input): boolean {
