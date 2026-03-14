@@ -225,6 +225,25 @@ jobs:
           - windows-latest
 
     steps:
+      - name: Normalize runner details
+        id: normalized
+        shell: bash
+        run: |
+          runner_arch="$(case '${{ runner.arch }}' in
+            (X64) printf x64 ;;
+            (ARM64) printf aarch64 ;;
+            (*) echo "Unsupported runner.arch: ${{ runner.arch }}" >&2; exit 1 ;;
+          esac)"
+          runner_os="$(case '${{ runner.os }}' in
+            (macOS) printf darwin ;;
+            (Linux) printf linux ;;
+            (Windows) printf windows ;;
+            (*) echo "Unsupported runner.os: ${{ runner.os }}" >&2; exit 1 ;;
+          esac)"
+          printf >> "${GITHUB_OUTPUT}" -- '%s=%s\n' \
+            runner_arch "${runner_arch}" \
+            runner_os "${runner_os}"
+
       - name: 📥 Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
@@ -232,7 +251,7 @@ jobs:
         uses: ./
         id: setup_bun
         with:
-          bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-${{runner.os == 'macOS' && 'darwin' || runner.os}}-${{ runner.arch == 'X64' && 'x64' || 'aarch64' }}.zip"
+          bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-${{ steps.normalized.outputs.runner_os }}-${{ steps.normalized.outputs.runner_arch }}.zip"
 
       - name: ▶️ Run Bun
         id: run_bun
