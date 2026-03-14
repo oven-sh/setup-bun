@@ -44,11 +44,23 @@ export async function request(
     headers.set("User-Agent", "@oven-sh/setup-bun");
   }
 
-  const canUseResponseCache = "GET" === (init?.method ?? "GET").toUpperCase();
+  const method = (init?.method ?? "GET").toUpperCase();
+  const canUseResponseCache = "GET" === method;
+  const stored = getStoredResponse(url);
   if (canUseResponseCache) {
-    const stored = getStoredResponse(url);
     if (stored) {
-      return stored;
+      if (stored.isRevivalNeeded) {
+        const etag = stored.response.headers.get("ETag");
+        if (etag) {
+          headers.set("If-None-Match", etag);
+        }
+        const lastModified = stored.response.headers.get("Last-Modified");
+        if (lastModified) {
+          headers.set("If-Modified-Since", lastModified);
+        }
+      } else {
+        return stored.response;
+      }
     }
   }
 
@@ -56,6 +68,14 @@ export async function request(
     ...init,
     headers,
   });
+
+  if (304 === res.status && canUseResponseCache && stored) {
+    // We re-save the cached response to update the modification time
+    // to 'now' effectively resetting the TTL.
+    await setStoredResponse(url, stored.response, method);
+    return stored.response;
+  }
+
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     throw new Error(
@@ -64,7 +84,7 @@ export async function request(
   }
 
   if (canUseResponseCache) {
-    await setStoredResponse(url, res, (init?.method ?? "GET").toUpperCase());
+    await setStoredResponse(url, res, method);
   }
 
   return res;
