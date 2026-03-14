@@ -1,24 +1,21 @@
+import { mkdirSync, symlinkSync, existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import {
-  mkdirSync,
-  readdirSync,
-  symlinkSync,
-  renameSync,
-  copyFileSync,
-  existsSync,
-} from "node:fs";
-import { addPath, info, warning } from "@actions/core";
-import { isFeatureAvailable, restoreCache } from "@actions/cache";
-import { downloadTool, extractZip } from "@actions/tool-cache";
-import { getExecOutput } from "@actions/exec";
-import { Registry } from "./registry";
-import { writeBunfig } from "./bunfig";
-import { saveState } from "@actions/core";
-import { addExtension, extractVersionFromUrl, getCacheKey } from "./utils";
-import { getDownloadUrl } from "./download-url";
 import { cwd } from "node:process";
-import { verifyAsset } from "./verify";
+import { isFeatureAvailable, restoreCache } from "@actions/cache";
+import { addPath, saveState, info, warning } from "@actions/core";
+import { atomicWriteFileSync } from "./atomic-write";
+import { writeBunfig } from "./bunfig";
+import { downloadBun } from "./download-bun";
+import { getDownloadUrl } from "./download-url";
+import { Registry } from "./registry";
+import {
+  exe,
+  extractVersionFromUrl,
+  getCacheKey,
+  getRevision,
+  isVersionMatch,
+} from "./utils";
 
 export type Input = {
   customUrl?: string;
@@ -64,8 +61,6 @@ export default async (options: Input): Promise<Output> => {
   }
   addPath(binPath);
 
-  const exe = (name: string) =>
-    process.platform === "win32" ? `${name}.exe` : name;
   const bunPath = join(binPath, exe("bun"));
   try {
     symlinkSync(bunPath, join(binPath, exe("bunx")));
@@ -122,7 +117,13 @@ export default async (options: Input): Promise<Output> => {
 
     if (!cacheHit) {
       info(`Downloading a new version of Bun: ${url}`);
-      revision = await downloadBun(url, bunPath, options.token);
+      const result = await downloadBun(url, bunPath, options.token);
+      cacheState.cacheHit = false;
+      checksum = result.checksum;
+      cacheState.checksum = checksum;
+
+      revision = await getRevision(bunPath);
+      cacheState.revision = revision;
     }
   }
 
@@ -152,54 +153,6 @@ export default async (options: Input): Promise<Output> => {
   };
 };
 
-function isVersionMatch(
-  existingRevision: string,
-  requestedVersion?: string,
-): boolean {
-  // If no version specified, default is "latest" - don't match existing
-  if (!requestedVersion) {
-    return false;
-  }
-
-  // Non-pinned versions should never match existing installations
-  if (/^(latest|canary|action)$/i.test(requestedVersion)) {
-    return false;
-  }
-
-  const [existingVersion] = existingRevision.split("+");
-
-  const normalizeVersion = (v: string) => v.replace(/^v/i, "");
-
-  return (
-    normalizeVersion(existingVersion) === normalizeVersion(requestedVersion)
-  );
-}
-
-async function downloadBun(
-  url: string,
-  bunPath: string,
-  token?: string,
-): Promise<string | undefined> {
-  // Workaround for https://github.com/oven-sh/setup-bun/issues/79 and https://github.com/actions/toolkit/issues/1179
-  const zipPath = addExtension(await downloadTool(url), ".zip");
-
-  // INTEGRITY CHECK: Verify the download before extraction.
-  // This checks the Local Hash, GitHub Asset Digest, and the robobun PGP Signature.
-  await verifyAsset(zipPath, url, token);
-
-  const extractedZipPath = await extractZip(zipPath);
-  const extractedBunPath = await extractBun(extractedZipPath);
-  try {
-    renameSync(extractedBunPath, bunPath);
-  } catch {
-    // If mv does not work, try to copy the file instead.
-    // For example: EXDEV: cross-device link not permitted
-    copyFileSync(extractedBunPath, bunPath);
-  }
-
-  return await getRevision(bunPath);
-}
-
 function isCacheEnabled(options: Input): boolean {
   const { customUrl, version, noCache } = options;
   if (noCache) {
@@ -212,40 +165,4 @@ function isCacheEnabled(options: Input): boolean {
     return false;
   }
   return isFeatureAvailable();
-}
-
-async function extractBun(path: string): Promise<string> {
-  for (const entry of readdirSync(path, { withFileTypes: true })) {
-    const { name } = entry;
-    const entryPath = join(path, name);
-    if (entry.isFile()) {
-      if (name === "bun" || name === "bun.exe") {
-        return entryPath;
-      }
-      if (/^bun.*\.zip/.test(name)) {
-        const extractedPath = await extractZip(entryPath);
-        return extractBun(extractedPath);
-      }
-    }
-    if (/^bun/.test(name) && entry.isDirectory()) {
-      return extractBun(entryPath);
-    }
-  }
-  throw new Error("Could not find executable: bun");
-}
-
-async function getRevision(exe: string): Promise<string | undefined> {
-  const revision = await getExecOutput(exe, ["--revision"], {
-    ignoreReturnCode: true,
-  });
-  if (revision.exitCode === 0 && /^\d+\.\d+\.\d+/.test(revision.stdout)) {
-    return revision.stdout.trim();
-  }
-  const version = await getExecOutput(exe, ["--version"], {
-    ignoreReturnCode: true,
-  });
-  if (version.exitCode === 0 && /^\d+\.\d+\.\d+/.test(version.stdout)) {
-    return version.stdout.trim();
-  }
-  return undefined;
 }

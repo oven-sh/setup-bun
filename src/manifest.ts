@@ -1,30 +1,7 @@
 import * as openpgp from "openpgp";
 import { info, error } from "@actions/core";
-import { request } from "./utils";
+import { getValidatedLastModified, request } from "./utils";
 import { getSigningKey } from "./signing-key";
-
-/**
- * Returns the 'Last-Modified' Date only if it is valid and falls
- * between 'created' and now. Otherwise returns undefined.
- */
-export function getValidatedLastModified(
-  res: Response,
-  created: Date,
-): Date | undefined {
-  const headerValue = res.headers.get("Last-Modified");
-  if (!headerValue) return undefined;
-
-  const mtime = new Date(headerValue);
-  const mtimeNum = mtime.getTime();
-
-  // 1. Check for 'Invalid Date' (NaN)
-  // 2. Ensure it isn't before the 'created' bound
-  // 3. Ensure it isn't in the future (server clock drift)
-  const isValid =
-    !isNaN(mtimeNum) && mtimeNum > created.getTime() && mtimeNum < Date.now();
-
-  return isValid ? mtime : undefined;
-}
 
 /**
  * Fetches the clearsigned manifest (.asc) and returns the verified text content.
