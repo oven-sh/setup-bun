@@ -1,2 +1,4 @@
 [install]
 saveTextLockfile = true
+[test]
+preload = ["./tests/init.suite.ts"]
