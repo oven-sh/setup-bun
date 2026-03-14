@@ -4,74 +4,26 @@ import { request } from "./utils";
 import { getSigningKey } from "./signing-key";
 
 /**
- * Extracts the creation date from an OpenPGP v6 signature object.
+ * Returns the 'Last-Modified' Date only if it is valid and falls
+ * between 'created' and now. Otherwise returns undefined.
  */
-async function getSignatureDate(signature: any): Promise<Date | null> {
-  if (null === signature) return null;
+export function getValidatedLastModified(
+  res: Response,
+  created: Date,
+): Date | undefined {
+  const headerValue = res.headers.get("Last-Modified");
+  if (!headerValue) return undefined;
 
-  try {
-    // 1. Official v6 async getter
-    if ("function" === typeof signature.getCreationTime) {
-      const date = await signature.getCreationTime();
-      if (date instanceof Date) return date;
-    }
+  const mtime = new Date(headerValue);
+  const mtimeNum = mtime.getTime();
 
-    const sigPacket = signature.signaturePacket;
-    if (null !== sigPacket && undefined !== sigPacket) {
-      // 2. Search Hashed Subpackets (Spec Type 2: Signature Creation Time)
-      const subpackets = [
-        ...(sigPacket.hashedSubpackets || []),
-        ...(sigPacket.subpackets || []),
-      ];
+  // 1. Check for 'Invalid Date' (NaN)
+  // 2. Ensure it isn't before the 'created' bound
+  // 3. Ensure it isn't in the future (server clock drift)
+  const isValid =
+    !isNaN(mtimeNum) && mtimeNum > created.getTime() && mtimeNum < Date.now();
 
-      const creationSub = subpackets.find(
-        (p) => 2 === p?.type || undefined !== p?.creationTime,
-      );
-      if (
-        undefined !== creationSub &&
-        creationSub?.creationTime instanceof Date
-      ) {
-        return creationSub.creationTime;
-      }
-      // 2b. v6 internal subpacket search (Type 2 is Creation Time)
-      // We convert to Array because v6 subpackets can be an Iterable/Map
-      const hashed = sigPacket.hashedSubpackets || [];
-      const unhashed = sigPacket.unhashedSubpackets || [];
-      const allSubpackets = [...hashed, ...unhashed];
-
-      for (const p of allSubpackets) {
-        if (2 === p?.type && p?.creationTime instanceof Date) {
-          return p.creationTime;
-        }
-      }
-
-      // 3. Check for the synchronous 'created' property
-      if (sigPacket.created instanceof Date) {
-        return sigPacket.created;
-      }
-
-      // 4. Try the packet-level getter
-      if ("function" === typeof sigPacket.getCreationTime) {
-        const date = await sigPacket.getCreationTime();
-        if (date instanceof Date) return date;
-      }
-    }
-
-    // 5. Deep Search in 'packets' array
-    const packets = signature.packets || [];
-    if (Array.isArray(packets)) {
-      for (const p of packets) {
-        if ("function" === typeof p.getCreationTime) {
-          const date = await p.getCreationTime();
-          if (date instanceof Date) return date;
-        }
-      }
-    }
-  } catch (err) {
-    // Silently continue
-  }
-
-  return null;
+  return isValid ? mtime : undefined;
 }
 
 /**
@@ -81,33 +33,37 @@ export async function getVerifiedManifest(
   downloadUrl: string,
   token?: string,
 ): Promise<string> {
-  const ascUrl = `${downloadUrl}.asc`;
-  const parsedUrl = new URL(ascUrl);
+  const parsedUrl = new URL(downloadUrl);
+  parsedUrl.pathname = `${parsedUrl.pathname}.asc`;
+  const ascUrl = parsedUrl.href;
 
   /**
    * Scoping the token to github.com prevents leaking credentials to
    * third-party servers while allowing for higher rate limits and
    * access to private repositories.
    */
-  const isGitHub = "github.com" === parsedUrl.hostname;
+  const isGitHub =
+    "github.com" === parsedUrl.hostname && "https:" === parsedUrl.protocol;
 
   const res = await request(ascUrl, {
     headers: isGitHub && token ? { "Authorization": `Bearer ${token}` } : {},
   });
 
-  const armoredSignedMessage = await res.text();
-
-  /**
-   * We run these in parallel to avoid "waterfalling" the async work:
-   * 1. getSigningKey: Resolves/validates the 'robobun' public key from storage or pool.
-   * 2. readCleartextMessage: Parses the raw string into an OpenPGP message object.
-   */
-  const [publicKey, message] = await Promise.all([
+  const [armoredSignedMessage, publicKey] = await Promise.all([
+    res.text(),
     getSigningKey(token),
-    openpgp.readCleartextMessage({ cleartextMessage: armoredSignedMessage }),
   ]);
+  // This must wait for armoredSignedMessage to be available.
+  const cleartextMessage = await openpgp.readCleartextMessage({
+    cleartextMessage: armoredSignedMessage,
+  });
 
+  const created = publicKey.getCreationTime();
   const fingerprint = publicKey.getFingerprint().toUpperCase();
+  const trustedKeyID = publicKey.getKeyID().toHex().toLowerCase();
+
+  info(`Trusted Key ID: ${trustedKeyID}`);
+  info(`Trusted Fingerprint: ${fingerprint}`);
 
   /**
    * 'verification' holds a result object that includes the unverified data
@@ -115,34 +71,28 @@ export async function getVerifiedManifest(
    * hasn't been checked yet.
    */
   const verification = await openpgp.verify({
-    message,
+    message: cleartextMessage,
     verificationKeys: publicKey,
+    date: getValidatedLastModified(res, created) ?? new Date(),
+    expectSigned: true,
     format: "utf8",
   });
-
-  const trustedKeyID = publicKey.getKeyID().toHex().toLowerCase();
-
-  info(`Trusted Key ID: ${trustedKeyID}`);
-  info(`Trusted Fingerprint: ${fingerprint}`);
 
   /**
    * Filter for the signature that matches our trusted robobun fingerprint.
    * This ensures we aren't misled by other signatures that might be present.
    */
   const signature = verification.signatures.find((sig) => {
-    const sigKeyID = sig.keyID.toHex().toLowerCase();
-
-    const sigFingerprint = sig.signingKey?.getFingerprint().toUpperCase();
-    if (
-      (sigFingerprint && sigFingerprint === fingerprint) ||
-      sigKeyID === trustedKeyID
-    ) {
+    const signingKey = publicKey.getKeys(sig.keyID)[0];
+    if (signingKey && publicKey.hasSameFingerprintAs(signingKey)) {
       return true;
     }
 
-    const signingSubkey = publicKey.getCommonKeys(sig.keyID)[0];
-    if (signingSubkey) {
-      return signingSubkey.getFingerprint().toUpperCase() === fingerprint;
+    const signingSubkeys = publicKey.getSubkeys(sig.keyID);
+    for (const subKey of signingSubkeys) {
+      if (subKey.mainKey.hasSameFingerprintAs(publicKey)) {
+        return true;
+      }
     }
 
     return false;
@@ -156,41 +106,40 @@ export async function getVerifiedManifest(
    * Log the signature details immediately. This allows us to see the
    * identity claims before the cryptographic verification is attempted.
    */
-  // In v6, the creation time might be in the signature object directly
-  // or inside the internal packets.
-  const creationDate = await getSignatureDate(signature);
   info("Checking PGP signature...");
-  info(
-    `- Signed On: ${creationDate instanceof Date ? creationDate.toISOString() : "Unknown"}`,
-  );
-  info(`- Key ID: ${signature.keyID.toHex().toLowerCase()}`);
-  info(`- Fingerprint: ${fingerprint}\n`);
-
-  const { verified, data } = signature;
+  info(`  - Key ID\t: ${signature.keyID.toHex().toLowerCase()}`);
+  const signatureKey = publicKey.getKeys(signature.keyID)[0];
+  info(`  - Fingerprint\t: ${signatureKey.getFingerprint().toUpperCase()}`);
 
   try {
     /**
      * MUST await 'verified' to perform the cryptographic check.
      * If the signature is invalid or tampered with, this throws.
      */
-    await verified;
-    info("Signature verified successfully.");
+    const [verifyObj, sigObj] = await Promise.all([
+      signature.verified,
+      signature.signature,
+    ]);
+
+    const creationDate = sigObj.packets[0]?.created;
+    info(
+      `  - Signed On\t: ${creationDate instanceof Date ? creationDate.toISOString() : "Unknown"}`,
+    );
+
+    if (true === verifyObj) {
+      info("\nSignature verified successfully.");
+    }
   } catch (err: unknown) {
-    const message = (err as Error).message;
-    error(`PGP Signature verification failed: ${message}`);
+    const errMessage = (err as Error).message;
+    error(`PGP Signature verification failed: ${errMessage}`);
     throw new Error(
-      `PGP Signature verification failed for ${ascUrl}: ${message}`,
+      `PGP Signature verification failed for ${ascUrl}: ${errMessage}`,
     );
   }
 
-  /**
-   * In v6, signature.data is undefined for cleartext.
-   * Use the 'message' object which is the CleartextMessage.
-   */
-  const text = message.getText();
-  if (!text) {
+  if (!verification.data) {
     throw new Error("Verified manifest text is empty or undefined.");
   }
 
-  return text;
+  return verification.data;
 }
