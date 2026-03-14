@@ -5,6 +5,7 @@ import { GITHUB_DIGEST_THRESHOLD } from "./github-api";
 import { fetchAssetMetadata, getHexFromDigest } from "./github-asset";
 import { getVerifiedManifest } from "./manifest";
 import { gitHubAssetDownloadUrl } from "./url";
+import { redactUrlForLogs } from "./utils";
 
 class DigestVerificationError extends Error {}
 class UnsupportedAlgorithmError extends Error {}
@@ -52,13 +53,12 @@ export async function verifyAsset(
   algorithm: SupportedAlgorithmNames = "sha256",
 ): Promise<string> {
   const manifestFile = getManifest(algorithm);
+  const safeUrl = redactUrlForLogs(downloadUrl);
   const urlObj = new URL(downloadUrl);
 
   const rawAssetName = urlObj.pathname.split("/").pop();
   if (!rawAssetName) {
-    throw new Error(
-      `Could not determine asset filename from URL: ${downloadUrl}`,
-    );
+    throw new Error(`Could not determine asset filename from URL: ${safeUrl}`);
   }
 
   let assetName: string = rawAssetName;
@@ -85,9 +85,7 @@ export async function verifyAsset(
     metadata = await fetchAssetMetadata(downloadUrl, token);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    warning(
-      `Skipping GitHub API digest check for: ${downloadUrl} (${message})`,
-    );
+    warning(`Skipping GitHub API digest check for: ${safeUrl} (${message})`);
   }
 
   let manifestBaseUrl = "";
@@ -144,7 +142,7 @@ export async function verifyAsset(
     // Bun archives always follow the pattern: bun-<specifiers>.zip
     if (!lastSegment.startsWith("bun-") || !lastSegment.endsWith(".zip")) {
       throw new Error(
-        `Cannot derive manifest URL: "${downloadUrl}" ` +
+        `Cannot derive manifest URL: "${safeUrl}" ` +
           `does not appear to be a direct Bun archive URL. ` +
           `The path was expected to end with a filename matching "bun-*.zip".`,
       );
