@@ -4,7 +4,7 @@ import { info, warning, setOutput } from "@actions/core";
 import { GITHUB_DIGEST_THRESHOLD } from "./github-api";
 import { fetchAssetMetadata, getHexFromDigest } from "./github-asset";
 import { getVerifiedManifest } from "./manifest";
-import { getGitHubManifestUrl } from "./url";
+import { gitHubAssetDownloadUrl } from "./url";
 
 class DigestVerificationError extends Error {}
 class UnsupportedAlgorithmError extends Error {}
@@ -93,7 +93,7 @@ export async function verifyAsset(
   let manifestBaseUrl = "";
   if (metadata) {
     assetName = metadata.name;
-    manifestBaseUrl = getGitHubManifestUrl(
+    manifestBaseUrl = gitHubAssetDownloadUrl(
       metadata.owner,
       metadata.repo,
       metadata.tag,

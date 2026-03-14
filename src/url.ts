@@ -57,16 +57,3 @@ export const getHkpUrl = (host: string, fp: string, port?: number) =>
 
 export const getGitHubGpgUrl = (user: string) =>
   buildUrl("github.com", `/${user.replace(/^@/, "")}.gpg`);
-
-export const getGitHubManifestUrl = (
-  owner: string,
-  repo: string,
-  tag: string,
-  asset: string,
-) =>
-  buildUrl(
-    "github.com",
-    [owner, repo, "releases", "download", tag, asset]
-      .map(encodeURIComponent)
-      .join("/"),
-  );
