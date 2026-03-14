@@ -195,7 +195,7 @@ export async function setStoredResponse(
       statusText: res.statusText,
       url: res.url,
       encoding: encoding,
-      storedAt: res.storedAt ?? Date.now(), // for testing
+      storedAt: (res as any).storedAt ?? Date.now(), // for testing
     });
 
     setCache(url, envelope);
