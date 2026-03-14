@@ -309,6 +309,18 @@ export function getValidatedLastModified(
   return isValid ? mtime : undefined;
 }
 
+export function redactUrlForLogs(url: string): string {
+  try {
+    const u = new URL(url);
+    u.username = "";
+    u.password = "";
+    if (u.search) u.search = "?redacted";
+    return u.toString();
+  } catch {
+    return url.replace(/\/\/[^@]+@/g, "//***@");
+  }
+}
+
 /**
  * Returns the URL with query-string and fragment removed.
  * Safe to call on any string; returns the original on parse failure.
