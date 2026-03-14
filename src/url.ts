@@ -34,7 +34,13 @@ export function gitHubAssetDownloadUrl(
 }
 
 export function isGitHub(url: string, api: boolean = false): boolean {
-  const parsedUrl = new URL(url);
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    return false;
+  }
+
   if (api) {
     return "api.github.com" === parsedUrl.hostname;
   }
