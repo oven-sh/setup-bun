@@ -5,6 +5,8 @@ import { existsSync, readFileSync, renameSync } from "node:fs";
 import { resolve, basename } from "node:path";
 import { compareVersions, validate } from "compare-versions";
 
+import { getStoredResponse, setStoredResponse } from "./response-storage";
+
 // First Bun version that ships native Windows ARM64 binaries.
 const WINDOWS_ARM64_MIN_VERSION = "1.3.10";
 
@@ -26,6 +28,14 @@ export async function request(
     headers.set("User-Agent", "@oven-sh/setup-bun");
   }
 
+  const canUseResponseCache = "GET" === (init?.method ?? "GET").toUpperCase();
+  if (canUseResponseCache) {
+    const stored = getStoredResponse(url);
+    if (stored) {
+      return stored;
+    }
+  }
+
   const res = await fetch(url, {
     ...init,
     headers,
@@ -35,6 +45,10 @@ export async function request(
     throw new Error(
       `Failed to fetch url ${url}. (status code: ${res.status}, status text: ${res.statusText})${body ? `\n${body}` : ""}`,
     );
+  }
+
+  if (canUseResponseCache) {
+    await setStoredResponse(url, res);
   }
 
   return res;
@@ -176,5 +190,22 @@ export function readVersionFromFile(
       info(`Obtained version ${output} from ${file}`);
       return output;
     }
+  }
+}
+
+/**
+ * Returns the URL with query-string and fragment removed.
+ * Safe to call on any string; returns the original on parse failure.
+ */
+export function stripUrlCredentials(url: string): string {
+  try {
+    const u = new URL(url);
+    u.username = "";
+    u.password = "";
+    u.search = "";
+    u.hash = "";
+    return u.toString();
+  } catch {
+    return url;
   }
 }
