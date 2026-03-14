@@ -18,9 +18,12 @@ function downloadLog(
   prefix: string = "download-bun",
 ): void {
   if (error instanceof Error) {
-    // Prepends your context to the error message without losing the Error object properties
-    error.message = `${prefix}: ${preface}: ${error.message}`;
-    f(error);
+    // Create a new Error so the original isn't mutated
+    const derived = new Error(`${prefix}: ${preface}: ${error.message}`, {
+      cause: error,
+    });
+    derived.stack = error.stack;
+    f(derived);
   } else {
     f(`${prefix}: ${preface}: ${String(error)}`);
   }
