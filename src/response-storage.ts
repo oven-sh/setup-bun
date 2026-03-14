@@ -118,7 +118,7 @@ export function getStoredResponse(url: string): StoredResponse | undefined {
     // (now - TTL) is the oldest possible age for this data
     const lastModified = new Date(Date.now() - getCacheTtl()).toUTCString();
     return {
-      isRevivalNeeded: false,
+      isRevivalNeeded: true,
       response: new Response(data, {
         status: 200,
         headers: {
