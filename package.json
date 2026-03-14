@@ -23,6 +23,8 @@
     "modules:patch": "npm x patch-package",
     "modules": "npm run modules:clean && npm run modules:patch",
     "build": "esbuild --target=node24 --outfile=dist/setup/index.js --bundle --keep-names --minify --platform=node --format=cjs --banner:js=\"var import_meta_url = require('url').pathToFileURL(__filename).href;\" --define:import.meta.url=import_meta_url src/index.ts && esbuild --target=node24 --outfile=dist/cache-save/index.js --bundle --keep-names --minify --platform=node --format=cjs --banner:js=\"var import_meta_url = require('url').pathToFileURL(__filename).href;\" --define:import.meta.url=import_meta_url src/cache-save.ts",
+    "build:tests": "esbuild --bundle --platform=node --format=esm --target=node24 --outfile=tests/build/tests.mjs --external:node:* --packages=external tests/bundled.suite.ts",
+    "tests:bundle": "node --test tests/build/tests.mjs",
     "start": "npm run build && node dist/setup/index.js"
   },
   "dependencies": {
