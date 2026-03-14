@@ -18,6 +18,10 @@
   "author": "xHyroM",
   "scripts": {
     "format": "prettier --write src *.yml *.json *.md",
+    "modules:lock": "npm install --no-fund --package-lock-only",
+    "modules:clean": "npm ci --no-fund",
+    "modules:patch": "npm x patch-package",
+    "modules": "npm run modules:clean && npm run modules:patch",
     "build": "esbuild --target=node24 --outfile=dist/setup/index.js --bundle --keep-names --minify --platform=node --format=cjs --banner:js=\"var import_meta_url = require('url').pathToFileURL(__filename).href;\" --define:import.meta.url=import_meta_url src/index.ts && esbuild --target=node24 --outfile=dist/cache-save/index.js --bundle --keep-names --minify --platform=node --format=cjs --banner:js=\"var import_meta_url = require('url').pathToFileURL(__filename).href;\" --define:import.meta.url=import_meta_url src/cache-save.ts",
     "start": "npm run build && node dist/setup/index.js"
   },
@@ -36,11 +40,9 @@
     "@types/bun": "^1.0.0",
     "@types/node": "^24.0.0",
     "esbuild": "^0.27.0",
+    "patch-package": "^8.0.0",
     "prettier": "^3.0.0",
     "typescript": "^5.0.0"
-  },
-  "patchedDependencies": {
-    "compare-versions@6.1.1": "patches/compare-versions@6.1.1.patch"
   },
   "overrides": {
     "form-data": "^4.0.4"
