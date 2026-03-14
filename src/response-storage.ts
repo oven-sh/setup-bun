@@ -18,6 +18,11 @@ export const MAX_CACHE_SIZE_BYTES = Math.min(
 // Extracts the type of the 'method' property from RequestInit
 type FetchMethod = NonNullable<RequestInit["method"]>;
 
+export interface StoredResponse {
+  isRevivalNeeded: boolean;
+  response: Response;
+}
+
 function makeEnvelopeValue(
   method: string,
   url: string,
@@ -49,11 +54,6 @@ function isMetadata(url: string): boolean {
   const smallish = isSecure && isGitHub && ".txt" === extension;
 
   return secureApi || smallish;
-}
-
-export interface StoredResponse {
-  isRevivalNeeded: boolean;
-  response: Response;
 }
 
 /**
