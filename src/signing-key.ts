@@ -1,5 +1,5 @@
 import * as openpgp from "openpgp";
-import { info } from "@actions/core";
+import { debug, info } from "@actions/core";
 import { addGitHubApiHeaders } from "./github-api";
 import { getCache, setCache } from "./filesystem-cache";
 import { request } from "./utils";
@@ -35,7 +35,10 @@ export async function getSigningKey(token?: string): Promise<openpgp.Key> {
       const cleanKey = await getCleanArmoredKey(storedKey);
       info(`Retrieved verified public key from filesystem storage.`);
       return await openpgp.readKey({ armoredKey: cleanKey });
-    } catch {
+    } catch (err) {
+      debug(
+        `Failed to parse cached signing key [${ROBOBUN_STORAGE_KEY}]: ${err instanceof Error ? err.message : String(err)}`,
+      );
       // Fall through to fetch fresh if stored data is corrupted
     }
   }
@@ -64,7 +67,10 @@ export async function getSigningKey(token?: string): Promise<openpgp.Key> {
         info(`Retrieved verified public key from ${parsedUrl.hostname}.`);
         return await openpgp.readKey({ armoredKey: cleanKey });
       }
-    } catch {
+    } catch (err) {
+      debug(
+        `Failed to fetch signing key from ${url}: ${err instanceof Error ? err.message : String(err)}`,
+      );
       continue;
     }
   }
