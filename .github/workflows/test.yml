@@ -300,7 +300,7 @@ jobs:
             echo "Successfully installed from default registry"
           else
             echo "${output}"
-        echo "Return code: ${status}"
+            echo "Return code: ${status}"
             echo "Failed to install from default registry"
             exit 1
           fi
