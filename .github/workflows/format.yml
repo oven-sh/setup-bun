@@ -21,7 +21,14 @@ jobs:
         uses: ./
 
       - name: 📦 Install Dependencies
-        run: bun install
+        run: |
+          mkdir -p dist
+          bun run bun_as:npm
+          bun run bun_as:npx
+          echo "$(realpath -e dist)" >> "${GITHUB_PATH}"
+          PATH="${PATH}:$(realpath -e dist)"
+          test -s bun.lock || bun run 'modules:lock'
+          bun install --frozen-lockfile
 
       - name: 🧹 Format
         run: |

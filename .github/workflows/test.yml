@@ -36,7 +36,14 @@ jobs:
           no-cache: true
 
       - name: Install dependencies
-        run: bun install
+        run: |
+          mkdir -p dist
+          bun run bun_as:npm
+          bun run bun_as:npx
+          echo "$(realpath -e dist)" >> "${GITHUB_PATH}"
+          PATH="${PATH}:$(realpath -e dist)"
+          test -s bun.lock || bun run 'modules:lock'
+          bun install --frozen-lockfile
 
       - name: Run tests
         run: bun test --coverage
@@ -225,6 +232,25 @@ jobs:
           - windows-latest
 
     steps:
+      - name: Normalize runner details
+        id: normalized
+        shell: bash
+        run: |
+          runner_arch="$(case '${{ runner.arch }}' in
+            (X64) printf x64 ;;
+            (ARM64) printf aarch64 ;;
+            (*) echo "Unsupported runner.arch: ${{ runner.arch }}" >&2; exit 1 ;;
+          esac)"
+          runner_os="$(case '${{ runner.os }}' in
+            (macOS) printf darwin ;;
+            (Linux) printf linux ;;
+            (Windows) printf windows ;;
+            (*) echo "Unsupported runner.os: ${{ runner.os }}" >&2; exit 1 ;;
+          esac)"
+          printf >> "${GITHUB_OUTPUT}" -- '%s=%s\n' \
+            runner_arch "${runner_arch}" \
+            runner_os "${runner_os}"
+
       - name: 📥 Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
@@ -232,7 +258,7 @@ jobs:
         uses: ./
         id: setup_bun
         with:
-          bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-${{runner.os == 'macOS' && 'darwin' || runner.os}}-${{ runner.arch == 'X64' && 'x64' || 'aarch64' }}.zip"
+          bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-${{ steps.normalized.outputs.runner_os }}-${{ steps.normalized.outputs.runner_arch }}.zip"
 
       - name: ▶️ Run Bun
         id: run_bun
@@ -261,24 +287,35 @@ jobs:
             https://registry.npmjs.org
             @types:https://registry.yarnpkg.com
 
-      - name: ▶️ Install from default registry
-        run: |
-          output=$(bun add is-odd --verbose --force 2>&1)
+      - name: 🔎 Display registry configurations
+        run: cat -v bunfig.toml
 
-          if echo "$output" | grep -q "HTTP/1.1 GET https://registry.npmjs.org/is-odd"; then
+      - name: ▶️ Install from default registry
+        shell: bash
+        run: |
+          status=0
+          output=$(bun add is-odd --verbose --force 2>&1) || status=$?
+
+          if [ 0 -eq "${status}" ] && grep <<<"$output" -q "HTTP/1.1 GET https://registry.npmjs.org/is-odd"; then
             echo "Successfully installed from default registry"
           else
+            echo "${output}"
+            echo "Return code: ${status}"
             echo "Failed to install from default registry"
             exit 1
           fi
 
       - name: ▶️ Install from @types registry
+        shell: bash
         run: |
-          output=$(bun add @types/bun --verbose --force 2>&1)
+          status=0
+          output=$(bun add @types/bun --verbose --force 2>&1) || status=$?
 
-          if echo "$output" | grep -q "HTTP/1.1 GET https://registry.yarnpkg.com/@types%2fbun"; then
+          if [ 0 -eq "${status}" ] && grep <<<"$output" -q "HTTP/1.1 GET https://registry.yarnpkg.com/@types%2fbun"; then
             echo "Successfully installed from @types registry"
           else
+            echo "${output}"
+            echo "Return code: ${status}"
             echo "Failed to install from @types registry"
             exit 1
           fi

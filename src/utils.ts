@@ -1,12 +1,24 @@
-import { debug, warning } from "@actions/core";
 import { info } from "node:console";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, renameSync } from "node:fs";
+import { copyFileSync, existsSync, readFileSync, renameSync } from "node:fs";
 import { resolve, basename } from "node:path";
+
+import { debug, warning } from "@actions/core";
+import { getExecOutput } from "@actions/exec";
 import { compareVersions, validate } from "compare-versions";
+
+import { getStoredResponse, setStoredResponse } from "./response-storage";
 
 // First Bun version that ships native Windows ARM64 binaries.
 const WINDOWS_ARM64_MIN_VERSION = "1.3.10";
+
+export const exe = (name: string) =>
+  "windows" === getPlatform() ? `${name}.exe` : name;
+
+const normalizeVersion = (v: string) => v.replace(/^v/i, "");
+
+const windows_arm = (os: string, arch: string) =>
+  "windows" === os && ("aarch64" === arch || "arm64" === arch);
 
 export function getCacheKey(url: string): string {
   return `bun-${createHash("sha1").update(url).digest("base64")}`;
@@ -26,15 +38,47 @@ export async function request(
     headers.set("User-Agent", "@oven-sh/setup-bun");
   }
 
+  const method = (init?.method ?? "GET").toUpperCase();
+  const canUseResponseCache = "GET" === method;
+  const stored = getStoredResponse(url);
+  if (canUseResponseCache) {
+    if (stored) {
+      if (stored.isRevivalNeeded) {
+        const etag = stored.response.headers.get("ETag");
+        if (etag) {
+          headers.set("If-None-Match", etag);
+        }
+        const lastModified = stored.response.headers.get("Last-Modified");
+        if (lastModified) {
+          headers.set("If-Modified-Since", lastModified);
+        }
+      } else {
+        return stored.response;
+      }
+    }
+  }
+
   const res = await fetch(url, {
     ...init,
     headers,
   });
+
+  if (304 === res.status && canUseResponseCache && stored) {
+    // We re-save the cached response to update the modification time
+    // to 'now' effectively resetting the TTL.
+    await setStoredResponse(url, stored.response, method);
+    return stored.response;
+  }
+
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     throw new Error(
       `Failed to fetch url ${url}. (status code: ${res.status}, status text: ${res.statusText})${body ? `\n${body}` : ""}`,
     );
+  }
+
+  if (canUseResponseCache) {
+    await setStoredResponse(url, res, method);
   }
 
   return res;
@@ -51,7 +95,7 @@ export function addExtension(path: string, ext: string): string {
 
 export function getPlatform(): string {
   const platform = process.platform;
-  if (platform === "win32") return "windows";
+  if ("win32" === platform) return "windows";
 
   return platform;
 }
@@ -69,7 +113,7 @@ export function getArchitecture(
   arch: string,
   version?: string,
 ): string {
-  if (os === "windows" && (arch === "aarch64" || arch === "arm64")) {
+  if (windows_arm(os, arch)) {
     if (!hasNativeWindowsArm64(version)) {
       warning(
         [
@@ -84,7 +128,7 @@ export function getArchitecture(
     }
   }
 
-  if (arch === "arm64") return "aarch64";
+  if ("arm64" === arch) return "aarch64";
   return arch;
 }
 
@@ -95,7 +139,7 @@ export function getAvx2(
   version?: string,
 ): boolean {
   // Workaround for absence of arm64 builds on Windows before 1.3.10 (#130)
-  if (os === "windows" && (arch === "aarch64" || arch === "arm64")) {
+  if (windows_arm(os, arch)) {
     if (!hasNativeWindowsArm64(version)) {
       return false;
     }
@@ -176,5 +220,94 @@ export function readVersionFromFile(
       info(`Obtained version ${output} from ${file}`);
       return output;
     }
+  }
+}
+
+export function isVersionMatch(
+  existingRevision: string,
+  requestedVersion?: string,
+): boolean {
+  // If no version specified, default is "latest" - don't match existing
+  if (!requestedVersion) {
+    return false;
+  }
+
+  // Non-pinned versions should never match existing installations
+  if (/^(latest|canary|action)$/i.test(requestedVersion)) {
+    return false;
+  }
+
+  const [existingVersion] = existingRevision.split("+");
+
+  return (
+    normalizeVersion(existingVersion) === normalizeVersion(requestedVersion)
+  );
+}
+
+export async function getRevision(exe: string): Promise<string | undefined> {
+  const revision = await getExecOutput(exe, ["--revision"], {
+    ignoreReturnCode: true,
+  });
+  if (0 === revision.exitCode && /^\d+\.\d+\.\d+/.test(revision.stdout)) {
+    return revision.stdout.trim();
+  }
+  const version = await getExecOutput(exe, ["--version"], {
+    ignoreReturnCode: true,
+  });
+  if (0 === version.exitCode && /^\d+\.\d+\.\d+/.test(version.stdout)) {
+    return version.stdout.trim();
+  }
+  return undefined;
+}
+
+/**
+ * Returns the 'Last-Modified' Date only if it is valid and falls
+ * between 'created' and now. Otherwise returns undefined.
+ */
+export function getValidatedLastModified(
+  res: Response,
+  created: Date,
+): Date | undefined {
+  const headerValue = res.headers.get("Last-Modified");
+  if (!headerValue) return undefined;
+
+  const mtime = new Date(headerValue);
+  const mtimeNum = mtime.getTime();
+
+  // 1. Check for 'Invalid Date' (NaN)
+  // 2. Ensure it isn't before the 'created' bound
+  // 3. Ensure it isn't in the future (server clock drift)
+  const isValid =
+    !isNaN(mtimeNum) && mtimeNum > created.getTime() && mtimeNum < Date.now();
+
+  return isValid ? mtime : undefined;
+}
+
+export function redactUrlForLogs(url: string): string {
+  try {
+    const u = new URL(url);
+    u.username = "";
+    u.password = "";
+    if (u.search) u.search = "?redacted";
+    return u.toString();
+  } catch {
+    return url.replace(/\/\/[^@]+@/g, "//***@");
+  }
+}
+
+/**
+ * Returns the URL with query-string and fragment removed.
+ * Safe to call on any string; returns the original on parse failure.
+ */
+export function stripUrlCredentials(url: string): string {
+  try {
+    const u = new URL(url);
+    u.username = "";
+    u.password = "";
+    u.search = "";
+    u.hash = "";
+    return u.toString();
+  } catch {
+    return url;
   }
 }

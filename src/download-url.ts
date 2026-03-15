@@ -5,6 +5,8 @@ import {
   validateStrict,
 } from "compare-versions";
 import { Input } from "./action";
+import { addGitHubApiHeaders } from "./github-api";
+import { buildUrl, gitHubAssetDownloadUrl } from "./url";
 import { getArchitecture, getAvx2, getPlatform, request } from "./utils";
 
 export async function getDownloadUrl(options: Input): Promise<string> {
@@ -25,12 +27,14 @@ async function getSemverDownloadUrl(options: Input): Promise<string> {
   }
 
   if (!tag) {
+    const apiUrl = buildUrl(
+      "api.github.com",
+      "repos/oven-sh/bun/git/refs/tags",
+      "https",
+    );
+    const headers = addGitHubApiHeaders(apiUrl, {}, options.token);
     const res = (await (
-      await request("https://api.github.com/repos/oven-sh/bun/git/refs/tags", {
-        headers: options.token
-          ? { "Authorization": `Bearer ${options.token}` }
-          : {},
-      })
+      await request(apiUrl, { headers: headers })
     ).json()) as { ref: string }[];
 
     let tags = res
@@ -62,23 +66,17 @@ async function getSemverDownloadUrl(options: Input): Promise<string> {
   }
 
   const resolvedTag = tag ?? version;
-  const eversion = encodeURIComponent(resolvedTag);
-  const eos = encodeURIComponent(os ?? getPlatform());
-  const earch = encodeURIComponent(
-    getArchitecture(os ?? getPlatform(), arch ?? process.arch, resolvedTag),
-  );
-  const eavx2 = encodeURIComponent(
-    getAvx2(os ?? getPlatform(), arch ?? process.arch, avx2, resolvedTag) ===
-      false
-      ? "-baseline"
-      : "",
-  );
-  const eprofile = encodeURIComponent(profile === true ? "-profile" : "");
-
-  const { href } = new URL(
-    `${eversion}/bun-${eos}-${earch}${eavx2}${eprofile}.zip`,
-    "https://github.com/oven-sh/bun/releases/download/",
-  );
-
-  return href;
+  const inputArch = arch ?? process.arch;
+  const resolvedOs = os ?? getPlatform();
+  const resolvedArch = getArchitecture(resolvedOs, inputArch, resolvedTag);
+  const isAvx2 = getAvx2(resolvedOs, inputArch, avx2, resolvedTag);
+  const assetParts: string[] = [
+    "bun",
+    resolvedOs,
+    resolvedArch,
+    isAvx2 ? "" : "baseline",
+    profile ? "profile" : "",
+  ];
+  const assetName = assetParts.filter((p) => "" !== p).join("-") + ".zip";
+  return gitHubAssetDownloadUrl("oven-sh", "bun", resolvedTag, assetName);
 }

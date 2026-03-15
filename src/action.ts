@@ -1,23 +1,24 @@
+import { mkdirSync, symlinkSync, existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
-import {
-  mkdirSync,
-  readdirSync,
-  symlinkSync,
-  renameSync,
-  copyFileSync,
-  existsSync,
-} from "node:fs";
-import { addPath, info, warning } from "@actions/core";
-import { isFeatureAvailable, restoreCache } from "@actions/cache";
-import { downloadTool, extractZip } from "@actions/tool-cache";
-import { getExecOutput } from "@actions/exec";
-import { Registry } from "./registry";
-import { writeBunfig } from "./bunfig";
-import { saveState } from "@actions/core";
-import { addExtension, extractVersionFromUrl, getCacheKey } from "./utils";
-import { getDownloadUrl } from "./download-url";
+import { dirname, join } from "node:path";
 import { cwd } from "node:process";
+import { isFeatureAvailable, restoreCache } from "@actions/cache";
+import { addPath, saveState, info, warning } from "@actions/core";
+import { atomicWriteFileSync } from "./atomic-write";
+import { writeBunfig } from "./bunfig";
+import { downloadBun } from "./download-bun";
+import { getDownloadUrl } from "./download-url";
+import { quickFingerprint } from "./quick-checksum";
+import { Registry } from "./registry";
+import { isGitHub } from "./url";
+import {
+  exe,
+  extractVersionFromUrl,
+  getCacheKey,
+  getRevision,
+  isVersionMatch,
+  stripUrlCredentials,
+} from "./utils";
 
 export type Input = {
   customUrl?: string;
@@ -36,6 +37,7 @@ export type Output = {
   revision: string;
   bunPath: string;
   url: string;
+  checksum?: string;
   cacheHit: boolean;
 };
 
@@ -44,56 +46,147 @@ export type CacheState = {
   cacheHit: boolean;
   bunPath: string;
   url: string;
+  checksum?: string;
+  binaryFingerprint?: string;
+  revision?: string;
 };
 
 export default async (options: Input): Promise<Output> => {
   const bunfigPath = join(cwd(), "bunfig.toml");
   writeBunfig(bunfigPath, options.registries);
 
-  const url = await getDownloadUrl(options);
   const cacheEnabled = isCacheEnabled(options);
+  const url = await getDownloadUrl(options);
+  const sUrl = isGitHub(url) ? url : stripUrlCredentials(url);
 
   const binPath = join(homedir(), ".bun", "bin");
   try {
     mkdirSync(binPath, { recursive: true });
   } catch (error) {
-    if (error.code !== "EEXIST") {
+    if ("EEXIST" !== error.code) {
       throw error;
     }
   }
-  addPath(binPath);
 
-  const exe = (name: string) =>
-    process.platform === "win32" ? `${name}.exe` : name;
   const bunPath = join(binPath, exe("bun"));
   try {
     symlinkSync(bunPath, join(binPath, exe("bunx")));
   } catch (error) {
-    if (error.code !== "EEXIST") {
+    if ("EEXIST" !== error.code) {
       throw error;
     }
   }
 
+  let checksum: string | undefined;
   let revision: string | undefined;
   let cacheHit = false;
 
-  // Check if Bun executable already exists and matches requested version
-  if (!options.customUrl && existsSync(bunPath)) {
-    const existingRevision = await getRevision(bunPath);
-    if (existingRevision && isVersionMatch(existingRevision, options.version)) {
-      revision = existingRevision;
-      cacheHit = true; // Treat as cache hit to avoid unnecessary network requests
-      info(`Using existing Bun installation: ${revision}`);
+  const cacheState: CacheState = {
+    cacheEnabled,
+    cacheHit,
+    bunPath,
+    url: sUrl,
+    checksum,
+    revision,
+  };
+
+  const cacheKey = getCacheKey(url);
+  const statePath = join(homedir(), ".bun", "bun.json");
+  if (cacheEnabled) {
+    if (existsSync(statePath)) {
+      try {
+        const state = JSON.parse(readFileSync(statePath, "utf8")) as CacheState;
+        if (state.url !== sUrl) {
+          throw new Error("The URL did not match.");
+        }
+
+        if ("string" === typeof state.checksum) {
+          checksum = state.checksum;
+        }
+        if ("string" === typeof state.binaryFingerprint) {
+          cacheState.binaryFingerprint = state.binaryFingerprint;
+        }
+        if ("string" === typeof state.bunPath) {
+          cacheState.bunPath = state.bunPath;
+        }
+        if ("string" === typeof state.revision) {
+          cacheState.revision = state.revision;
+        }
+      } catch {
+        warning(`Ignoring metadata from: ${statePath}`);
+      }
+      if (checksum) {
+        cacheState.cacheHit = true;
+        cacheState.checksum = checksum;
+      }
     }
   }
 
+  // Check if Bun executable already exists and matches requested version
+  if (
+    !options.customUrl &&
+    cacheState.revision &&
+    existsSync(cacheState.bunPath)
+  ) {
+    if (isVersionMatch(cacheState.revision, options.version)) {
+      if (cacheState.binaryFingerprint) {
+        try {
+          const livePrint = quickFingerprint(cacheState.bunPath);
+          if (livePrint === cacheState.binaryFingerprint) {
+            revision = cacheState.revision;
+            // Treat as cache hit to avoid unnecessary network requests
+            cacheHit = cacheState.cacheHit;
+            info(`Using existing Bun installation: ${revision}`);
+          } else {
+            info(
+              `Binary at ${cacheState.bunPath} does not match stored fingerprint; re-downloading.`,
+            );
+          }
+        } catch {
+          info(
+            `Could not verify binary at ${cacheState.bunPath}; re-downloading.`,
+          );
+        }
+      }
+      // No fingerprint in sidecar (first run after adding this feature):
+      // fall through to re-download which will compute and persist it.
+    }
+  }
+
+  const cachePaths = [cacheState.bunPath, statePath];
   if (!revision) {
     if (cacheEnabled) {
-      const cacheKey = getCacheKey(url);
-
-      const cacheRestored = await restoreCache([bunPath], cacheKey);
+      const cacheRestored = await restoreCache(cachePaths, cacheKey);
       if (cacheRestored) {
-        revision = await getRevision(bunPath);
+        if (existsSync(statePath)) {
+          try {
+            const state = JSON.parse(
+              readFileSync(statePath, "utf8"),
+            ) as CacheState;
+            if (state.url !== sUrl) {
+              throw new Error("The URL did not match.");
+            }
+
+            if ("string" === typeof state.checksum) {
+              checksum = state.checksum;
+              cacheState.checksum = checksum;
+            }
+            if ("string" === typeof state.binaryFingerprint) {
+              // There was a fingerprint, but restoring always invalidates it.
+              cacheState.binaryFingerprint = "restored";
+            }
+            if ("string" === typeof state.bunPath) {
+              cacheState.bunPath = state.bunPath;
+            }
+            if ("string" === typeof state.revision) {
+              revision = state.revision;
+              cacheState.revision = revision;
+            }
+          } catch {
+            warning(`Ignoring cached metadata from: ${statePath}`);
+          }
+        }
+
         if (revision) {
           const expectedVersion = extractVersionFromUrl(url);
           const [actualVersion] = revision.split("+");
@@ -107,22 +200,50 @@ export default async (options: Input): Promise<Output> => {
               `Cached Bun version ${revision} does not match expected version ${expectedVersion}. Re-downloading.`,
             );
             revision = undefined;
-          } else {
+          } else if (cacheState.checksum) {
             cacheHit = true;
+            cacheState.cacheHit = cacheHit;
+            // Refresh fingerprint so the local fast-path works on the next run
+            try {
+              if ("restored" === cacheState.binaryFingerprint) {
+                cacheState.binaryFingerprint = quickFingerprint(
+                  cacheState.bunPath,
+                );
+                atomicWriteFileSync(statePath, JSON.stringify(cacheState));
+              }
+            } catch {
+              // non-critical; next run will just fall back to restoreCache
+            }
             info(`Using a cached version of Bun: ${revision}`);
           }
         } else {
           warning(
-            `Found a cached version of Bun: ${revision} (but it appears to be corrupted?)`,
+            `Found a Bun binary (with an unknown version) at: ${cacheState.bunPath}`,
           );
         }
       }
     }
+  }
 
-    if (!cacheHit) {
-      info(`Downloading a new version of Bun: ${url}`);
-      revision = await downloadBun(url, bunPath);
+  if (!cacheHit) {
+    cacheState.cacheHit = false;
+
+    info(`Downloading a new version of Bun: ${url}`);
+    const result = await downloadBun(url, bunPath, options.token);
+
+    checksum = result.checksum;
+    cacheState.bunPath = result.binPath;
+    cacheState.checksum = checksum;
+    cacheState.url = result.url;
+
+    try {
+      cacheState.binaryFingerprint = quickFingerprint(result.binPath);
+    } catch {
+      warning(`Could not fingerprint: ${result.binPath}`);
     }
+
+    revision = await getRevision(result.binPath);
+    cacheState.revision = revision;
   }
 
   if (!revision) {
@@ -133,69 +254,33 @@ export default async (options: Input): Promise<Output> => {
 
   const [version] = revision.split("+");
 
-  const cacheState: CacheState = {
-    cacheEnabled,
-    cacheHit,
-    bunPath,
-    url,
-  };
+  cacheState.cacheHit = cacheHit;
+  cacheState.checksum = checksum;
+  cacheState.revision = revision;
+  const stateValue = JSON.stringify({
+    ...cacheState,
+    url: stripUrlCredentials(cacheState.url),
+  });
+  if (cacheEnabled && !cacheHit) {
+    atomicWriteFileSync(statePath, stateValue);
+  }
+  saveState("cache", stateValue);
 
-  saveState("cache", JSON.stringify(cacheState));
-
+  addPath(dirname(cacheState.bunPath));
   return {
     version,
     revision,
-    bunPath,
-    url,
+    bunPath: cacheState.bunPath,
+    url: cacheState.url,
+    checksum,
     cacheHit,
   };
 };
 
-function isVersionMatch(
-  existingRevision: string,
-  requestedVersion?: string,
-): boolean {
-  // If no version specified, default is "latest" - don't match existing
-  if (!requestedVersion) {
-    return false;
-  }
-
-  // Non-pinned versions should never match existing installations
-  if (/^(latest|canary|action)$/i.test(requestedVersion)) {
-    return false;
-  }
-
-  const [existingVersion] = existingRevision.split("+");
-
-  const normalizeVersion = (v: string) => v.replace(/^v/i, "");
-
-  return (
-    normalizeVersion(existingVersion) === normalizeVersion(requestedVersion)
-  );
-}
-
-async function downloadBun(
-  url: string,
-  bunPath: string,
-): Promise<string | undefined> {
-  // Workaround for https://github.com/oven-sh/setup-bun/issues/79 and https://github.com/actions/toolkit/issues/1179
-  const zipPath = addExtension(await downloadTool(url), ".zip");
-  const extractedZipPath = await extractZip(zipPath);
-  const extractedBunPath = await extractBun(extractedZipPath);
-  try {
-    renameSync(extractedBunPath, bunPath);
-  } catch {
-    // If mv does not work, try to copy the file instead.
-    // For example: EXDEV: cross-device link not permitted
-    copyFileSync(extractedBunPath, bunPath);
-  }
-
-  return await getRevision(bunPath);
-}
-
 function isCacheEnabled(options: Input): boolean {
   const { customUrl, version, noCache } = options;
   if (noCache) {
+    process.env["FS_CACHE_FORCE_STALE"] = "1";
     return false;
   }
   if (customUrl) {
@@ -205,40 +290,4 @@ function isCacheEnabled(options: Input): boolean {
     return false;
   }
   return isFeatureAvailable();
-}
-
-async function extractBun(path: string): Promise<string> {
-  for (const entry of readdirSync(path, { withFileTypes: true })) {
-    const { name } = entry;
-    const entryPath = join(path, name);
-    if (entry.isFile()) {
-      if (name === "bun" || name === "bun.exe") {
-        return entryPath;
-      }
-      if (/^bun.*\.zip/.test(name)) {
-        const extractedPath = await extractZip(entryPath);
-        return extractBun(extractedPath);
-      }
-    }
-    if (/^bun/.test(name) && entry.isDirectory()) {
-      return extractBun(entryPath);
-    }
-  }
-  throw new Error("Could not find executable: bun");
-}
-
-async function getRevision(exe: string): Promise<string | undefined> {
-  const revision = await getExecOutput(exe, ["--revision"], {
-    ignoreReturnCode: true,
-  });
-  if (revision.exitCode === 0 && /^\d+\.\d+\.\d+/.test(revision.stdout)) {
-    return revision.stdout.trim();
-  }
-  const version = await getExecOutput(exe, ["--version"], {
-    ignoreReturnCode: true,
-  });
-  if (version.exitCode === 0 && /^\d+\.\d+\.\d+/.test(version.stdout)) {
-    return version.stdout.trim();
-  }
-  return undefined;
 }

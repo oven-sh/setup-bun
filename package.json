@@ -17,29 +17,40 @@
   "license": "MIT",
   "author": "xHyroM",
   "scripts": {
-    "format": "prettier --write src *.yml *.json *.md",
-    "build": "esbuild --target=node24 --outfile=dist/setup/index.js --bundle --keep-names --minify --platform=node --format=cjs src/index.ts && esbuild --target=node24 --outfile=dist/cache-save/index.js --bundle --keep-names --minify --platform=node --format=cjs src/cache-save.ts",
+    "postinstall": "npx -- patch-package",
+    "bun_as:npm": "printf >| dist/npm -- '%s\\n' '#!/usr/bin/env sh' '' 'exec bunx --bun -- npm \"$@\"' && chmod a+rx dist/npm",
+    "bun_as:npx": "printf >| dist/npx -- '%s\\n' '#!/usr/bin/env sh' '' 'exec bunx --bun --package=npm -- \"npx\" \"$@\"' && chmod a+rx dist/npx",
+    "format": "npx -- prettier --write src *.yml *.json *.md",
+    "modules:clean": "npm ci --no-fund",
+    "modules:lock:npm": "npm install --no-fund --ignore-scripts --package-lock-only",
+    "modules:lock:bun": "rm -f bun.lock; bun install --lockfile-only",
+    "modules:lock": "npm run modules:lock:npm && npm run modules:lock:bun",
+    "modules": "npm run modules:lock:npm && npm run modules:clean",
+    "build:cache-save": "npx -- esbuild --target=node24 --outfile=dist/cache-save/index.js --bundle --keep-names --minify --platform=node --format=cjs src/cache-save.ts",
+    "build:setup": "npx -- esbuild --target=node24 --outfile=dist/setup/index.js --bundle --keep-names --minify --platform=node --format=cjs --banner:js=\"var import_meta_url = require('url').pathToFileURL(__filename).href;\" --define:import.meta.url=import_meta_url src/index.ts",
+    "build:tests": "npx -- esbuild --bundle --platform=node --format=esm --target=node24 --outfile=tests/build/tests.mjs --external:node:* --packages=external tests/bundled.suite.ts",
+    "build": "npm run build:cache-save && npm run build:setup",
+    "tests:bundle": "npm run build:tests && node --test tests/build/tests.mjs",
     "start": "npm run build && node dist/setup/index.js"
   },
   "dependencies": {
-    "@actions/cache": "^5.0.5",
-    "@actions/core": "^2.0.3",
+    "@actions/cache": "^5.0.0",
+    "@actions/core": "^2.0.0",
     "@actions/exec": "^2.0.0",
     "@actions/glob": "^0.5.0",
     "@actions/io": "^2.0.0",
     "@actions/tool-cache": "^3.0.0",
-    "@iarna/toml": "^2.2.5",
-    "compare-versions": "^6.1.1"
+    "@iarna/toml": "^2.0.0",
+    "compare-versions": "6.1.1",
+    "openpgp": "^6.0.0"
   },
   "devDependencies": {
-    "@types/bun": "^1.3.10",
+    "@types/bun": "^1.0.0",
     "@types/node": "^24.0.0",
-    "esbuild": "^0.19.12",
-    "prettier": "^3.8.1",
-    "typescript": "^4.9.5"
-  },
-  "patchedDependencies": {
-    "compare-versions@6.1.1": "patches/compare-versions@6.1.1.patch"
+    "esbuild": "^0.27.0",
+    "patch-package": "^8.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
   },
   "overrides": {
     "form-data": "^4.0.4"

@@ -1,6 +1,7 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { info } from "@actions/core";
 import { parse, stringify } from "@iarna/toml";
+import { atomicWriteFileSync } from "./atomic-write";
 import { Registry } from "./registry";
 
 type BunfigConfig = {
@@ -77,5 +78,5 @@ export function writeBunfig(path: string, registries: Registry[]): void {
     delete config.install.scopes;
   }
 
-  writeFileSync(path, stringify(config), { encoding: "utf8" });
+  atomicWriteFileSync(path, stringify(config), { mode: 0o600 });
 }
