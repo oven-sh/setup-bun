@@ -1,9 +1,12 @@
 import { renameSync, rmSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
+
 import { debug, error, info, warning } from "@actions/core";
 import type { AnnotationProperties } from "@actions/core";
 import { downloadTool, extractZip } from "@actions/tool-cache";
-import { addExtension, extractBun, getCacheKey } from "./utils";
+
+import { extractBun } from "./extract-bun";
+import { addExtension, getCacheKey } from "./utils";
 import { verifyAsset } from "./verify";
 
 // This type covers info, debug, notice, warning, and error

@@ -1,16 +1,10 @@
 import { info } from "node:console";
 import { createHash } from "node:crypto";
-import {
-  copyFileSync,
-  existsSync,
-  readdirSync,
-  readFileSync,
-  renameSync,
-} from "node:fs";
-import { join, resolve, basename } from "node:path";
+import { copyFileSync, existsSync, readFileSync, renameSync } from "node:fs";
+import { resolve, basename } from "node:path";
+
 import { debug, warning } from "@actions/core";
 import { getExecOutput } from "@actions/exec";
-import { extractZip } from "@actions/tool-cache";
 import { compareVersions, validate } from "compare-versions";
 
 import { getStoredResponse, setStoredResponse } from "./response-storage";
@@ -248,26 +242,6 @@ export function isVersionMatch(
   return (
     normalizeVersion(existingVersion) === normalizeVersion(requestedVersion)
   );
-}
-
-export async function extractBun(path: string): Promise<string> {
-  for (const entry of readdirSync(path, { withFileTypes: true })) {
-    const { name } = entry;
-    const entryPath = join(path, name);
-    if (entry.isFile()) {
-      if ("bun" === name || "bun.exe" === name) {
-        return entryPath;
-      }
-      if (/^bun.*\.zip/.test(name)) {
-        const extractedPath = await extractZip(entryPath);
-        return extractBun(extractedPath);
-      }
-    }
-    if (/^bun/.test(name) && entry.isDirectory()) {
-      return extractBun(entryPath);
-    }
-  }
-  throw new Error("Could not find executable: bun");
 }
 
 export async function getRevision(exe: string): Promise<string | undefined> {
