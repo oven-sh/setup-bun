@@ -287,24 +287,35 @@ jobs:
             https://registry.npmjs.org
             @types:https://registry.yarnpkg.com
 
-      - name: ▶️ Install from default registry
-        run: |
-          output=$(bun add is-odd --verbose --force 2>&1)
+      - name: 🔎 Display registry configurations
+        run: cat -v bunfig.toml
 
-          if echo "$output" | grep -q "HTTP/1.1 GET https://registry.npmjs.org/is-odd"; then
+      - name: ▶️ Install from default registry
+        shell: bash
+        run: |
+          status=0
+          output=$(bun add is-odd --verbose --force 2>&1) || status=$?
+
+          if [ 0 -eq "${status}" ] && grep <<<"$output" -q "HTTP/1.1 GET https://registry.npmjs.org/is-odd"; then
             echo "Successfully installed from default registry"
           else
+            echo "${output}"
+        echo "Return code: ${status}"
             echo "Failed to install from default registry"
             exit 1
           fi
 
       - name: ▶️ Install from @types registry
+        shell: bash
         run: |
-          output=$(bun add @types/bun --verbose --force 2>&1)
+          status=0
+          output=$(bun add @types/bun --verbose --force 2>&1) || status=$?
 
-          if echo "$output" | grep -q "HTTP/1.1 GET https://registry.yarnpkg.com/@types%2fbun"; then
+          if [ 0 -eq "${status}" ] && grep <<<"$output" -q "HTTP/1.1 GET https://registry.yarnpkg.com/@types%2fbun"; then
             echo "Successfully installed from @types registry"
           else
+            echo "${output}"
+            echo "Return code: ${status}"
             echo "Failed to install from @types registry"
             exit 1
           fi
