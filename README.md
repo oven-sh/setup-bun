@@ -76,6 +76,20 @@ If you need to override the download URL, you can use the `bun-download-url` inp
     bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip"
 ```
 
+### Behind a Proxy
+
+If you are running this behind a proxy make sure your `HTTPS_PROXY` or `https_proxy` or `HTTP_PROXY` or `http_proxy` are setup correctly.
+Then run the this action with the `NODE_USE_ENV_PROXY=1` environment variable set.
+
+Examples:
+
+```yaml
+- uses: oven-sh/setup-bun@v2
+  env:
+    HTTPS_PROXY: "http://your-proxy-url:8080"
+    NODE_USE_ENV_PROXY: "1"
+```
+
 ## Inputs
 
 | Name               | Description                                                                       | Default                                  | Examples                                         |
