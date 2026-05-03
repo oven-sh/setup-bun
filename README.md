@@ -78,8 +78,8 @@ If you need to override the download URL, you can use the `bun-download-url` inp
 
 ### Behind a Proxy
 
-If you are running this behind a proxy make sure your `HTTPS_PROXY` or `https_proxy` or `HTTP_PROXY` or `http_proxy` are setup correctly.
-Then run the this action with the `NODE_USE_ENV_PROXY=1` environment variable set.
+If you are running this behind a proxy make sure your `HTTPS_PROXY` or `https_proxy` or `HTTP_PROXY` or `http_proxy` are set up correctly.
+Then run this action with the `NODE_USE_ENV_PROXY=1` environment variable set.
 
 Examples:
 
