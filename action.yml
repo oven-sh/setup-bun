@@ -17,6 +17,9 @@ inputs:
   bun-download-url:
     description: Override the URL to download Bun from. This skips version resolution and verifying AVX2 support.
     required: false
+  checksum:
+    description: Expected SHA256 checksum of the downloaded Bun archive.
+    required: false
   registries:
     description: |
       List of package registries with authentication support. Format:

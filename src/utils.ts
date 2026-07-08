@@ -12,6 +12,26 @@ export function getCacheKey(url: string): string {
   return `bun-${createHash("sha1").update(url).digest("base64")}`;
 }
 
+export function verifyChecksum(path: string, expectedChecksum?: string): void {
+  if (!expectedChecksum) {
+    return;
+  }
+
+  const normalizedExpected = expectedChecksum.trim().toLowerCase();
+  if (!/^[a-f0-9]{64}$/.test(normalizedExpected)) {
+    throw new Error("The checksum input must be a SHA256 hex digest.");
+  }
+
+  const actualChecksum = createHash("sha256")
+    .update(readFileSync(path))
+    .digest("hex");
+  if (actualChecksum !== normalizedExpected) {
+    throw new Error(
+      `Downloaded Bun archive checksum mismatch. Expected ${normalizedExpected}, got ${actualChecksum}.`,
+    );
+  }
+}
+
 export function extractVersionFromUrl(url: string): string | undefined {
   const match = url.match(/\/bun-v([^/]+)\//);
   return match?.[1];

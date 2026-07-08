@@ -15,7 +15,12 @@ import { getExecOutput } from "@actions/exec";
 import { Registry } from "./registry";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { addExtension, extractVersionFromUrl, getCacheKey } from "./utils";
+import {
+  addExtension,
+  extractVersionFromUrl,
+  getCacheKey,
+  verifyChecksum,
+} from "./utils";
 import { getDownloadUrl } from "./download-url";
 import { cwd } from "node:process";
 
@@ -29,6 +34,7 @@ export type Input = {
   registries?: Registry[];
   noCache?: boolean;
   token?: string;
+  checksum?: string;
 };
 
 export type Output = {
@@ -121,7 +127,7 @@ export default async (options: Input): Promise<Output> => {
 
     if (!cacheHit) {
       info(`Downloading a new version of Bun: ${url}`);
-      revision = await downloadBun(url, bunPath);
+      revision = await downloadBun(url, bunPath, options.checksum);
     }
   }
 
@@ -177,9 +183,11 @@ function isVersionMatch(
 async function downloadBun(
   url: string,
   bunPath: string,
+  checksum?: string,
 ): Promise<string | undefined> {
   // Workaround for https://github.com/oven-sh/setup-bun/issues/79 and https://github.com/actions/toolkit/issues/1179
   const zipPath = addExtension(await downloadTool(url), ".zip");
+  verifyChecksum(zipPath, checksum);
   const extractedZipPath = await extractZip(zipPath);
   const extractedBunPath = await extractBun(extractedZipPath);
   try {
