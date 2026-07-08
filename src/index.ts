@@ -32,6 +32,7 @@ runAction({
   registries: registries,
   noCache: getBooleanInput("no-cache") || false,
   token: getInput("token"),
+  checksum: getInput("checksum") || undefined,
 })
   .then(({ version, revision, bunPath, url, cacheHit }) => {
     setOutput("bun-version", version);
