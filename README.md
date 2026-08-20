@@ -81,7 +81,7 @@ If you need to override the download URL, you can use the `bun-download-url` inp
 | Name               | Description                                                                       | Default                                  | Examples                                         |
 | ------------------ | --------------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------ |
 | `bun-version`      | The version of Bun to download and install.                                       | Version from `package.json`, or `latest` | `canary`, `1.0.0`, `1.0.x`                       |
-| `bun-version-file` | The version of Bun to download and install from file.                             | `undefined`                              | `package.json`, `.bun-version`, `.tool-versions` |
+| `bun-version-file` | The version of Bun to download and install from file.                             | `undefined`                              | `package.json`, `.bun-version`, `.tool-versions`, `mise.toml`, `.mise.toml` |
 | `bun-download-url` | URL to download .zip file for Bun release                                         |                                          |                                                  |
 | `registry-url`     | Registry URL where some private package is stored.                                | `undefined`                              | `"https://npm.pkg.github.com/"`                  |
 | `scope`            | Scope for private packages.                                                       | `undefined`                              | `"@foo"`, `"@orgname"`                           |

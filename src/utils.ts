@@ -1,4 +1,5 @@
 import { debug, warning } from "@actions/core";
+import { parse as parseTOML } from "@iarna/toml";
 import { info } from "node:console";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, renameSync } from "node:fs";
@@ -118,6 +119,15 @@ export function getAvx2(
   return avx2 ?? true;
 }
 
+const readMiseToml = (content: string) => {
+  const toml = parseTOML(content);
+  const tools = toml.tools as Record<string, unknown> | undefined;
+  if (!tools) return;
+  const bun = tools.bun;
+  if (typeof bun === "string") return bun;
+  if (Array.isArray(bun) && typeof bun[0] === "string") return bun[0];
+};
+
 const FILE_VERSION_READERS = {
   "package.json": (content: string) => {
     const pkg = JSON.parse(content);
@@ -127,6 +137,8 @@ const FILE_VERSION_READERS = {
     content.match(/^bun\s*(?<version>.*?)$/m)?.groups?.version,
   ".bumrc": (content: string) => content, // https://github.com/owenizedd/bum
   ".bun-version": (content: string) => content,
+  "mise.toml": readMiseToml,
+  ".mise.toml": readMiseToml,
 };
 
 export function readVersionFromFile(
