@@ -17,6 +17,36 @@ export function extractVersionFromUrl(url: string): string | undefined {
   return match?.[1];
 }
 
+export function isVersionMatch(
+  existingRevision: string | undefined,
+  requestedVersion?: string,
+  resolvedVersion?: string,
+): boolean {
+  if (!existingRevision) {
+    return false;
+  }
+
+  const [existingVersion] = existingRevision.split("+");
+  const normalizeVersion = (version: string) => version.replace(/^v/i, "");
+
+  // If no version is specified, compare against the resolved latest version.
+  if (!requestedVersion) {
+    return (
+      !!resolvedVersion &&
+      normalizeVersion(existingVersion) === normalizeVersion(resolvedVersion)
+    );
+  }
+
+  // Non-pinned versions should never match existing installations
+  if (/^(latest|canary|action)$/i.test(requestedVersion)) {
+    return false;
+  }
+
+  return (
+    normalizeVersion(existingVersion) === normalizeVersion(requestedVersion)
+  );
+}
+
 export async function request(
   url: string,
   init?: RequestInit,
