@@ -142,6 +142,18 @@ describe("getDownloadUrl", () => {
       ).rejects.toThrow("No Bun release found matching version '^2.0.0'");
       expect(requestSpy).toHaveBeenCalledTimes(1);
     });
+
+    it("should fail safely when latest version lookup fails", async () => {
+      requestSpy.mockRejectedValueOnce(new Error("network unavailable"));
+
+      expect(
+        getDownloadUrl({
+          version: "latest",
+          os: "linux",
+          arch: "x64",
+        }),
+      ).rejects.toThrow("network unavailable");
+    });
   });
 
   describe("Windows ARM64", () => {

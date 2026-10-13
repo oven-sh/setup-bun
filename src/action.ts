@@ -15,7 +15,12 @@ import { getExecOutput } from "@actions/exec";
 import { Registry } from "./registry";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { addExtension, extractVersionFromUrl, getCacheKey } from "./utils";
+import {
+  addExtension,
+  extractVersionFromUrl,
+  getCacheKey,
+  isVersionMatch,
+} from "./utils";
 import { getDownloadUrl } from "./download-url";
 import { cwd } from "node:process";
 
@@ -79,11 +84,20 @@ export default async (options: Input): Promise<Output> => {
 
   // Check if Bun executable already exists and matches requested version
   if (!options.customUrl && existsSync(bunPath)) {
-    const existingRevision = await getRevision(bunPath);
-    if (existingRevision && isVersionMatch(existingRevision, options.version)) {
-      revision = existingRevision;
-      cacheHit = true; // Treat as cache hit to avoid unnecessary network requests
-      info(`Using existing Bun installation: ${revision}`);
+    try {
+      const existingRevision = await getRevision(bunPath);
+      const resolvedVersion = extractVersionFromUrl(url);
+      if (
+        existingRevision &&
+        isVersionMatch(existingRevision, options.version, resolvedVersion)
+      ) {
+        revision = existingRevision;
+        cacheHit = true; // Treat as cache hit to avoid unnecessary network requests
+        info(`Using existing Bun installation: ${revision}`);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      info(`Existing Bun installation is invalid: ${message}`);
     }
   }
 
@@ -150,29 +164,6 @@ export default async (options: Input): Promise<Output> => {
     cacheHit,
   };
 };
-
-function isVersionMatch(
-  existingRevision: string,
-  requestedVersion?: string,
-): boolean {
-  // If no version specified, default is "latest" - don't match existing
-  if (!requestedVersion) {
-    return false;
-  }
-
-  // Non-pinned versions should never match existing installations
-  if (/^(latest|canary|action)$/i.test(requestedVersion)) {
-    return false;
-  }
-
-  const [existingVersion] = existingRevision.split("+");
-
-  const normalizeVersion = (v: string) => v.replace(/^v/i, "");
-
-  return (
-    normalizeVersion(existingVersion) === normalizeVersion(requestedVersion)
-  );
-}
 
 async function downloadBun(
   url: string,
