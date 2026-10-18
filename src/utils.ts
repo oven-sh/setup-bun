@@ -121,7 +121,10 @@ export function getAvx2(
 const FILE_VERSION_READERS = {
   "package.json": (content: string) => {
     const pkg = JSON.parse(content);
-    return pkg.packageManager?.split("bun@")?.[1] ?? pkg.engines?.bun;
+    // Corepack allows a hash after the version, e.g. "bun@1.1.0+sha512.abc"
+    return (
+      pkg.packageManager?.split("bun@")?.[1]?.split("+")[0] ?? pkg.engines?.bun
+    );
   },
   ".tool-versions": (content: string) =>
     content.match(/^bun\s*(?<version>.*?)$/m)?.groups?.version,

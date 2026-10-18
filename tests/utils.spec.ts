@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it, spyOn } from "bun:test";
-import { extractVersionFromUrl, getArchitecture, getAvx2, hasNativeWindowsArm64 } from "../src/utils";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { extractVersionFromUrl, getArchitecture, getAvx2, hasNativeWindowsArm64, readVersionFromFile } from "../src/utils";
 import * as core from "@actions/core";
 
 describe("extractVersionFromUrl", () => {
@@ -193,5 +196,39 @@ describe("getAvx2", () => {
     expect(getAvx2("linux", "aarch64")).toBe(true);
     expect(getAvx2("darwin", "arm64")).toBe(true);
     expect(getAvx2("darwin", "aarch64")).toBe(true);
+  });
+});
+
+describe("readVersionFromFile", () => {
+  const originalWorkspace = process.env.GITHUB_WORKSPACE;
+  let workspace: string;
+
+  const writePackageJson = (pkg: object) => {
+    workspace = mkdtempSync(join(tmpdir(), "setup-bun-"));
+    process.env.GITHUB_WORKSPACE = workspace;
+    writeFileSync(join(workspace, "package.json"), JSON.stringify(pkg));
+  };
+
+  afterEach(() => {
+    process.env.GITHUB_WORKSPACE = originalWorkspace;
+    rmSync(workspace, { recursive: true, force: true });
+  });
+
+  it("should read the version from packageManager", () => {
+    writePackageJson({ packageManager: "bun@1.1.0" });
+    expect(readVersionFromFile("package.json")).toBe("1.1.0");
+  });
+
+  it("should strip the corepack hash from packageManager", () => {
+    writePackageJson({
+      packageManager:
+        "bun@1.1.0+sha512.3f3b7c1e2d4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c",
+    });
+    expect(readVersionFromFile("package.json")).toBe("1.1.0");
+  });
+
+  it("should fall back to engines.bun", () => {
+    writePackageJson({ engines: { bun: "^1.1.0" } });
+    expect(readVersionFromFile("package.json")).toBe("^1.1.0");
   });
 });
