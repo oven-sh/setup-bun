@@ -118,10 +118,29 @@ export function getAvx2(
   return avx2 ?? true;
 }
 
+type DevEngine = { name: string; version?: string };
+
+function readDevEngineVersion(
+  engine: DevEngine | DevEngine[] | undefined,
+): string | undefined {
+  const engines = Array.isArray(engine) ? engine : [engine];
+  return engines.find(
+    (entry) =>
+      entry?.name === "bun" &&
+      typeof entry.version === "string" &&
+      entry.version.trim(),
+  )?.version;
+}
+
 const FILE_VERSION_READERS = {
   "package.json": (content: string) => {
     const pkg = JSON.parse(content);
-    return pkg.packageManager?.split("bun@")?.[1] ?? pkg.engines?.bun;
+    return (
+      pkg.packageManager?.split("bun@")?.[1] ??
+      pkg.engines?.bun ??
+      readDevEngineVersion(pkg.devEngines?.runtime) ??
+      readDevEngineVersion(pkg.devEngines?.packageManager)
+    );
   },
   ".tool-versions": (content: string) =>
     content.match(/^bun\s*(?<version>.*?)$/m)?.groups?.version,

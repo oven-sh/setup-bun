@@ -127,6 +127,16 @@ jobs:
             run: |
               echo "$(jq '.engines = {"bun": "1.1.0"}' package.json)" > package.json
 
+          - name: package.json (devEngines.runtime bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '.devEngines = {"runtime": {"name": "bun", "version": "1.1.0"}}' package.json)" > package.json
+
+          - name: package.json (devEngines.packageManager bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '.devEngines = {"packageManager": {"name": "bun", "version": "1.1.0"}}' package.json)" > package.json
+
           - name: .tool-versions (bun 1.1.0)
             file: .tool-versions
             run: echo "bun 1.1.0" > .tool-versions
@@ -193,6 +203,16 @@ jobs:
             file: package.json
             run: |
               echo "$(jq '.engines = {"bun": "1.1.0"}' package.json)" > package.json
+
+          - name: package.json (devEngines.runtime bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '.devEngines = {"runtime": {"name": "bun", "version": "1.1.0"}}' package.json)" > package.json
+
+          - name: package.json (devEngines.packageManager bun@1.1.0)
+            file: package.json
+            run: |
+              echo "$(jq '.devEngines = {"packageManager": {"name": "bun", "version": "1.1.0"}}' package.json)" > package.json
 
     steps:
       - name: 📥 Checkout
