@@ -12,7 +12,22 @@ By default, if no version is specified, the action will:
 
 1. Check `package.json` for the `packageManager` field (e.g., `"packageManager": "bun@1.0.25"`)
 2. If `packageManager` doesn't exist, check `package.json` for `engines.bun`
-3. If neither exists or `package.json` is not found, use `latest`
+3. Check `devEngines.runtime` for an entry with `"name": "bun"` and a `version`
+4. Check `devEngines.packageManager` for an entry with `"name": "bun"` and a `version`
+5. If none specifies a Bun version or `package.json` is not found, use `latest`
+
+Both `devEngines` fields support an object or an array of objects. The first Bun entry with a non-empty version is used. For example:
+
+```json
+{
+  "devEngines": {
+    "runtime": {
+      "name": "bun",
+      "version": "^1.4.0"
+    }
+  }
+}
+```
 
 You can also explicitly specify a version:
 
