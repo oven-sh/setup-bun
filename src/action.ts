@@ -9,13 +9,14 @@ import {
   existsSync,
 } from "node:fs";
 import { addPath, info, warning } from "@actions/core";
-import { isFeatureAvailable, restoreCache } from "@actions/cache";
+import { restoreCache } from "@actions/cache";
 import { downloadTool, extractZip } from "@actions/tool-cache";
 import { getExecOutput } from "@actions/exec";
 import { Registry } from "./registry";
 import { writeBunfig } from "./bunfig";
 import { saveState } from "@actions/core";
-import { addExtension, extractVersionFromUrl, getCacheKey } from "./utils";
+import { addExtension, extractVersionFromUrl } from "./utils";
+import { getCacheSettings } from "./cache";
 import { getDownloadUrl } from "./download-url";
 import { cwd } from "node:process";
 
@@ -28,6 +29,7 @@ export type Input = {
   profile?: boolean;
   registries?: Registry[];
   noCache?: boolean;
+  cacheKeyPrefix?: string;
   token?: string;
 };
 
@@ -42,6 +44,7 @@ export type Output = {
 export type CacheState = {
   cacheEnabled: boolean;
   cacheHit: boolean;
+  cacheKey: string;
   bunPath: string;
   url: string;
 };
@@ -51,7 +54,7 @@ export default async (options: Input): Promise<Output> => {
   writeBunfig(bunfigPath, options.registries);
 
   const url = await getDownloadUrl(options);
-  const cacheEnabled = isCacheEnabled(options);
+  const { cacheEnabled, cacheKey } = getCacheSettings(options, url);
 
   const binPath = join(homedir(), ".bun", "bin");
   try {
@@ -89,8 +92,6 @@ export default async (options: Input): Promise<Output> => {
 
   if (!revision) {
     if (cacheEnabled) {
-      const cacheKey = getCacheKey(url);
-
       const cacheRestored = await restoreCache([bunPath], cacheKey);
       if (cacheRestored) {
         revision = await getRevision(bunPath);
@@ -136,6 +137,7 @@ export default async (options: Input): Promise<Output> => {
   const cacheState: CacheState = {
     cacheEnabled,
     cacheHit,
+    cacheKey,
     bunPath,
     url,
   };
@@ -191,20 +193,6 @@ async function downloadBun(
   }
 
   return await getRevision(bunPath);
-}
-
-function isCacheEnabled(options: Input): boolean {
-  const { customUrl, version, noCache } = options;
-  if (noCache) {
-    return false;
-  }
-  if (customUrl) {
-    return false;
-  }
-  if (!version || /latest|canary|action/i.test(version)) {
-    return false;
-  }
-  return isFeatureAvailable();
 }
 
 async function extractBun(path: string): Promise<string> {

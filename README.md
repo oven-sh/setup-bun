@@ -76,6 +76,19 @@ If you need to override the download URL, you can use the `bun-download-url` inp
     bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip"
 ```
 
+### Cache key prefix
+
+The downloaded executable is cached under a key derived from a hash of its download URL (e.g. `bun-vyrKTwhw5PEh6pGRz1Zgyle11uQ=`). To give the cache a readable name, set `cache-key-prefix`. The Bun version, platform and URL hash are appended, so upgrading Bun still creates a new cache entry. The prefix cannot contain commas, and the full key is limited to 512 characters.
+
+The executable is not cached when `no-cache` is `true`, `bun-download-url` is set, the version is `latest`, `canary` or unset, or the runner has no cache service. `cache-key-prefix` then has no effect, and the step logs a warning saying why.
+
+```yaml
+- uses: oven-sh/setup-bun@v2
+  with:
+    bun-version: 1.4.4
+    cache-key-prefix: bun-bin # e.g. on linux-x64: bun-bin-1.4.4-linux-x64-vyrKTwhw5PEh6pGRz1Zgyle11uQ=
+```
+
 ## Inputs
 
 | Name               | Description                                                                       | Default                                  | Examples                                         |
@@ -86,6 +99,7 @@ If you need to override the download URL, you can use the `bun-download-url` inp
 | `registry-url`     | Registry URL where some private package is stored.                                | `undefined`                              | `"https://npm.pkg.github.com/"`                  |
 | `scope`            | Scope for private packages.                                                       | `undefined`                              | `"@foo"`, `"@orgname"`                           |
 | `no-cache`         | Disable caching of the downloaded executable.                                     | `false`                                  | `true`, `false`                                  |
+| `cache-key-prefix` | Cache key prefix; the version, platform and hash follow. Unset: `bun-<hash>`.     | `undefined`                              | `bun-bin`                                        |
 | `token`            | Personal access token (PAT) used to fetch tags from the `oven-sh/bun` repository. | `${{ github.token }}`                    | `${{ secrets.GITHUB_TOKEN }}`                    |
 
 ## Outputs

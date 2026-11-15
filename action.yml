@@ -39,6 +39,9 @@ inputs:
     type: boolean
     default: false
     description: Disable caching of bun executable.
+  cache-key-prefix:
+    required: false
+    description: Prefix for the bun executable cache key. The Bun version, platform and download URL hash are appended (e.g. "<prefix>-1.0.0-linux-x64-<hash>"). When unset, the key is "bun-<hash>".
   token:
     required: false
     default: ${{ github.server_url == 'https://github.com' && github.token || '' }}

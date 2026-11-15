@@ -18,8 +18,9 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      # This run's ref, except entries the cleanup job deletes
       - name: 🗑️ Remove cache
-        run: gh cache delete --all || true
+        run: gh cache list --ref "$GITHUB_REF" --limit 1000 --json id,key --jq '.[] | select(.key | startswith("setup-bun-test-") | not) | .id' | xargs -r -n1 gh cache delete || true
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -282,3 +283,70 @@ jobs:
             echo "Failed to install from @types registry"
             exit 1
           fi
+
+  # Per-run prefix, so only this run's entry can match
+  save-cache-key-prefix:
+    name: save cache with key prefix
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: [remove-cache, tests]
+    permissions:
+      contents: read
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: 🛠️ Setup Bun
+        uses: ./
+        with:
+          bun-version: "1.1.0"
+          cache-key-prefix: setup-bun-test-${{ github.run_id }}
+
+  restore-cache-key-prefix:
+    name: restore cache with key prefix
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: [save-cache-key-prefix]
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: 🛠️ Setup Bun
+        uses: ./
+        id: setup_bun
+        with:
+          bun-version: "1.1.0"
+          cache-key-prefix: setup-bun-test-${{ github.run_id }}
+
+      - name: ⚖️ Verify cache hit
+        env:
+          CACHE_HIT: ${{ steps.setup_bun.outputs.cache-hit }}
+        run: test "$CACHE_HIT" = true
+
+      - name: 🔑 Verify cache key
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEY: setup-bun-test-${{ github.run_id }}-1.1.0-linux-x64
+        run: test "$(gh cache list --key "$KEY" --json key --jq length)" -ge 1
+
+  # Own job, as setup-bun's post step saves after other steps
+  cleanup-cache-key-prefix:
+    name: delete cache with key prefix
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [save-cache-key-prefix, restore-cache-key-prefix]
+    permissions:
+      actions: write
+
+    steps:
+      - name: 🗑️ Delete test cache
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          KEY: setup-bun-test-${{ github.run_id }}-
+        run: gh cache list --ref "$GITHUB_REF" --key "$KEY" --json id --jq '.[].id' | xargs -r -n1 gh cache delete || true
