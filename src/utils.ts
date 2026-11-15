@@ -1,16 +1,11 @@
 import { debug, warning } from "@actions/core";
 import { info } from "node:console";
-import { createHash } from "node:crypto";
 import { existsSync, readFileSync, renameSync } from "node:fs";
 import { resolve, basename } from "node:path";
 import { compareVersions, validate } from "compare-versions";
 
 // First Bun version that ships native Windows ARM64 binaries.
 const WINDOWS_ARM64_MIN_VERSION = "1.3.10";
-
-export function getCacheKey(url: string): string {
-  return `bun-${createHash("sha1").update(url).digest("base64")}`;
-}
 
 export function extractVersionFromUrl(url: string): string | undefined {
   const match = url.match(/\/bun-v([^/]+)\//);
